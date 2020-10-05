@@ -1,7 +1,8 @@
-#include "mainwindow.h"
-#include "robot.h"
-#include "plot2d.h"
-#include "GLwidget.h"
+#include <mainwindow.h>
+#include <robot.h>
+#include <plot2d.h>
+#include <GLwidget.h>
+#include <robotmove.h>
 
 #include <QThread>
 #include <QSettings>
@@ -94,22 +95,13 @@ MainWindow::onStartStopPushed() {
     pMovingThread = new QThread();
     connect(pMovingThread, SIGNAL(finished()),
             this, SLOT(onMoveThreadDone()));
+    pRobotMove = new RobotMove(pRobot, this);
+    pRobotMove->moveToThread(pMovingThread);
+    connect(this, SIGNAL(startMove()),
+            pRobotMove, SLOT(startMoving()));
+    pMovingThread->start();
 
     //pFirst = new std::thread(go, pRobot);
-
-/*
-    // And the Spot Update Server
-    QString spotUpdateServer;
-    spotUpdateServer= QString("ws://%1:%2").arg(pPanelServerSocket->peerAddress().toString()).arg(spotUpdatePort);
-    pSpotUpdater = new FileUpdater(QString("SpotUpdater"), spotUpdateServer, logFile);
-    pSpotUpdater->moveToThread(pSpotUpdaterThread);
-    connect(this, SIGNAL(updateSpots()),
-            pSpotUpdater, SLOT(startUpdate()));
-    pSpotUpdaterThread->start();
-    pSpotUpdater->setDestination(sSpotDir, QString("*.mp4 *.MP4"));
-
-    emit updateSpots();
-*/
 }
 
 

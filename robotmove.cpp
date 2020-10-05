@@ -6,3 +6,9 @@ RobotMove::RobotMove(Robot* pRobot, QObject *parent)
 {
 
 }
+
+
+void
+RobotMove::startMove() {
+
+}

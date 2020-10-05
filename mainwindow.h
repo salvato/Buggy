@@ -10,6 +10,7 @@ QT_FORWARD_DECLARE_CLASS(GLWidget)
 QT_FORWARD_DECLARE_CLASS(Plot2D)
 QT_FORWARD_DECLARE_CLASS(QPushButton)
 QT_FORWARD_DECLARE_CLASS(QThread)
+QT_FORWARD_DECLARE_CLASS(RobotMove)
 
 
 class MainWindow : public QWidget
@@ -21,6 +22,7 @@ public:
     ~MainWindow();
 
 signals:
+    void startMove();
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -45,6 +47,7 @@ private:
     Robot*       pRobot;
     QPushButton* pButtonStartStop;
     QThread*     pMovingThread;
+    RobotMove*   pRobotMove;
 
     QTimer       loopTimer;
 
