@@ -3,13 +3,13 @@
 #include <QWidget>
 #include <QTimer>
 #include <pigpiod_if2.h>
-#include <thread> // std::thread
 
 
 QT_FORWARD_DECLARE_CLASS(Robot)
 QT_FORWARD_DECLARE_CLASS(GLWidget)
 QT_FORWARD_DECLARE_CLASS(Plot2D)
 QT_FORWARD_DECLARE_CLASS(QPushButton)
+QT_FORWARD_DECLARE_CLASS(QThread)
 
 
 class MainWindow : public QWidget
@@ -21,7 +21,6 @@ public:
     ~MainWindow();
 
 signals:
-    void pathDone();
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -45,11 +44,10 @@ private:
     Plot2D*      pPlotVal;
     Robot*       pRobot;
     QPushButton* pButtonStartStop;
-    std::thread* pFirst;
-    std::thread* pSecond;
+    QThread*     pMovingThread;
 
-    QTimer    loopTimer;
+    QTimer       loopTimer;
 
-    int gpioHostHandle;
+    int   gpioHostHandle;
     float q0, q1, q2, q3;
 };

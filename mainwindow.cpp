@@ -75,7 +75,7 @@ MainWindow::initGpio() {
 
 void
 MainWindow::go(Robot* pRobot) {
-    double speed = 0.3;
+    double speed = 1.0;
     for(int i=0; i<3; i++) {
         pRobot->forward(speed);
         QThread::sleep(3);
@@ -90,7 +90,26 @@ MainWindow::go(Robot* pRobot) {
 void
 MainWindow::onStartStopPushed() {
     pButtonStartStop->setText("Stop");
-    pFirst = new std::thread(go, pRobot);
+    // Create the Moving Thread
+    pMovingThread = new QThread();
+    connect(pMovingThread, SIGNAL(finished()),
+            this, SLOT(onMoveThreadDone()));
+
+    //pFirst = new std::thread(go, pRobot);
+
+/*
+    // And the Spot Update Server
+    QString spotUpdateServer;
+    spotUpdateServer= QString("ws://%1:%2").arg(pPanelServerSocket->peerAddress().toString()).arg(spotUpdatePort);
+    pSpotUpdater = new FileUpdater(QString("SpotUpdater"), spotUpdateServer, logFile);
+    pSpotUpdater->moveToThread(pSpotUpdaterThread);
+    connect(this, SIGNAL(updateSpots()),
+            pSpotUpdater, SLOT(startUpdate()));
+    pSpotUpdaterThread->start();
+    pSpotUpdater->setDestination(sSpotDir, QString("*.mp4 *.MP4"));
+
+    emit updateSpots();
+*/
 }
 
 
