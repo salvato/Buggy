@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 #include "robot.h"
 #include "plot2d.h"
 #include "GLwidget.h"
@@ -24,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     loopTimer.setTimerType(Qt::PreciseTimer);
     connect(&loopTimer, SIGNAL(timeout()),
             this, SLOT(onLoopTimeElapsed()));
+    loopTimer.start(100);
 }
 
 
