@@ -37,6 +37,7 @@ protected:
 private slots:
     void onLoopTimeElapsed();
     void onStartStopPushed();
+    void onMoveDone();
 
 private:
     static void go(Robot* pRobot);

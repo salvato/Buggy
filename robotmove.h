@@ -13,10 +13,13 @@ public:
     explicit RobotMove(Robot* pRobot, QObject *parent = nullptr);
 
 signals:
+    void moveDone();
 
 public slots:
     void startMove();
 
 public slots:
 
+private:
+    Robot* pRobby;
 };

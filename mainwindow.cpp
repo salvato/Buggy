@@ -99,9 +99,17 @@ MainWindow::onStartStopPushed() {
     pRobotMove->moveToThread(pMovingThread);
     connect(this, SIGNAL(startMove()),
             pRobotMove, SLOT(startMoving()));
+    connect(pRobotMove, SIGNAL(moveDone()),
+            this, SLOT(onMoveDone()));
     pMovingThread->start();
 
     //pFirst = new std::thread(go, pRobot);
+}
+
+
+void
+MainWindow::onMoveDone() {
+    pButtonStartStop->setText("Start");
 }
 
 
