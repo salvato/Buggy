@@ -120,7 +120,7 @@ Plot2D::minimumSizeHint() const {
 
 QSize
 Plot2D::sizeHint() const {
-   return QSize(330, 330);
+   return QSize(400, 400);
 }
 
 

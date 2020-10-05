@@ -74,7 +74,7 @@ MainWindow::initGpio() {
 
 
 void
-go(Robot* pRobot) {
+MainWindow::go(Robot* pRobot) {
     double speed = 0.3;
     for(int i=0; i<3; i++) {
         pRobot->forward(speed);
@@ -89,6 +89,7 @@ go(Robot* pRobot) {
 
 void
 MainWindow::onStartStopPushed() {
+    pButtonStartStop->setText("Stop");
     pFirst = new std::thread(go, pRobot);
 }
 
@@ -103,9 +104,7 @@ MainWindow::createButtons() {
 
 
 void
-MainWindow::createPlot() {
-    pPlotVal = new Plot2D(this, "Plot");
-
+MainWindow::initPlot() {
     pPlotVal->NewDataSet(1, 1, QColor(255,   0,   0), Plot2D::ipoint, "X");
     pPlotVal->NewDataSet(2, 1, QColor(  0, 255,   0), Plot2D::ipoint, "Y");
     pPlotVal->NewDataSet(3, 1, QColor(  0,   0, 255), Plot2D::ipoint, "Z");
@@ -125,7 +124,8 @@ MainWindow::createPlot() {
 void
 MainWindow::initLayout() {
     pGLWidget = new GLWidget(this);
-    createPlot();
+    pPlotVal = new Plot2D(this, "Plot");
+    initPlot();
 
     QHBoxLayout *firstRow = new QHBoxLayout;
     firstRow->addWidget(pGLWidget);

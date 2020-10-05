@@ -55,8 +55,8 @@
 
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent)
-    , geometries(0)
-    , texture(0)
+    , geometries(nullptr)
+    , texture(nullptr)
 {
 }
 
@@ -79,7 +79,7 @@ GLWidget::minimumSizeHint() const {
 
 QSize
 GLWidget::sizeHint() const {
-  return QSize(330, 330);
+  return QSize(400, 400);
 }
 
 
@@ -140,11 +140,11 @@ GLWidget::resizeGL(int w, int h) {
     // Calculate aspect ratio
     qreal aspect = qreal(w) / qreal(h ? h : 1);
     // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-    const qreal zNear = 3.0, zFar = 7.0, fov = 45.0;
+    const qreal zNear = 3.0, zFar = 7.0, fov = 90.0;
     // Reset projection
     projection.setToIdentity();
     // Set perspective projection
-    projection.perspective(fov, aspect, zNear, zFar);
+    projection.perspective(fov, float(aspect), zNear, zFar);
 }
 
 
