@@ -17,6 +17,9 @@ MainWindow::MainWindow(QWidget *parent)
     , pGLWidget(nullptr)
     , pPlotVal(nullptr)
 {
+    pMovingThread = nullptr;
+    pRobotMove    = nullptr;
+
     restoreSettings();
     if(!initGpio())
         exit(EXIT_FAILURE);
@@ -92,18 +95,21 @@ void
 MainWindow::onStartStopPushed() {
     pButtonStartStop->setText("Stop");
     // Create the Moving Thread
-    pMovingThread = new QThread();
-    connect(pMovingThread, SIGNAL(finished()),
-            this, SLOT(onMoveThreadDone()));
-    pRobotMove = new RobotMove(pRobot, this);
-    pRobotMove->moveToThread(pMovingThread);
-    connect(this, SIGNAL(startMove()),
-            pRobotMove, SLOT(startMoving()));
-    connect(pRobotMove, SIGNAL(moveDone()),
-            this, SLOT(onMoveDone()));
+    if(!pMovingThread) {
+        pMovingThread = new QThread();
+        connect(pMovingThread, SIGNAL(finished()),
+                this, SLOT(onMoveThreadDone()));
+    }
+    if(!pRobotMove) {
+        pRobotMove = new RobotMove(pRobot);
+        pRobotMove->moveToThread(pMovingThread);
+        connect(this, SIGNAL(startMove()),
+                pRobotMove, SLOT(startMove()));
+        connect(pRobotMove, SIGNAL(moveDone()),
+                this, SLOT(onMoveDone()));
+    }
     pMovingThread->start();
-
-    //pFirst = new std::thread(go, pRobot);
+    emit startMove();
 }
 
 
@@ -176,4 +182,10 @@ MainWindow::onLoopTimeElapsed() {
     pRobot->getOrientation(&q0, &q1, &q2, &q3);
     pGLWidget->setRotation(q0, q1, q2, q3);
     pGLWidget->update();
+}
+
+
+void
+MainWindow::onMoveThreadDone() {
+
 }
