@@ -8,6 +8,7 @@
 QT_FORWARD_DECLARE_CLASS(Robot)
 QT_FORWARD_DECLARE_CLASS(GLWidget)
 QT_FORWARD_DECLARE_CLASS(Plot2D)
+QT_FORWARD_DECLARE_CLASS(QPushButton)
 
 
 class MainWindow : public QWidget
@@ -29,15 +30,16 @@ protected:
 
 private slots:
     void onLoopTimeElapsed();
-
+    void onStartStopPushed();
 
 private:
     bool initGpio();
 
 private:
-    GLWidget* pGLWidget;
-    Plot2D*   pPlotVal;
-    Robot*    pRobot;
+    GLWidget*    pGLWidget;
+    Plot2D*      pPlotVal;
+    Robot*       pRobot;
+    QPushButton* pButtonStartStop;
 
     QTimer    loopTimer;
 

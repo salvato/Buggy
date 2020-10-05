@@ -7,6 +7,7 @@
 #include <QSettings>
 #include <QLayout>
 #include <QKeyEvent>
+#include <QPushButton>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -72,7 +73,8 @@ MainWindow::initGpio() {
 }
 
 
-/*
+void
+MainWindow::onStartStopPushed() {
     double speed = 0.3;
     for(int i=0; i<3; i++) {
         pRobot->forward(speed);
@@ -85,42 +87,13 @@ MainWindow::initGpio() {
 }
 
 
-void
-MainWindow::periodicUpdateWidgets() {
-}
-*/
-
 
 void
 MainWindow::createButtons() {
-/*
-    buttonStartStop       = new QPushButton("Start",     this);
-    buttonAccCalibration  = new QPushButton("Acc. Cal.", this);
-    buttonGyroCalibration = new QPushButton("Gyro Cal.", this);
-    buttonMagCalibration  = new QPushButton("Mag. Cal.", this);
-    buttonShowPidOutput   = new QPushButton("Show PID",  this);
-    buttonHide3D          = new QPushButton("Hide3D",    this);
-
-    buttonStartStop->setEnabled(true);
-    buttonHide3D->setEnabled(true);
-    buttonAccCalibration->setEnabled(false);
-    buttonGyroCalibration->setEnabled(false);
-    buttonMagCalibration->setEnabled(false);
-    buttonShowPidOutput->setEnabled(false);
-
-    connect(buttonStartStop, SIGNAL(clicked()),
+    pButtonStartStop = new QPushButton("Start", this);
+    pButtonStartStop->setEnabled(true);
+    connect(pButtonStartStop, SIGNAL(clicked()),
             this, SLOT(onStartStopPushed()));
-    connect(buttonAccCalibration, SIGNAL(clicked()),
-            this, SLOT(onStartAccCalibration()));
-    connect(buttonGyroCalibration, SIGNAL(clicked()),
-            this, SLOT(onStartGyroCalibration()));
-    connect(buttonMagCalibration, SIGNAL(clicked()),
-            this, SLOT(onStartMagCalibration()));
-    connect(buttonShowPidOutput, SIGNAL(clicked(bool)),
-            this, SLOT(onShowPidOutput()));
-    connect(buttonHide3D, SIGNAL(clicked()),
-            this, SLOT(onHide3DPushed()));
-*/
 }
 
 
@@ -157,17 +130,11 @@ MainWindow::initLayout() {
     mainLayout->addLayout(firstRow);
     setLayout(mainLayout);
 
-/*
     createButtons();
     QHBoxLayout *firstButtonRow = new QHBoxLayout;
-    firstButtonRow->addWidget(buttonStartStop);
-    firstButtonRow->addWidget(buttonHide3D);
-    firstButtonRow->addWidget(buttonAccCalibration);
-    firstButtonRow->addWidget(buttonGyroCalibration);
-    firstButtonRow->addWidget(buttonMagCalibration);
-    firstButtonRow->addWidget(buttonShowPidOutput);
+    firstButtonRow->addWidget(pButtonStartStop);
+
     mainLayout->addLayout(firstButtonRow);
-*/
 }
 
 
