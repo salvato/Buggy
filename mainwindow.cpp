@@ -13,18 +13,21 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
-    // Widgets
-    , pGLWidget(nullptr)
-    , pPlotVal(nullptr)
 {
+    pGLWidget     = nullptr;
+    pPlotVal      = nullptr;
     pMovingThread = nullptr;
     pRobotMove    = nullptr;
 
     restoreSettings();
+
     if(!initGpio())
         exit(EXIT_FAILURE);
+
     pRobot = new Robot(27, 17, 24, 23, gpioHostHandle, parent);
+
     initLayout();
+
     loopTimer.setTimerType(Qt::PreciseTimer);
     connect(&loopTimer, SIGNAL(timeout()),
             this, SLOT(onLoopTimeElapsed()));
@@ -49,7 +52,6 @@ MainWindow::closeEvent(QCloseEvent *event) {
 void
 MainWindow::restoreSettings() {
     QSettings settings;
-
     // Restore Geometry and State of the window
     restoreGeometry(settings.value("Geometry").toByteArray());
 }
@@ -58,7 +60,6 @@ MainWindow::restoreSettings() {
 void
 MainWindow::saveSettings() {
     QSettings settings;
-
     // Window Position and Size
     settings.setValue("Geometry", saveGeometry());
 }
@@ -74,20 +75,6 @@ MainWindow::initGpio() {
     if(gpioHostHandle < 0)
         return false;
     return true;
-}
-
-
-void
-MainWindow::go(Robot* pRobot) {
-    double speed = 1.0;
-    for(int i=0; i<3; i++) {
-        pRobot->forward(speed);
-        QThread::sleep(3);
-        pRobot->stop();
-        pRobot->right(speed);
-        QThread::sleep(1);
-        pRobot->stop();
-    }
 }
 
 

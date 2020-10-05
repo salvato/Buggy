@@ -21,9 +21,6 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-signals:
-    void startMove();
-
 protected:
     void closeEvent(QCloseEvent *event);
     void keyPressEvent(QKeyEvent *event);
@@ -34,14 +31,16 @@ protected:
     void initPlot();
     bool initGpio();
 
+private:
+
+signals:
+    void startMove();
+
 private slots:
     void onLoopTimeElapsed();
     void onStartStopPushed();
     void onMoveDone();
     void onMoveThreadDone();
-
-private:
-    static void go(Robot* pRobot);
 
 private:
     GLWidget*    pGLWidget;
