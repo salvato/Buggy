@@ -74,7 +74,7 @@ MainWindow::initGpio() {
 
 
 void
-MainWindow::onStartStopPushed() {
+go(Robot* pRobot) {
     double speed = 0.3;
     for(int i=0; i<3; i++) {
         pRobot->forward(speed);
@@ -86,6 +86,11 @@ MainWindow::onStartStopPushed() {
     }
 }
 
+
+void
+MainWindow::onStartStopPushed() {
+    pFirst = new std::thread(go, pRobot);
+}
 
 
 void

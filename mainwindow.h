@@ -3,6 +3,7 @@
 #include <QWidget>
 #include <QTimer>
 #include <pigpiod_if2.h>
+#include <thread> // std::thread
 
 
 QT_FORWARD_DECLARE_CLASS(Robot)
@@ -40,6 +41,8 @@ private:
     Plot2D*      pPlotVal;
     Robot*       pRobot;
     QPushButton* pButtonStartStop;
+    std::thread* pFirst;
+    std::thread* pSecond;
 
     QTimer    loopTimer;
 
