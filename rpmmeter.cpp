@@ -24,12 +24,12 @@ RPMmeter::RPMmeter(uint gpioPin, int gpioHandle, QObject *parent)
         perror("Unable to set rpm meter as input");
         exit(EXIT_FAILURE);
     }
-    userData.pMainWindow = parent;
+    ::userData.pMainWindow = parent;
     iStatus = callback_ex(gpioHostHandle,
                           inputPin,
                           EITHER_EDGE,
                           reinterpret_cast<CBFuncEx_t>(statusChanged),
-                          reinterpret_cast<void *>(&userData));
+                          reinterpret_cast<void *>(&::userData));
     if(iStatus==pigif_duplicate_callback) {
         perror("Duplicate Callback");
         exit(EXIT_FAILURE);
@@ -55,8 +55,20 @@ statusChanged(int handle,
     // currentTick is the number of microseconds since boot.
     // WARNING: this wraps around from 4294967295 to 0 roughly every 72 minutes
     Q_UNUSED(handle)
+    Q_UNUSED(level)
 
     userData = *(reinterpret_cast<callbackData*>(userdata));
-    qDebug() << user_gpio << level << currentTick;
+    userData.transitionCounter[user_gpio]++;
+    int64_t dt = currentTick-userData.tick0[user_gpio];
+    if(dt > 1000000) {
+        qDebug() << user_gpio
+                 << userData.transitionCounter[user_gpio];
+        userData.transitionCounter[user_gpio] = 0;
+        userData.tick0[user_gpio] = currentTick;
+    }
+    if(dt < 0) {
+        userData.tick0[user_gpio] = currentTick;
+        userData.transitionCounter[user_gpio] = 0;
+    }
     return nullptr;
 }

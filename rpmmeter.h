@@ -42,7 +42,6 @@ public slots:
 private:
     uint inputPin;
     int gpioHostHandle;
-    callbackData userData;
 };
 
 #endif // RPMMETER_H
