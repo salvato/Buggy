@@ -31,6 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
     initLayout();
 
     pRightSpeed = new RPMmeter(22, gpioHostHandle, nullptr);
+    pLeftSpeed  = new RPMmeter(5,  gpioHostHandle, nullptr);
+
     loopTimer.setTimerType(Qt::PreciseTimer);
     connect(&loopTimer, SIGNAL(timeout()),
             this, SLOT(onLoopTimeElapsed()));

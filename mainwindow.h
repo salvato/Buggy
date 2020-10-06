@@ -51,6 +51,7 @@ private:
     QThread*     pMoveThread;
     RobotMove*   pRobotMove;
     RPMmeter*    pRightSpeed;
+    RPMmeter*    pLeftSpeed;
 
     QTimer       loopTimer;
 

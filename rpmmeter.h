@@ -6,12 +6,12 @@
 
 
 typedef struct {
-    int transitionCounter;
-    int iHumidity;
-    int iTemperature;
-    int callBackId;
-    void* pMainWindow = Q_NULLPTR;
+    uint32_t transitionCounter[32] = {0};
+    uint32_t tick0[32] = {0};
+    uint32_t speed[32] = {0};
+    void* pMainWindow = nullptr;
 } callbackData;
+
 
 #ifdef __cplusplus
 extern "C" {
