@@ -25,16 +25,16 @@ RPMmeter::RPMmeter(uint gpioPin, int gpioHandle, QObject *parent)
                           inputPin,
                           EITHER_EDGE,
                           reinterpret_cast<CBFuncEx_t>(statusChanged),
-                          reinterpret_cast<void*>(&userData));
+                          reinterpret_cast<void *>(&userData));
 }
 
 
 CBFuncEx_t
-RPMmeter::statusChanged(int handle,
-                        unsigned user_gpio,
-                        unsigned level,
-                        uint32_t currentTick,
-                        void *userdata)
+statusChanged(int handle,
+              unsigned user_gpio,
+              unsigned level,
+              uint32_t currentTick,
+              void *userdata)
 {
     Q_UNUSED(handle)
 
