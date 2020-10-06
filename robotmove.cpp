@@ -21,5 +21,5 @@ RobotMove::startMove() {
         QThread::sleep(1);
         pRobby->stop();
     }
-    moveDone();
+    emit moveDone();
 }

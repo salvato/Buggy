@@ -11,6 +11,7 @@ QT_FORWARD_DECLARE_CLASS(Plot2D)
 QT_FORWARD_DECLARE_CLASS(QPushButton)
 QT_FORWARD_DECLARE_CLASS(QThread)
 QT_FORWARD_DECLARE_CLASS(RobotMove)
+QT_FORWARD_DECLARE_CLASS(RPMmeter)
 
 
 class MainWindow : public QWidget
@@ -47,8 +48,9 @@ private:
     Plot2D*      pPlotVal;
     Robot*       pRobot;
     QPushButton* pButtonStartStop;
-    QThread*     pMovingThread;
+    QThread*     pMoveThread;
     RobotMove*   pRobotMove;
+    RPMmeter*    pRightSpeed;
 
     QTimer       loopTimer;
 

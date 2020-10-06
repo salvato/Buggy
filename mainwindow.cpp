@@ -3,6 +3,7 @@
 #include <plot2d.h>
 #include <GLwidget.h>
 #include <robotmove.h>
+#include <rpmmeter.h>
 
 #include <QThread>
 #include <QSettings>
@@ -16,8 +17,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
     pGLWidget     = nullptr;
     pPlotVal      = nullptr;
-    pMovingThread = nullptr;
+    pMoveThread   = nullptr;
     pRobotMove    = nullptr;
+    pRightSpeed   = nullptr;
 
     restoreSettings();
 
@@ -28,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     initLayout();
 
+    pRightSpeed = new RPMmeter(22, gpioHostHandle, nullptr);
     loopTimer.setTimerType(Qt::PreciseTimer);
     connect(&loopTimer, SIGNAL(timeout()),
             this, SLOT(onLoopTimeElapsed()));
@@ -82,20 +85,20 @@ void
 MainWindow::onStartStopPushed() {
     pButtonStartStop->setText("Stop");
     // Create the Moving Thread
-    if(!pMovingThread) {
-        pMovingThread = new QThread();
-        connect(pMovingThread, SIGNAL(finished()),
+    if(!pMoveThread) {
+        pMoveThread = new QThread();
+        connect(pMoveThread, SIGNAL(finished()),
                 this, SLOT(onMoveThreadDone()));
     }
     if(!pRobotMove) {
         pRobotMove = new RobotMove(pRobot);
-        pRobotMove->moveToThread(pMovingThread);
+        pRobotMove->moveToThread(pMoveThread);
         connect(this, SIGNAL(startMove()),
                 pRobotMove, SLOT(startMove()));
         connect(pRobotMove, SIGNAL(moveDone()),
                 this, SLOT(onMoveDone()));
     }
-    pMovingThread->start();
+    pMoveThread->start();
     emit startMove();
 }
 
