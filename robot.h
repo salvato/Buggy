@@ -20,9 +20,7 @@ class Robot : public QObject
 {
     Q_OBJECT
 public:
-    explicit Robot(uint leftForwardPin, uint leftBackwardPin,
-                   uint rightForwardPin, uint rightBackwardPin,
-                   int gpioHandle, QObject *parent = nullptr);
+    explicit Robot(DcMotor*  leftMotor, DcMotor*  rightMotor, QObject *parent = nullptr);
     bool forward(double speed);
     bool backward(double speed);
     bool stop();
@@ -41,10 +39,8 @@ protected:
     __suseconds_t micros();
 
 private:
-    int gpioHostHandle;
-
-    DcMotor*  leftMotor;
-    DcMotor*  rightMotor;
+    DcMotor*  pLeftMotor;
+    DcMotor*  pRightMotor;
 
     ADXL345*  pAcc;
     ITG3200*  pGyro;

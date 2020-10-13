@@ -3,7 +3,7 @@
 
 
 static callbackData userData;
-
+#define SAMPLETIME 200000 // in us
 
 RPMmeter::RPMmeter(uint gpioPin, int gpioHandle, QObject *parent)
     : QObject(parent)
@@ -25,11 +25,16 @@ RPMmeter::RPMmeter(uint gpioPin, int gpioHandle, QObject *parent)
         exit(EXIT_FAILURE);
     }
     ::userData.pMainWindow = parent;
+    ::userData.speed[inputPin] = 0;
+    ::userData.transitionCounter[inputPin] = 0;
+    ::userData.tick0[inputPin] = 0;
+
     iStatus = callback_ex(gpioHostHandle,
                           inputPin,
                           EITHER_EDGE,
                           reinterpret_cast<CBFuncEx_t>(statusChanged),
                           reinterpret_cast<void *>(&::userData));
+
     if(iStatus==pigif_duplicate_callback) {
         perror("Duplicate Callback");
         exit(EXIT_FAILURE);
@@ -60,9 +65,8 @@ statusChanged(int handle,
     userData = *(reinterpret_cast<callbackData*>(userdata));
     userData.transitionCounter[user_gpio]++;
     int64_t dt = currentTick-userData.tick0[user_gpio];
-    if(dt > 1000000) {
-        qDebug() << user_gpio
-                 << userData.transitionCounter[user_gpio];
+    if(dt > SAMPLETIME) {
+        userData.speed[user_gpio] = userData.transitionCounter[user_gpio];
         userData.transitionCounter[user_gpio] = 0;
         userData.tick0[user_gpio] = currentTick;
     }

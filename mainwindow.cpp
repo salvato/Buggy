@@ -1,4 +1,5 @@
 #include <mainwindow.h>
+#include <dcmotor.h>
 #include <robot.h>
 #include <plot2d.h>
 #include <GLwidget.h>
@@ -26,12 +27,21 @@ MainWindow::MainWindow(QWidget *parent)
     if(!initGpio())
         exit(EXIT_FAILURE);
 
-    pRobot = new Robot(27, 17, 24, 23, gpioHostHandle, parent);
+    leftSpeedPin     = 5;
+    rightSpeedPin    = 22;
+    leftForwardPin   = 27;
+    leftBackwardPin  = 17;
+    rightForwardPin  = 24;
+    rightBackwardPin = 23;
+
+    pLeftSpeed  = new RPMmeter(leftSpeedPin,  gpioHostHandle, nullptr);
+    pRightSpeed = new RPMmeter(rightSpeedPin, gpioHostHandle, nullptr);
+    pLeftMotor  = new DcMotor(leftForwardPin,  leftBackwardPin,  gpioHostHandle, parent);
+    pRightMotor = new DcMotor(rightForwardPin, rightBackwardPin, gpioHostHandle, parent);
+
+    pRobot = new Robot(pLeftMotor, pRightMotor, parent);
 
     initLayout();
-
-    pRightSpeed = new RPMmeter(22, gpioHostHandle, nullptr);
-    pLeftSpeed  = new RPMmeter(5,  gpioHostHandle, nullptr);
 
     loopTimer.setTimerType(Qt::PreciseTimer);
     connect(&loopTimer, SIGNAL(timeout()),

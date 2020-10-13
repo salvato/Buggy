@@ -22,8 +22,8 @@ private:
 private:
     uint forward;
     uint backward;
+    uint pwmFrequency;
     int gpioHostHandle;
     int forwardPWMrange;
     int backwardPWMrange;
-    int pwmFrequency;
 };

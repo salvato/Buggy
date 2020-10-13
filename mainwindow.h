@@ -12,6 +12,7 @@ QT_FORWARD_DECLARE_CLASS(QPushButton)
 QT_FORWARD_DECLARE_CLASS(QThread)
 QT_FORWARD_DECLARE_CLASS(RobotMove)
 QT_FORWARD_DECLARE_CLASS(RPMmeter)
+QT_FORWARD_DECLARE_CLASS(DcMotor)
 
 
 class MainWindow : public QWidget
@@ -44,14 +45,23 @@ private slots:
     void onMoveThreadDone();
 
 private:
+    uint leftSpeedPin;
+    uint rightSpeedPin;
+    uint leftForwardPin;
+    uint leftBackwardPin;
+    uint rightForwardPin;
+    uint rightBackwardPin;
+
     GLWidget*    pGLWidget;
     Plot2D*      pPlotVal;
+    RPMmeter*    pLeftSpeed;
+    RPMmeter*    pRightSpeed;
+    DcMotor*     pLeftMotor;
+    DcMotor*     pRightMotor;
     Robot*       pRobot;
     QPushButton* pButtonStartStop;
     QThread*     pMoveThread;
     RobotMove*   pRobotMove;
-    RPMmeter*    pRightSpeed;
-    RPMmeter*    pLeftSpeed;
 
     QTimer       loopTimer;
 

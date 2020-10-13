@@ -1,5 +1,4 @@
-#ifndef RPMMETER_H
-#define RPMMETER_H
+#pragma once
 
 #include <QObject>
 #include <pigpiod_if2.h>
@@ -38,10 +37,7 @@ signals:
 
 public slots:
 
-
 private:
     uint inputPin;
     int gpioHostHandle;
 };
-
-#endif // RPMMETER_H

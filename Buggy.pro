@@ -34,7 +34,9 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 CONFIG += c++11
 
 SOURCES += main.cpp \
-    robotmove.cpp
+    robotmove.cpp \
+    controlledmotor.cpp \
+    PID_v1.cpp
 SOURCES += axesdialog.cpp
 SOURCES += AxisFrame.cpp
 SOURCES += AxisLimits.cpp
@@ -55,7 +57,9 @@ SOURCES += mainwindow.cpp
 
 
 HEADERS += mainwindow.h \
-    robotmove.h
+    robotmove.h \
+    controlledmotor.h \
+    PID_v1.h
 HEADERS += rpmmeter.h
 HEADERS += ADXL345.h
 HEADERS += HMC5883L.h

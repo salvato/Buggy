@@ -12,15 +12,11 @@
 //      Vcc on 5V Power: pin 4 in the 40 pins GPIO connector
 //      GND on GND:      pin 6 in the 40 pins GPIO connector
 
-Robot::Robot(uint leftForwardPin, uint leftBackwardPin,
-             uint rightForwardPin, uint rightBackwardPin,
-             int gpioHandle, QObject *parent)
+Robot::Robot(DcMotor *leftMotor, DcMotor *rightMotor, QObject *parent)
     : QObject(parent)
-    , gpioHostHandle(gpioHandle)
+    , pLeftMotor(leftMotor)
+    , pRightMotor(rightMotor)
 {
-    leftMotor  = new DcMotor(leftForwardPin,  leftBackwardPin,  gpioHostHandle, parent);
-    rightMotor = new DcMotor(rightForwardPin, rightBackwardPin, gpioHostHandle, parent);
-
     initAHRSsensor();
 
     samplingFrequency = 300;
@@ -93,7 +89,7 @@ bool
 Robot::forward(double speed) {
     if(speed > 1.0) speed = 1.0;
     if(speed < 0.0) speed = 0.0;
-    if(leftMotor->goForward(speed) && rightMotor->goForward(speed))
+    if(pLeftMotor->goForward(speed) && pRightMotor->goForward(speed))
         return true;
     return false;
 }
@@ -103,7 +99,7 @@ bool
 Robot::backward(double speed) {
     if(speed > 1.0) speed = 1.0;
     if(speed < 0.0) speed = 0.0;
-    if(leftMotor->goBackward(speed) && rightMotor->goBackward(speed))
+    if(pLeftMotor->goBackward(speed) && pRightMotor->goBackward(speed))
         return true;
     return false;
 }
@@ -111,7 +107,7 @@ Robot::backward(double speed) {
 
 bool
 Robot::stop() {
-    if(leftMotor->stop() && rightMotor->stop())
+    if(pLeftMotor->stop() && pRightMotor->stop())
         return true;
     return false;
 }
@@ -121,7 +117,7 @@ bool
 Robot::left(double speed) {
     if(speed > 1.0) speed = 1.0;
     if(speed < 0.0) speed = 0.0;
-    if(leftMotor->goBackward(speed) && rightMotor->goForward(speed))
+    if(pLeftMotor->goBackward(speed) && pRightMotor->goForward(speed))
         return true;
     return false;
 }
@@ -131,7 +127,7 @@ bool
 Robot::right(double speed) {
     if(speed > 1.0) speed = 1.0;
     if(speed < 0.0) speed = 0.0;
-    if(leftMotor->goForward(speed) && rightMotor->goBackward(speed))
+    if(pLeftMotor->goForward(speed) && pRightMotor->goBackward(speed))
         return true;
     return false;
 }
