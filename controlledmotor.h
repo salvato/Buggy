@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QTimer>
 
 QT_FORWARD_DECLARE_CLASS(DcMotor)
 QT_FORWARD_DECLARE_CLASS(RPMmeter)
@@ -13,9 +14,8 @@ class ControlledMotor : public QObject
 
 public:
     explicit ControlledMotor(DcMotor* motor, RPMmeter* speedMeter, QObject* parent);
-    void stop();
-    void goForward(double speed=1.0);
-    void goBackward(double speed=1.0);
+    void go();
+    void setSpeed(double speed);
 
 signals:
 
@@ -26,5 +26,7 @@ private:
     RPMmeter* pSpeedMeter;
     PID*      pPid;
 
-    double wantedSpeed;
+    volatile double wantedSpeed;
+    volatile bool bTerminate;
+    QTimer updateTimer;
 };

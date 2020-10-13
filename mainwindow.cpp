@@ -20,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     pPlotVal      = nullptr;
     pMoveThread   = nullptr;
     pRobotMove    = nullptr;
+    pLeftSpeed    = nullptr;
     pRightSpeed   = nullptr;
 
     restoreSettings();
@@ -29,13 +30,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     leftSpeedPin     = 5;
     rightSpeedPin    = 22;
+    pLeftSpeed  = new RPMmeter(leftSpeedPin,  gpioHostHandle, nullptr);
+    pRightSpeed = new RPMmeter(rightSpeedPin, gpioHostHandle, nullptr);
+
     leftForwardPin   = 27;
     leftBackwardPin  = 17;
     rightForwardPin  = 24;
     rightBackwardPin = 23;
-
-    pLeftSpeed  = new RPMmeter(leftSpeedPin,  gpioHostHandle, nullptr);
-    pRightSpeed = new RPMmeter(rightSpeedPin, gpioHostHandle, nullptr);
     pLeftMotor  = new DcMotor(leftForwardPin,  leftBackwardPin,  gpioHostHandle, parent);
     pRightMotor = new DcMotor(rightForwardPin, rightBackwardPin, gpioHostHandle, parent);
 
