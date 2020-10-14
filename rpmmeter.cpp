@@ -7,6 +7,8 @@
 static callbackData userData;
 #define SAMPLETIME 200000 // in us
 
+//typedef void (*CBFuncEx_t)
+//   (int pi, unsigned user_gpio, unsigned level, uint32_t tick, void *userdata);
 
 CBFuncEx_t
 statusChanged(int handle,
