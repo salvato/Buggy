@@ -4,6 +4,9 @@
 #include <pigpiod_if2.h>
 
 
+QT_FORWARD_DECLARE_CLASS(QTimer)
+
+
 typedef struct {
     uint32_t transitionCounter[32] = {0};
     uint32_t tick0[32] = {0};
@@ -32,12 +35,15 @@ class RPMmeter : public QObject
 
 public:
     explicit RPMmeter(uint gpioPin, int gpioHandle, QObject *parent = nullptr);
+    uint32_t currentSpeed();
 
 signals:
 
 public slots:
+    void onTimeToReset();
 
 private:
     uint inputPin;
     int gpioHostHandle;
+    QTimer* pResetTimer;
 };

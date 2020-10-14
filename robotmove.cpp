@@ -1,5 +1,7 @@
 #include "robotmove.h"
 #include "robot.h"
+#include <QThread>
+
 
 RobotMove::RobotMove(Robot* pRobot, QObject *parent)
     : QObject(parent)
@@ -11,7 +13,8 @@ RobotMove::RobotMove(Robot* pRobot, QObject *parent)
 void
 RobotMove::startMove() {
     double speed = 0.25;
-    for(int i=0; i<3; i++) {
+    //for(int i=0; i<3; i++) {
+    while(true) {
         pRobby->forward(speed);
         QThread::sleep(3);
         pRobby->stop();

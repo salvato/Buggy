@@ -13,20 +13,32 @@ class ControlledMotor : public QObject
     Q_OBJECT
 
 public:
-    explicit ControlledMotor(DcMotor* motor, RPMmeter* speedMeter, QObject* parent);
-    void go();
-    void setSpeed(double speed);
+    explicit ControlledMotor(DcMotor* motor, RPMmeter* speedMeter, QObject* parent=nullptr);
+
+public:
+    PID* pPid;
 
 signals:
+    void LMotorValues(double wantedSpeed, double currentSpeed, double speed);
 
 public slots:
+    void updateSpeed();
+    void terminate();
+    void go();
+    void setSpeed(double speed);
+    void setP(double p);
+    void setI(double i);
+    void setD(double d);
 
 private:
+    time_t micros();
+
     DcMotor*  pMotor;
     RPMmeter* pSpeedMeter;
-    PID*      pPid;
+    QTimer*   pUpdateTimer;
 
     volatile double wantedSpeed;
     volatile bool bTerminate;
-    QTimer updateTimer;
+    double currentSpeed;
+    double currentP, currentI, currentD;
 };
