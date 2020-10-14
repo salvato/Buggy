@@ -19,10 +19,17 @@ statusChanged(int handle,
     // WARNING: this wraps around from 4294967295 to 0 roughly every 72 minutes
     Q_UNUSED(handle)
     Q_UNUSED(level)
+    Q_UNUSED(userdata)
+
+    struct timespec tv;
+    clock_gettime(CLOCK_BOOTTIME, &tv);
+    uint64_t ticks = uint32_t(tv.tv_sec*CLOCKS_PER_SEC)+uint32_t(tv.tv_nsec/1000);
+    uint64_t tick0 = uint32_t(currentTick);
+    qDebug() << ticks << tick0 << tv.tv_sec << tv.tv_nsec;
 
     userData = *(reinterpret_cast<callbackData*>(userdata));
     userData.transitionCounter[user_gpio]++;
-    int64_t dt = currentTick-userData.tick0[user_gpio];
+    int64_t dt = int64_t(currentTick)-int64_t(userData.tick0[user_gpio]);
     if(dt > SAMPLETIME) {
         userData.speed[user_gpio] = userData.transitionCounter[user_gpio];
         userData.transitionCounter[user_gpio] = 0;
@@ -87,11 +94,15 @@ RPMmeter::RPMmeter(uint gpioPin, int gpioHandle, QObject *parent)
 
 void
 RPMmeter::onTimeToReset() {
-    struct timeval tv;
-    gettimeofday(&tv, nullptr);
-    if(static_cast<int64_t>(tv.tv_sec*static_cast<long>(1000000)+tv.tv_usec -
-       ::userData.tick0[inputPin]) > SAMPLETIME)
+    if(::userData.speed[inputPin] == 0)
+        return;
+    clock_gettime(CLOCK_BOOTTIME, &tv);
+    uint64_t ticks = uint64_t(tv.tv_sec*CLOCKS_PER_SEC+tv.tv_nsec/1000);
+    uint64_t tick0 = uint64_t(::userData.tick0[inputPin]);
+    //qDebug() << ticks << tick0;
+    if(ticks - tick0 > 2*SAMPLETIME) {
         ::userData.speed[inputPin] = 0;
+    }
 }
 
 

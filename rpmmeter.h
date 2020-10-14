@@ -45,5 +45,6 @@ public slots:
 private:
     uint inputPin;
     int gpioHostHandle;
+    struct timespec tv;
     QTimer* pResetTimer;
 };
