@@ -40,4 +40,5 @@ private:
     double currentSpeed;
     double currentP, currentI, currentD;
     double speedMax;
+    int    sampleTime_ms;
 };
