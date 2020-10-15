@@ -12,36 +12,32 @@ ControlledMotor::ControlledMotor(DcMotor* motor, RPMmeter* speedMeter, QObject* 
     , pMotor(motor)
     , pSpeedMeter(speedMeter)
 {
-    wantedSpeed = 0.5;
-    currentP = 0.01;
+    wantedSpeed = 0.0;
+    speedMax = 12.0;// In giri/s
+    currentP = 0.0;
     currentI = 0.0;
     currentD = 0.0;
     pPid = new PID(currentP, currentI, currentD, DIRECT);
-    pPid->SetSampleTime(200);
+    pPid->SetSampleTime(100);
     pPid->SetMode(AUTOMATIC);
+    pPid->SetOutputLimits(-1.0, 1.0);
     bTerminate = false;
 }
 
-time_t
-ControlledMotor::micros() {
-    struct timeval tv;
-    gettimeofday(&tv, nullptr);
-    return tv.tv_sec*static_cast<long>(1000000)+tv.tv_usec;
-}
 
 void
 ControlledMotor::go() {
     pUpdateTimer = new QTimer();
     connect(pUpdateTimer, SIGNAL(timeout()),
             this, SLOT(updateSpeed()));
-    pUpdateTimer->start(200);
+    pUpdateTimer->start(100);
 }
 
 
 void
 ControlledMotor::updateSpeed() {
     if(!bTerminate) {
-        currentSpeed = pSpeedMeter->currentSpeed()/100.0;
+        currentSpeed = pSpeedMeter->currentSpeed()/speedMax;
         double speed = pPid->Compute(currentSpeed, wantedSpeed);
         emit LMotorValues(wantedSpeed, currentSpeed, speed);
         if(speed < 0)

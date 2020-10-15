@@ -4,43 +4,26 @@
 #include <QTimer>
 
 
-static callbackData userData;
-#define SAMPLETIME 200000 // in us
+static callbackData* pUserData;
+
 
 //typedef void (*CBFuncEx_t)
 //   (int pi, unsigned user_gpio, unsigned level, uint32_t tick, void *userdata);
-
 CBFuncEx_t
-statusChanged(int handle,
+statusChanged(int      handle,
               unsigned user_gpio,
               unsigned level,
               uint32_t currentTick,
-              void *userdata)
+              void*    pData)
 {
     // currentTick is the number of microseconds since boot.
     // WARNING: this wraps around from 4294967295 to 0 roughly every 72 minutes
     Q_UNUSED(handle)
     Q_UNUSED(level)
-    Q_UNUSED(userdata)
+    Q_UNUSED(pData)
 
-    struct timespec tv;
-    clock_gettime(CLOCK_BOOTTIME, &tv);
-    uint64_t ticks = uint32_t(tv.tv_sec*CLOCKS_PER_SEC)+uint32_t(tv.tv_nsec/1000);
-    uint64_t tick0 = uint32_t(currentTick);
-    qDebug() << ticks << tick0 << tv.tv_sec << tv.tv_nsec;
-
-    userData = *(reinterpret_cast<callbackData*>(userdata));
-    userData.transitionCounter[user_gpio]++;
-    int64_t dt = int64_t(currentTick)-int64_t(userData.tick0[user_gpio]);
-    if(dt > SAMPLETIME) {
-        userData.speed[user_gpio] = userData.transitionCounter[user_gpio];
-        userData.transitionCounter[user_gpio] = 0;
-        userData.tick0[user_gpio] = currentTick;
-    }
-    if(dt < 0) {
-        userData.tick0[user_gpio] = currentTick;
-        userData.transitionCounter[user_gpio] = 0;
-    }
+    pUserData->transitionCounter[user_gpio]++;
+    pUserData->lastTick[user_gpio] = currentTick;
     return nullptr;
 }
 
@@ -64,16 +47,16 @@ RPMmeter::RPMmeter(uint gpioPin, int gpioHandle, QObject *parent)
         perror("Unable to set rpm meter as input");
         exit(EXIT_FAILURE);
     }
-    ::userData.pMainWindow = parent;
-    ::userData.speed[inputPin] = 0;
-    ::userData.transitionCounter[inputPin] = 0;
-    ::userData.tick0[inputPin] = 0;
+    pUserData = new callbackData;
+    pUserData->transitionCounter[inputPin] = 0;
+    pUserData->tick0[inputPin] = 0;
+    pUserData->lastTick[inputPin] = 0;
 
     iStatus = callback_ex(gpioHostHandle,
                           inputPin,
                           EITHER_EDGE,
                           reinterpret_cast<CBFuncEx_t>(statusChanged),
-                          reinterpret_cast<void *>(&::userData));
+                          reinterpret_cast<void *>(pUserData));
 
     if(iStatus==pigif_duplicate_callback) {
         perror("Duplicate Callback");
@@ -87,28 +70,16 @@ RPMmeter::RPMmeter(uint gpioPin, int gpioHandle, QObject *parent)
         perror("Bad Callback");
         exit(EXIT_FAILURE);
     }
-    pResetTimer = new QTimer();
-    connect(pResetTimer, SIGNAL(timeout()),
-            this, SLOT(onTimeToReset()));
-    pResetTimer->start(SAMPLETIME/500);
 }
 
 
-void
-RPMmeter::onTimeToReset() {
-    if(::userData.speed[inputPin] == 0)
-        return;
-    clock_gettime(CLOCK_BOOTTIME, &tv);
-    uint64_t ticks = uint64_t(tv.tv_sec*CLOCKS_PER_SEC+tv.tv_nsec/1000);
-    uint64_t tick0 = uint64_t(::userData.tick0[inputPin]);
-    //qDebug() << ticks << tick0;
-    if(ticks - tick0 > 2*SAMPLETIME) {
-        ::userData.speed[inputPin] = 0;
-    }
-}
-
-
-uint32_t
-RPMmeter::currentSpeed() {
-    return ::userData.speed[inputPin];
+double
+RPMmeter::currentSpeed() { // In giri/s
+    double dt = (pUserData->lastTick[inputPin]-pUserData->tick0[inputPin])*1.0e-6;
+    if(dt == 0.0) return 0.0;
+    double speed = pUserData->transitionCounter[inputPin] /
+                   (20.0*dt);
+    pUserData->transitionCounter[inputPin] = 0;
+    pUserData->tick0[inputPin] = pUserData->lastTick[inputPin];
+    return speed;
 }

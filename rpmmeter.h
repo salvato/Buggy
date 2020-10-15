@@ -4,14 +4,10 @@
 #include <pigpiod_if2.h>
 
 
-QT_FORWARD_DECLARE_CLASS(QTimer)
-
-
 typedef struct {
     uint32_t transitionCounter[32] = {0};
-    uint32_t tick0[32] = {0};
-    uint32_t speed[32] = {0};
-    void* pMainWindow = nullptr;
+    uint32_t tick0[32]             = {0};
+    uint32_t lastTick[32]          = {0};
 } callbackData;
 
 
@@ -19,11 +15,11 @@ typedef struct {
 extern "C" {
 #endif
 
-CBFuncEx_t statusChanged(int handle,
+CBFuncEx_t statusChanged(int      handle,
                          unsigned user_gpio,
                          unsigned level,
                          uint32_t currentTick,
-                         void *userdata);
+                         void*    pData);
 #ifdef __cplusplus
 }
 #endif
@@ -35,16 +31,13 @@ class RPMmeter : public QObject
 
 public:
     explicit RPMmeter(uint gpioPin, int gpioHandle, QObject *parent = nullptr);
-    uint32_t currentSpeed();
+    double currentSpeed();
 
 signals:
 
 public slots:
-    void onTimeToReset();
 
 private:
     uint inputPin;
     int gpioHostHandle;
-    struct timespec tv;
-    QTimer* pResetTimer;
 };

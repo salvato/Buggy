@@ -16,7 +16,6 @@ public:
     explicit ControlledMotor(DcMotor* motor, RPMmeter* speedMeter, QObject* parent=nullptr);
 
 public:
-    PID* pPid;
 
 signals:
     void LMotorValues(double wantedSpeed, double currentSpeed, double speed);
@@ -31,14 +30,14 @@ public slots:
     void setD(double d);
 
 private:
-    time_t micros();
-
     DcMotor*  pMotor;
     RPMmeter* pSpeedMeter;
     QTimer*   pUpdateTimer;
+    PID*      pPid;
 
     volatile double wantedSpeed;
     volatile bool bTerminate;
     double currentSpeed;
     double currentP, currentI, currentD;
+    double speedMax;
 };
