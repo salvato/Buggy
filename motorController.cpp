@@ -1,4 +1,4 @@
-#include "controlledmotor.h"
+#include "motorController.h"
 #include "dcmotor.h"
 #include "rpmmeter.h"
 #include "PID_v1.h"
@@ -7,12 +7,12 @@
 #include <QDebug>
 
 
-ControlledMotor::ControlledMotor(DcMotor* motor, RPMmeter* speedMeter, QObject* parent)
+MotorController::MotorController(DcMotor* motor, RPMmeter* speedMeter, QObject* parent)
     : QObject(parent)
     , pMotor(motor)
     , pSpeedMeter(speedMeter)
 {
-    sampleTime_ms = 100;
+    sampleTime_ms = 102;
     wantedSpeed = 0.0;
     speedMax = 12.0;// In giri/s
     currentP = 0.0;
@@ -21,13 +21,13 @@ ControlledMotor::ControlledMotor(DcMotor* motor, RPMmeter* speedMeter, QObject* 
     pPid = new PID(currentP, currentI, currentD, DIRECT);
     pPid->SetSampleTime(sampleTime_ms);
     pPid->SetMode(AUTOMATIC);
-    pPid->SetOutputLimits(-1.0, 1.0);
+    pPid->SetOutputLimits(0.0, 1.0);
     bTerminate = false;
 }
 
 
 void
-ControlledMotor::go() {
+MotorController::go() {
     pUpdateTimer = new QTimer();
     connect(pUpdateTimer, SIGNAL(timeout()),
             this, SLOT(updateSpeed()));
@@ -36,14 +36,15 @@ ControlledMotor::go() {
 
 
 void
-ControlledMotor::updateSpeed() {
+MotorController::updateSpeed() {
     if(!bTerminate) {
         currentSpeed = pSpeedMeter->currentSpeed()/speedMax;
         double speed = pPid->Compute(currentSpeed, wantedSpeed);
         if(speed < 0.0)
-            pMotor->goBackward(wantedSpeed+speed);
+            pMotor->goBackward(-speed);
+            //pMotor->goForward(0.0);
         else {
-            pMotor->goForward(wantedSpeed-speed);
+            pMotor->goForward(speed);
         }
         emit LMotorValues(wantedSpeed, currentSpeed, speed);
     }
@@ -57,34 +58,34 @@ ControlledMotor::updateSpeed() {
 
 
 void
-ControlledMotor::setP(double p) {
+MotorController::setP(double p) {
     currentP = p;
     pPid->SetTunings(currentP, currentI, currentD);
 }
 
 
 void
-ControlledMotor::setI(double i) {
+MotorController::setI(double i) {
     currentI = i;
     pPid->SetTunings(currentP, currentI, currentD);
 }
 
 
 void
-ControlledMotor::setD(double d) {
+MotorController::setD(double d) {
     currentD = d;
     pPid->SetTunings(currentP, currentI, currentD);
 }
 
 
 void
-ControlledMotor::setSpeed(double speed) {
+MotorController::setSpeed(double speed) {
     wantedSpeed = speed;
 }
 
 
 void
-ControlledMotor::terminate() {
+MotorController::terminate() {
     bTerminate = true;
 }
 

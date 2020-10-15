@@ -8,12 +8,12 @@ QT_FORWARD_DECLARE_CLASS(RPMmeter)
 QT_FORWARD_DECLARE_CLASS(PID)
 
 
-class ControlledMotor : public QObject
+class MotorController : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit ControlledMotor(DcMotor* motor, RPMmeter* speedMeter, QObject* parent=nullptr);
+    explicit MotorController(DcMotor* motor, RPMmeter* speedMeter, QObject* parent=nullptr);
 
 public:
 
