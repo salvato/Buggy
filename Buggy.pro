@@ -33,10 +33,10 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 
 CONFIG += c++11
 
-SOURCES += main.cpp \
-    robotmove.cpp \
-    controlledmotor.cpp \
-    PID_v1.cpp
+SOURCES += main.cpp
+SOURCES += robotmove.cpp
+SOURCES += motorController.cpp
+SOURCES += PID_v1.cpp
 SOURCES += axesdialog.cpp
 SOURCES += AxisFrame.cpp
 SOURCES += AxisLimits.cpp
@@ -56,10 +56,10 @@ SOURCES += dcmotor.cpp
 SOURCES += mainwindow.cpp
 
 
-HEADERS += mainwindow.h \
-    robotmove.h \
-    controlledmotor.h \
-    PID_v1.h
+HEADERS += mainwindow.h
+HEADERS += robotmove.h
+HEADERS += motorController.h
+HEADERS += PID_v1.h
 HEADERS += rpmmeter.h
 HEADERS += ADXL345.h
 HEADERS += HMC5883L.h
@@ -90,13 +90,13 @@ LIBS += -lrt
 LIBS += -lpthread
 
 
-# Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
-
-
 DISTFILES += fshader.glsl
 DISTFILES += vshader.glsl
 DISTFILES += cube.png
 DISTFILES += plot.png
+
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
