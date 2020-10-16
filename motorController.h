@@ -35,10 +35,10 @@ private:
     QTimer*   pUpdateTimer;
     PID*      pPid;
 
-    volatile double wantedSpeed;
-    volatile bool bTerminate;
+    double wantedSpeed;
     double currentSpeed;
+    volatile bool bTerminate;
     double currentP, currentI, currentD;
     double speedMax;
-    int    sampleTime_ms;
+    int    msSampleTime;
 };

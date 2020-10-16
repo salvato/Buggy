@@ -24,6 +24,7 @@ statusChanged(int      handle,
 
     pUserData->transitionCounter[user_gpio]++;
     pUserData->lastTick[user_gpio] = currentTick;
+    pUserData->totalTick[user_gpio]++;
     return nullptr;
 }
 
@@ -83,4 +84,16 @@ RPMmeter::currentSpeed() { // In giri/s
     pUserData->transitionCounter[inputPin] = 0;
     pUserData->tick0[inputPin] = pUserData->lastTick[inputPin];
     return speed;
+}
+
+
+void
+RPMmeter::resetDistance() {
+    pUserData->totalTick[inputPin] = 0;
+}
+
+
+double
+RPMmeter::traveledDistance() {
+    return pUserData->transitionCounter[inputPin] / double(encoderTicks);
 }

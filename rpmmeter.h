@@ -8,6 +8,7 @@ typedef struct {
     uint32_t transitionCounter[32] = {0};
     uint32_t tick0[32]             = {0};
     uint32_t lastTick[32]          = {0};
+    uint64_t totalTick[32]         = {0};
 } callbackData;
 
 
@@ -32,6 +33,8 @@ class RPMmeter : public QObject
 public:
     explicit RPMmeter(uint gpioPin, int gpioHandle, QObject *parent = nullptr);
     double currentSpeed();
+    double traveledDistance();
+    void   resetDistance();
 
 signals:
 
