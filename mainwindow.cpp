@@ -17,7 +17,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
 {
     pGLWidget     = nullptr;
-    pPlotVal      = nullptr;
+    pLeftPlot     = nullptr;
+    pRightPlot    = nullptr;
     pMoveThread   = nullptr;
     pRobotMove    = nullptr;
     pLeftSpeed    = nullptr;
@@ -132,32 +133,60 @@ MainWindow::createButtons() {
 
 
 void
-MainWindow::initPlot() {
-    pPlotVal->NewDataSet(1, 1, QColor(255,   0,   0), Plot2D::ipoint, "X");
-    pPlotVal->NewDataSet(2, 1, QColor(  0, 255,   0), Plot2D::ipoint, "Y");
-    pPlotVal->NewDataSet(3, 1, QColor(  0,   0, 255), Plot2D::ipoint, "Z");
-    pPlotVal->NewDataSet(4, 1, QColor(255, 255, 255), Plot2D::ipoint, "PID-In");
-    pPlotVal->NewDataSet(5, 1, QColor(255, 255,  64), Plot2D::ipoint, "PID-Out");
+MainWindow::initPlots() {
+    pLeftPlot = new Plot2D(nullptr, "Left Motor");
 
-    pPlotVal->SetShowTitle(1, true);
-    pPlotVal->SetShowTitle(2, true);
-    pPlotVal->SetShowTitle(3, true);
-    pPlotVal->SetShowTitle(4, true);
-    pPlotVal->SetShowTitle(5, true);
+    pLeftPlot->NewDataSet(1, 3, QColor(255,   0, 255), Plot2D::ipoint, "SetPt");
+    pLeftPlot->NewDataSet(2, 1, QColor(255, 255,   0), Plot2D::iline, "Speed");
+    pLeftPlot->NewDataSet(3, 1, QColor(  0, 255, 255), Plot2D::iline, "PID-Out");
 
-    pPlotVal->SetLimits(-1.0, 1.0, -1.0, 1.0, true, true, false, false);
+    pLeftPlot->SetShowTitle(1, true);
+    pLeftPlot->SetShowTitle(2, true);
+    pLeftPlot->SetShowTitle(3, true);
+
+    pLeftPlot->SetShowDataSet(1, true);
+    pLeftPlot->SetShowDataSet(2, true);
+    pLeftPlot->SetShowDataSet(3, true);
+
+    pLeftPlot->SetLimits(0.0, 1.0, -1.0, 1.0, true, true, false, false);
+    pLeftPlot->UpdatePlot();
+    pLeftPlot->show();
+
+    nLeftPlotPoints = 0;
+
+    pRightPlot = new Plot2D(nullptr, "Right Motor");
+
+    pRightPlot->NewDataSet(1, 3, QColor(255,   0, 255), Plot2D::ipoint, "SetPt");
+    pRightPlot->NewDataSet(2, 1, QColor(255, 255,   0), Plot2D::iline, "Speed");
+    pRightPlot->NewDataSet(3, 1, QColor(  0, 255, 255), Plot2D::iline, "PID-Out");
+
+    pRightPlot->SetShowTitle(1, true);
+    pRightPlot->SetShowTitle(2, true);
+    pRightPlot->SetShowTitle(3, true);
+
+    pRightPlot->SetShowDataSet(1, true);
+    pRightPlot->SetShowDataSet(2, true);
+    pRightPlot->SetShowDataSet(3, true);
+
+    pRightPlot->SetLimits(0.0, 1.0, -1.0, 1.0, true, true, false, false);
+    pRightPlot->UpdatePlot();
+    pRightPlot->show();
+
+    nRightPlotPoints = 0;
 }
 
 
 void
 MainWindow::initLayout() {
     pGLWidget = new GLWidget(this);
-    pPlotVal = new Plot2D(this, "Plot");
-    initPlot();
+    initPlots();
+    QVBoxLayout* pPlotLayout = new (QVBoxLayout);
+    pPlotLayout->addWidget(pLeftPlot);
+    pPlotLayout->addWidget(pRightPlot);
 
     QHBoxLayout *firstRow = new QHBoxLayout;
     firstRow->addWidget(pGLWidget);
-    firstRow->addWidget(pPlotVal);
+    firstRow->addLayout(pPlotLayout);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(firstRow);

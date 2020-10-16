@@ -30,7 +30,7 @@ protected:
     void saveSettings();
     void createButtons();
     void initLayout();
-    void initPlot();
+    void initPlots();
     bool initGpio();
 
 private:
@@ -53,7 +53,8 @@ private:
     uint rightBackwardPin;
 
     GLWidget*    pGLWidget;
-    Plot2D*      pPlotVal;
+    Plot2D*      pLeftPlot;
+    Plot2D*      pRightPlot;
     RPMmeter*    pLeftSpeed;
     RPMmeter*    pRightSpeed;
     DcMotor*     pLeftMotor;
@@ -67,4 +68,6 @@ private:
 
     int   gpioHostHandle;
     float q0, q1, q2, q3;
+    int   nLeftPlotPoints;
+    int   nRightPlotPoints;
 };
