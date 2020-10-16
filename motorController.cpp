@@ -29,6 +29,7 @@ MotorController::MotorController(DcMotor* motor, RPMmeter* speedMeter, QObject* 
 void
 MotorController::go() {
     pUpdateTimer = new QTimer();
+    pUpdateTimer->setTimerType(Qt::PreciseTimer);
     connect(pUpdateTimer, SIGNAL(timeout()),
             this, SLOT(updateSpeed()));
     pUpdateTimer->start(sampleTime_ms);
@@ -41,7 +42,7 @@ MotorController::updateSpeed() {
         currentSpeed = pSpeedMeter->currentSpeed()/speedMax;
         double speed = pPid->Compute(currentSpeed, wantedSpeed);
         if(speed < 0.0)
-            pMotor->goForward(0);
+            pMotor->goForward(0.0);
             //pMotor->goBackward(-speed);
         else {
             pMotor->goForward(speed);
