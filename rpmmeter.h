@@ -40,4 +40,5 @@ public slots:
 private:
     uint inputPin;
     int gpioHostHandle;
+    int encoderTicks = 38;
 };

@@ -70,6 +70,7 @@ RPMmeter::RPMmeter(uint gpioPin, int gpioHandle, QObject *parent)
         perror("Bad Callback");
         exit(EXIT_FAILURE);
     }
+    encoderTicks = 38;
 }
 
 
@@ -78,7 +79,7 @@ RPMmeter::currentSpeed() { // In giri/s
     double dt = (pUserData->lastTick[inputPin]-pUserData->tick0[inputPin])*1.0e-6;
     if(dt == 0.0) return 0.0;
     double speed = pUserData->transitionCounter[inputPin] /
-                   (38.0*dt);
+                   (double(encoderTicks)*dt);
     pUserData->transitionCounter[inputPin] = 0;
     pUserData->tick0[inputPin] = pUserData->lastTick[inputPin];
     return speed;
