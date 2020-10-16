@@ -12,13 +12,13 @@ MotorController::MotorController(DcMotor* motor, RPMmeter* speedMeter, QObject* 
     , pMotor(motor)
     , pSpeedMeter(speedMeter)
 {
-    msSampleTime = 100;
-    targetSpeed = 0.0;
     speedMax = 8.0;// In giri/s
+    targetSpeed = 0.0;
     currentP = 0.0;
     currentI = 0.0;
     currentD = 0.0;
     pPid = new PID(currentP, currentI, currentD, DIRECT);
+    msSampleTime = 100;
     pPid->SetSampleTime(msSampleTime);
     pPid->SetMode(AUTOMATIC);
     pPid->SetOutputLimits(-1.0, 1.0);
@@ -28,6 +28,8 @@ MotorController::MotorController(DcMotor* motor, RPMmeter* speedMeter, QObject* 
 
 void
 MotorController::go() {
+    // The Timer MUST be created when the
+    // Controller Thread has been started
     pUpdateTimer = new QTimer();
     pUpdateTimer->setTimerType(Qt::PreciseTimer);
     connect(pUpdateTimer, SIGNAL(timeout()),
@@ -42,11 +44,9 @@ MotorController::updateSpeed() {
         currentSpeed = pSpeedMeter->currentSpeed()/speedMax;
         double speed = pPid->Compute(currentSpeed, targetSpeed);
         if(speed < 0.0)
-            pMotor->goForward(0.0);
-            //pMotor->goBackward(-speed);
-        else {
+            pMotor->goForward(0.0);//pMotor->goBackward(-speed);
+        else
             pMotor->goForward(speed);
-        }
         emit MotorValues(targetSpeed, currentSpeed, speed);
     }
     else {
