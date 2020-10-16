@@ -13,7 +13,7 @@ MotorController::MotorController(DcMotor* motor, RPMmeter* speedMeter, QObject* 
     , pSpeedMeter(speedMeter)
 {
     msSampleTime = 100;
-    wantedSpeed = 0.0;
+    targetSpeed = 0.0;
     speedMax = 8.0;// In giri/s
     currentP = 0.0;
     currentI = 0.0;
@@ -40,14 +40,14 @@ void
 MotorController::updateSpeed() {
     if(!bTerminate) {
         currentSpeed = pSpeedMeter->currentSpeed()/speedMax;
-        double speed = pPid->Compute(currentSpeed, wantedSpeed);
+        double speed = pPid->Compute(currentSpeed, targetSpeed);
         if(speed < 0.0)
             pMotor->goForward(0.0);
             //pMotor->goBackward(-speed);
         else {
             pMotor->goForward(speed);
         }
-        emit MotorValues(wantedSpeed, currentSpeed, speed);
+        emit MotorValues(targetSpeed, currentSpeed, speed);
     }
     else {
         pMotor->stop();
@@ -81,7 +81,7 @@ MotorController::setD(double d) {
 
 void
 MotorController::setSpeed(double speed) {
-    wantedSpeed = speed;
+    targetSpeed = speed;
 }
 
 

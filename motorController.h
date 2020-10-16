@@ -35,7 +35,7 @@ private:
     QTimer*   pUpdateTimer;
     PID*      pPid;
 
-    double wantedSpeed;
+    double targetSpeed;
     double currentSpeed;
     volatile bool bTerminate;
     double currentP, currentI, currentD;
