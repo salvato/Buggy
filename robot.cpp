@@ -12,7 +12,7 @@
 //      Vcc on 5V Power: pin 4 in the 40 pins GPIO connector
 //      GND on GND:      pin 6 in the 40 pins GPIO connector
 
-Robot::Robot(DcMotor *leftMotor, DcMotor *rightMotor, QObject *parent)
+Robot::Robot(MotorController *leftMotor, MotorController *rightMotor, QObject *parent)
     : QObject(parent)
     , pLeftMotor(leftMotor)
     , pRightMotor(rightMotor)
@@ -42,6 +42,9 @@ Robot::Robot(DcMotor *leftMotor, DcMotor *rightMotor, QObject *parent)
     lastUpdate = micros();
     now = lastUpdate;
     updateTimer.start(int32_t(1000.0/double(samplingFrequency)+0.5));
+    connect(&sendDataTimer, SIGNAL(timeout()),
+            this, SLOT(onTimeToSendData()));
+    sendDataTimer.start(100);
 }
 
 
@@ -89,8 +92,8 @@ bool
 Robot::forward(double speed) {
     if(speed > 1.0) speed = 1.0;
     if(speed < 0.0) speed = 0.0;
-    if(pLeftMotor->goForward(speed) && pRightMotor->goForward(speed))
-        return true;
+    pLeftMotor->setSpeed(speed);
+    pRightMotor->setSpeed(speed);
     return false;
 }
 
@@ -99,16 +102,16 @@ bool
 Robot::backward(double speed) {
     if(speed > 1.0) speed = 1.0;
     if(speed < 0.0) speed = 0.0;
-    if(pLeftMotor->goBackward(speed) && pRightMotor->goBackward(speed))
-        return true;
+    pLeftMotor->setSpeed(-speed);
+    pRightMotor->setSpeed(-speed);
     return false;
 }
 
 
 bool
 Robot::stop() {
-    if(pLeftMotor->stop() && pRightMotor->stop())
-        return true;
+    pLeftMotor->setSpeed(0.0);
+    pRightMotor->setSpeed(0.0);
     return false;
 }
 
@@ -117,8 +120,8 @@ bool
 Robot::left(double speed) {
     if(speed > 1.0) speed = 1.0;
     if(speed < 0.0) speed = 0.0;
-    if(pLeftMotor->goBackward(speed) && pRightMotor->goForward(speed))
-        return true;
+    pLeftMotor->setSpeed(-speed);
+    pRightMotor->setSpeed(speed);
     return false;
 }
 
@@ -127,25 +130,14 @@ bool
 Robot::right(double speed) {
     if(speed > 1.0) speed = 1.0;
     if(speed < 0.0) speed = 0.0;
-    if(pLeftMotor->goForward(speed) && pRightMotor->goBackward(speed))
-        return true;
+    pLeftMotor->setSpeed(speed);
+    pRightMotor->setSpeed(-speed);
     return false;
 }
 
 
 void
 Robot::onUpdateTimeElapsed() {
-    //==================================================================
-    //  !!! Attention !!!
-    //==================================================================
-    // Reasonable convergence can be achieved in two or three iterations
-    // meaning that we should operate this sensor fusion filter at a
-    // rate two or three times the output data rate of the sensor.
-    //
-    // Deliver sensor values at the Madgwick algorithm
-    // in the expected format which is rad/s, m/s² and mG (milliGauss)
-    //==================================================================
-
     if(pAcc->getInterruptSource(7))
         pAcc->get_Gxyz(&values[0]);
 
@@ -161,7 +153,7 @@ Robot::onUpdateTimeElapsed() {
     lastUpdate = now;
     pMadgwick->update(values[3], values[4], values[5],
                       values[0], values[1], values[2],
-            values[6], values[7], values[8]);
+                      values[6], values[7], values[8]);
 }
 
 
@@ -170,4 +162,12 @@ Robot::getOrientation(float* q0, float* q1, float* q2, float* q3) {
     if(!pMadgwick) return false;
     pMadgwick->getRotation(q0, q1, q2, q3);
     return true;
+}
+
+
+
+void
+Robot::onTimeToSendData() {
+    pMadgwick->getRotation(&q0, &q1, &q2, &q3);
+    emit sendOrientation(q0, q1, q2, q3);
 }

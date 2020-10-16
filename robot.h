@@ -6,7 +6,7 @@
 #include <ITG3200.h>
 #include <HMC5883L.h>
 #include <MadgwickAHRS.h>
-#include <dcmotor.h>
+#include <motorController.h>
 #include <sys/time.h>
 #include <inttypes.h>
 
@@ -20,7 +20,7 @@ class Robot : public QObject
 {
     Q_OBJECT
 public:
-    explicit Robot(DcMotor*  leftMotor, DcMotor*  rightMotor, QObject *parent = nullptr);
+    explicit Robot(MotorController*  leftMotor, MotorController*  rightMotor, QObject *parent = nullptr);
     bool forward(double speed);
     bool backward(double speed);
     bool stop();
@@ -29,9 +29,11 @@ public:
     bool getOrientation(float* q0, float* q1, float* q2, float* q3);
 
 signals:
+    void sendOrientation(float q0, float q1, float q2, float q3);
 
 public slots:
     void onUpdateTimeElapsed();
+    void onTimeToSendData();
 
 protected:
     void initAHRSsensor();
@@ -39,8 +41,8 @@ protected:
     __suseconds_t micros();
 
 private:
-    DcMotor*  pLeftMotor;
-    DcMotor*  pRightMotor;
+    MotorController*  pLeftMotor;
+    MotorController*  pRightMotor;
 
     ADXL345*  pAcc;
     ITG3200*  pGyro;
@@ -50,6 +52,7 @@ private:
     float samplingFrequency;
 
     QTimer updateTimer;
+    QTimer sendDataTimer;
     __suseconds_t lastUpdate;
     __suseconds_t now;
     float delta;
@@ -58,4 +61,9 @@ private:
     float GyroXOffset;
     float GyroYOffset;
     float GyroZOffset;
+
+    float q0;
+    float q1;
+    float q2;
+    float q3;
 };

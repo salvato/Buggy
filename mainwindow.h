@@ -10,7 +10,7 @@ QT_FORWARD_DECLARE_CLASS(GLWidget)
 QT_FORWARD_DECLARE_CLASS(Plot2D)
 QT_FORWARD_DECLARE_CLASS(QPushButton)
 QT_FORWARD_DECLARE_CLASS(QThread)
-QT_FORWARD_DECLARE_CLASS(RobotMove)
+QT_FORWARD_DECLARE_CLASS(MotorController)
 QT_FORWARD_DECLARE_CLASS(RPMmeter)
 QT_FORWARD_DECLARE_CLASS(DcMotor)
 
@@ -36,13 +36,33 @@ protected:
 private:
 
 signals:
-    void startMove();
+    void operate();
+
+    void stopLMotor();
+    void LPvalueChanged(double Pvalue);
+    void LIvalueChanged(double Ivalue);
+    void LDvalueChanged(double Dvalue);
+    void LSpeedChanged(double speed);
+
+    void stopRMotor();
+    void RPvalueChanged(double Pvalue);
+    void RIvalueChanged(double Ivalue);
+    void RDvalueChanged(double Dvalue);
+    void RSpeedChanged(double speed);
 
 private slots:
-    void onLoopTimeElapsed();
     void onStartStopPushed();
-    void onMoveDone();
-    void onMoveThreadDone();
+
+    void onLeftMotorThreadDone();
+    void onNewLMotorValues(double wantedSpeed, double currentSpeed, double speed);
+    void onRightMotorThreadDone();
+    void onNewRMotorValues(double wantedSpeed, double currentSpeed, double speed);
+
+    void onUpdateOrientation(float q0, float q1, float q2, float q3);
+
+private:
+    void CreateLeftMotorThread();
+    void CreateRightMotorThread();
 
 private:
     uint leftSpeedPin;
@@ -52,19 +72,24 @@ private:
     uint rightForwardPin;
     uint rightBackwardPin;
 
-    GLWidget*    pGLWidget;
-    Plot2D*      pLeftPlot;
-    Plot2D*      pRightPlot;
-    RPMmeter*    pLeftSpeed;
-    RPMmeter*    pRightSpeed;
-    DcMotor*     pLeftMotor;
-    DcMotor*     pRightMotor;
-    Robot*       pRobot;
-    QPushButton* pButtonStartStop;
-    QThread*     pMoveThread;
-    RobotMove*   pRobotMove;
+    double currentLspeed;
+    double currentRspeed;
 
-    QTimer       loopTimer;
+    GLWidget*        pGLWidget;
+    Plot2D*          pLeftPlot;
+    Plot2D*          pRightPlot;
+    RPMmeter*        pLeftSpeed;
+    RPMmeter*        pRightSpeed;
+    DcMotor*         pLeftMotor;
+    DcMotor*         pRightMotor;
+    Robot*           pRobot;
+    QPushButton*     pButtonStartStop;
+    MotorController* pLMotor;
+    MotorController* pRMotor;
+    QThread*         pRightMotorThread;
+    QThread*         pLeftMotorThread;
+
+    QTimer loopTimer;
 
     int   gpioHostHandle;
     float q0, q1, q2, q3;
