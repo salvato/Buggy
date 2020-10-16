@@ -18,7 +18,7 @@ public:
 public:
 
 signals:
-    void LMotorValues(double wantedSpeed, double currentSpeed, double speed);
+    void MotorValues(double wantedSpeed, double currentSpeed, double speed);
 
 public slots:
     void updateSpeed();

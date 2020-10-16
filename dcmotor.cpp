@@ -8,7 +8,7 @@ DcMotor::DcMotor(uint forwardPin, uint backwardPin, int gpioHandle, QObject *par
     , backward(backwardPin)
     , gpioHostHandle(gpioHandle)
 {
-    pwmFrequency = 100;
+    pwmFrequency = 250;
     if(!init())
         exit(EXIT_FAILURE);
 }
