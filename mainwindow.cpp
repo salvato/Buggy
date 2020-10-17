@@ -324,4 +324,5 @@ MainWindow::onRightMotorThreadDone() {
 void
 MainWindow::onUpdateOrientation(float q0, float q1, float q2, float q3) {
     pGLWidget->setRotation(q0, q1, q2, q3);
+    pGLWidget->update();
 }
