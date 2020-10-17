@@ -214,9 +214,9 @@ void
 MainWindow::initPlots() {
     pLeftPlot = new Plot2D(nullptr, "Left Motor");
 
-    pLeftPlot->NewDataSet(1, 3, QColor(255,   0, 255), Plot2D::ipoint, "SetPt");
-    pLeftPlot->NewDataSet(2, 1, QColor(255, 255,   0), Plot2D::iline, "Speed");
-    pLeftPlot->NewDataSet(3, 1, QColor(  0, 255, 255), Plot2D::iline, "PID-Out");
+    pLeftPlot->NewDataSet(1, 2, QColor(255,   0, 255), Plot2D::ipoint, "SetPt");
+    pLeftPlot->NewDataSet(2, 2, QColor(255, 255,   0), Plot2D::iline, "Speed");
+    pLeftPlot->NewDataSet(3, 2, QColor(  0, 255, 255), Plot2D::iline, "PID-Out");
 
     pLeftPlot->SetShowTitle(1, true);
     pLeftPlot->SetShowTitle(2, true);
@@ -234,9 +234,9 @@ MainWindow::initPlots() {
 
     pRightPlot = new Plot2D(nullptr, "Right Motor");
 
-    pRightPlot->NewDataSet(1, 3, QColor(255,   0, 255), Plot2D::ipoint, "SetPt");
-    pRightPlot->NewDataSet(2, 1, QColor(255, 255,   0), Plot2D::iline, "Speed");
-    pRightPlot->NewDataSet(3, 1, QColor(  0, 255, 255), Plot2D::iline, "PID-Out");
+    pRightPlot->NewDataSet(1, 2, QColor(255,   0, 255), Plot2D::ipoint, "SetPt");
+    pRightPlot->NewDataSet(2, 2, QColor(255, 255,   0), Plot2D::iline, "Speed");
+    pRightPlot->NewDataSet(3, 2, QColor(  0, 255, 255), Plot2D::iline, "PID-Out");
 
     pRightPlot->SetShowTitle(1, true);
     pRightPlot->SetShowTitle(2, true);
