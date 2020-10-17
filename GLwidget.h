@@ -71,17 +71,18 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    explicit GLWidget(QWidget *parent = 0);
-    ~GLWidget();
+    explicit GLWidget(QWidget *parent = nullptr);
+    ~GLWidget() override;
     void setRotation(float q0, float q1, float q2, float q3);
+    void setRotation(QQuaternion newRotation);
 
 protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
 
-    QSize minimumSizeHint() const;
-    QSize sizeHint() const;
+    QSize minimumSizeHint() const override;
+    QSize sizeHint() const override;
 
     void initShaders();
     void initTextures();

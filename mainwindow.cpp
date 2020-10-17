@@ -19,22 +19,31 @@ MainWindow::MainWindow(QWidget *parent)
     pGLWidget     = nullptr;
     pLeftPlot     = nullptr;
     pRightPlot    = nullptr;
+
     pLeftSpeed    = nullptr;
     pRightSpeed   = nullptr;
 
+    pLeftMotor    = nullptr;
+    pRightMotor   = nullptr;
+
     pRightMotorThread = nullptr;
-    pLeftMotorThread = nullptr;
+    pLeftMotorThread  = nullptr;
 
     restoreSettings();
+
+    // Init the GUI Layout
+    initLayout();
 
     if(!initGpio())
         exit(EXIT_FAILURE);
 
+    // Create the two Speed Meters objects
     leftSpeedPin     = 22;
     rightSpeedPin    = 5;
     pLeftSpeed  = new RPMmeter(leftSpeedPin,  gpioHostHandle, nullptr);
     pRightSpeed = new RPMmeter(rightSpeedPin, gpioHostHandle, nullptr);
 
+    // Create the two Motors objects
     leftForwardPin   = 24;
     leftBackwardPin  = 23;
     rightForwardPin  = 27;
@@ -46,11 +55,11 @@ MainWindow::MainWindow(QWidget *parent)
     pLMotor = new MotorController(pLeftMotor,  pLeftSpeed);
     pRMotor = new MotorController(pRightMotor, pRightSpeed);
 
-    // Create the Motor Threads
+    // Create the Motor Controller Threads
     CreateLeftMotorThread();
     CreateRightMotorThread();
 
-    // Send PID Parameters to the Motor Controller
+    // Send PID Parameters to the two Motor Controller
     emit LPvalueChanged(0.5);
     emit LIvalueChanged(0.0);
     emit LDvalueChanged(0.0);
@@ -59,14 +68,11 @@ MainWindow::MainWindow(QWidget *parent)
     emit RIvalueChanged(0.0);
     emit RDvalueChanged(0.0);
 
-    emit operate();
-
+    // Create the Robot object
     pRobot = new Robot(pLMotor, pRMotor, parent);
     connect(pRobot, SIGNAL(sendOrientation(float, float, float, float)),
             this, SLOT(onUpdateOrientation(float, float, float, float)));
-
-    initLayout();
-
+    // Start the two Motor Controller Threads
     emit operate();
 }
 
@@ -171,19 +177,26 @@ MainWindow::CreateRightMotorThread() {
 void
 MainWindow::onStartStopPushed() {
     if(pButtonStartStop->text()== QString("Start")) {
-        connect(pLMotor, SIGNAL(MotorValues(double, double, double)),
-                this, SLOT(onNewLMotorValues(double, double, double)));
+
         pLeftPlot->ClearDataSet(1);
         pLeftPlot->ClearDataSet(2);
         pLeftPlot->ClearDataSet(3);
         nLeftPlotPoints = 0;
 
-        connect(pRMotor, SIGNAL(MotorValues(double, double, double)),
-                this, SLOT(onNewRMotorValues(double, double, double)));
         pRightPlot->ClearDataSet(1);
         pRightPlot->ClearDataSet(2);
         pRightPlot->ClearDataSet(3);
         nRightPlotPoints = 0;
+
+        connect(pLMotor, SIGNAL(MotorValues(double, double, double)),
+                this, SLOT(onNewLMotorValues(double, double, double)));
+        connect(pRMotor, SIGNAL(MotorValues(double, double, double)),
+                this, SLOT(onNewRMotorValues(double, double, double)));
+
+        currentLspeed = 1.0;
+        currentRspeed = 1.0;
+        emit LSpeedChanged(currentLspeed);
+        emit RSpeedChanged(currentRspeed);
 
         pButtonStartStop->setText("Stop");
     }
@@ -226,7 +239,7 @@ MainWindow::initPlots() {
     pLeftPlot->SetShowDataSet(2, true);
     pLeftPlot->SetShowDataSet(3, true);
 
-    pLeftPlot->SetLimits(0.0, 1.0, -1.0, 1.0, true, true, false, false);
+    pLeftPlot->SetLimits(0.0, 1.0, -1.1, 1.1, true, false, false, false);
     pLeftPlot->UpdatePlot();
     pLeftPlot->show();
 
@@ -246,7 +259,7 @@ MainWindow::initPlots() {
     pRightPlot->SetShowDataSet(2, true);
     pRightPlot->SetShowDataSet(3, true);
 
-    pRightPlot->SetLimits(0.0, 1.0, -1.0, 1.0, true, true, false, false);
+    pRightPlot->SetLimits(0.0, 1.0, -1.0, 1.0, true, false, false, false);
     pRightPlot->UpdatePlot();
     pRightPlot->show();
 

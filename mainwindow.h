@@ -2,6 +2,7 @@
 
 #include <QWidget>
 #include <QTimer>
+#include <QQuaternion>
 #include <pigpiod_if2.h>
 
 
@@ -78,20 +79,24 @@ private:
     GLWidget*        pGLWidget;
     Plot2D*          pLeftPlot;
     Plot2D*          pRightPlot;
+
     RPMmeter*        pLeftSpeed;
     RPMmeter*        pRightSpeed;
     DcMotor*         pLeftMotor;
     DcMotor*         pRightMotor;
-    Robot*           pRobot;
-    QPushButton*     pButtonStartStop;
     MotorController* pLMotor;
     MotorController* pRMotor;
     QThread*         pRightMotorThread;
     QThread*         pLeftMotorThread;
 
+    Robot*           pRobot;
+
+    QPushButton*     pButtonStartStop;
+
     QTimer loopTimer;
 
     int   gpioHostHandle;
+    QQuaternion quat0, quat1;
     float q0, q1, q2, q3;
     int   nLeftPlotPoints;
     int   nRightPlotPoints;

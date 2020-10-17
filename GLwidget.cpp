@@ -89,6 +89,12 @@ GLWidget::setRotation(float q0, float q1, float q2, float q3) {
 }
 
 
+void
+GLWidget::setRotation(QQuaternion newRotation) {
+    rotation = newRotation;
+}
+
+
 
 void
 GLWidget::initializeGL() {

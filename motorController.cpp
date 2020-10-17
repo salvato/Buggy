@@ -21,6 +21,7 @@ MotorController::MotorController(DcMotor* motor, RPMmeter* speedMeter, QObject* 
     msSampleTime = 100;
     pPid->SetSampleTime(msSampleTime);
     pPid->SetMode(AUTOMATIC);
+//    pPid->SetMode(MANUAL);
     pPid->SetOutputLimits(-1.0, 1.0);
     bTerminate = false;
 }

@@ -31,7 +31,7 @@ PID::PID(double Kp, double Ki, double Kd, int ControllerDirection) {
 // a new pid Output needs to be computed
 double
 PID::Compute(double input, double setpoint) {
-    if(!inAuto) return output;
+    if(!inAuto) return setpoint;
     unsigned long now = static_cast<unsigned long>(micros()/1000);
     unsigned long timeChange = (now - lastTime);
 
