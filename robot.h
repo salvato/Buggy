@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QTimer>
+
 #include <ADXL345.h>
 #include <ITG3200.h>
 #include <HMC5883L.h>

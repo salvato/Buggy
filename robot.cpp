@@ -165,7 +165,6 @@ Robot::getOrientation(float* q0, float* q1, float* q2, float* q3) {
 }
 
 
-
 void
 Robot::onTimeToSendData() {
     pMadgwick->getRotation(&q0, &q1, &q2, &q3);

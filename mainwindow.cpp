@@ -73,6 +73,9 @@ MainWindow::MainWindow(QWidget *parent)
     pRobot = new Robot(pLMotor, pRMotor, parent);
     connect(pRobot, SIGNAL(sendOrientation(float, float, float, float)),
             this, SLOT(onUpdateOrientation(float, float, float, float)));
+
+    quat0 = QQuaternion(1, 0, 0, 0).conjugated();
+
     // Start the two Motor Controller Threads
     emit operate();
 }
@@ -92,6 +95,8 @@ MainWindow::closeEvent(QCloseEvent *event) {
     currentRspeed = 0.0;
     emit LSpeedChanged(currentLspeed);
     emit RSpeedChanged(currentRspeed);
+    pLMotor->setPIDmode(MANUAL);
+    pRMotor->setPIDmode(MANUAL);
     disconnect(pLMotor, SIGNAL(MotorValues(double, double, double)),
             this, SLOT(onNewLMotorValues(double, double, double)));
     disconnect(pRMotor, SIGNAL(MotorValues(double, double, double)),
@@ -186,7 +191,8 @@ MainWindow::CreateRightMotorThread() {
 void
 MainWindow::onStartStopPushed() {
     if(pButtonStartStop->text()== QString("Start")) {
-
+        pRobot->getOrientation(&q0, &q1, &q2, &q3);
+        quat0 = QQuaternion(q0, q1, q2, q3).conjugated();
         pLeftPlot->ClearDataSet(1);
         pLeftPlot->ClearDataSet(2);
         pLeftPlot->ClearDataSet(3);
@@ -216,6 +222,8 @@ MainWindow::onStartStopPushed() {
         currentRspeed = 0.0;
         emit LSpeedChanged(currentLspeed);
         emit RSpeedChanged(currentRspeed);
+        pLMotor->setPIDmode(MANUAL);
+        pRMotor->setPIDmode(MANUAL);
         disconnect(pLMotor, SIGNAL(MotorValues(double, double, double)),
                 this, SLOT(onNewLMotorValues(double, double, double)));
         disconnect(pRMotor, SIGNAL(MotorValues(double, double, double)),
@@ -347,6 +355,7 @@ MainWindow::onRightMotorThreadDone() {
 
 void
 MainWindow::onUpdateOrientation(float q0, float q1, float q2, float q3) {
-    pGLWidget->setRotation(q0, q1, q2, q3);
+    quat1 = QQuaternion(q0, q1, q2, q3)*quat0;
+    pGLWidget->setRotation(quat1);
     pGLWidget->update();
 }

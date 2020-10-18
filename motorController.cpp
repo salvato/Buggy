@@ -50,7 +50,7 @@ MotorController::updateSpeed() {
         currentSpeed = pSpeedMeter->currentSpeed()/speedMax;
         double speed = pPid->Compute(currentSpeed, targetSpeed);
         if(speed < 0.0)
-            pMotor->goForward(0.0);//pMotor->goBackward(-speed);
+            pMotor->goBackward(-speed);
         else
             pMotor->goForward(speed);
         emit MotorValues(targetSpeed, currentSpeed, speed);
