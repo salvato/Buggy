@@ -33,7 +33,8 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 
 CONFIG += c++11
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    dcmotor.cpp
 SOURCES += robotmove.cpp
 SOURCES += motorController.cpp
 SOURCES += PID_v1.cpp
@@ -90,7 +91,19 @@ LIBS += -lrt
 LIBS += -lpthread
 
 
-DISTFILES += fshader.glsl
+DISTFILES += fshader.glsl \
+    BuggyDocs/DcMotor_Digital_Control.pdf \
+    BuggyDocs/DcMotor_Digital_PID_Control.pdf \
+    BuggyDocs/DcMotor_PI_Control.pdf \
+    BuggyDocs/DcMotor_PID_Control.pdf \
+    BuggyDocs/DcMotor_ROOT_Locus.pdf \
+    BuggyDocs/DcMotorControl.pdf \
+    BuggyDocs/DcMotorFrequencyDomain.pdf \
+    BuggyDocs/DcMotorModel.pdf \
+    BuggyDocs/DcMotorSimscapeModeling.pdf \
+    BuggyDocs/DcMotorSimulinkControllerDesign.pdf \
+    BuggyDocs/DcMotorSimulinkModeling.pdf \
+    BuggyDocs/DcMotorStateSpace.pdf
 DISTFILES += vshader.glsl
 DISTFILES += cube.png
 DISTFILES += plot.png

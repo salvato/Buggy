@@ -51,13 +51,13 @@ void
 MotorController::updateSpeed() {
     if(!bTerminate) {
         currentSpeed = pSpeedMeter->currentSpeed()/speedMax;
-        double speed = pPid->Compute(currentSpeed, targetSpeed);
-        if(speed < 0.0)
-            //pMotor->goBackward(-speed);// Fino a quando il sensore di
+        double commandedSpeed = pPid->Compute(currentSpeed, targetSpeed);
+        if(commandedSpeed < 0.0)
+            //pMotor->goBackward(-commandedSpeed);// Fino a quando il sensore di
             pMotor->goForward(0.0);// rotazione non fornisce la direzione
         else
-            pMotor->goForward(speed);
-        emit MotorValues(targetSpeed, currentSpeed, speed);
+            pMotor->goForward(commandedSpeed);
+        emit MotorValues(targetSpeed, currentSpeed, commandedSpeed);
     }
     else {
         pMotor->stop();

@@ -1,6 +1,25 @@
 #include "dcmotor.h"
 #include "pigpiod_if2.h"
 
+// Caratteristiche Motore:
+
+// Tensione applicabile: 3 - 12 V DC
+// Velocità di rotazione 200RPM @ 4.5V - 170mA
+// Coppia max 800gf @ 3V
+// Riduzione 1:48
+// Diametro Ruota 69mm
+
+// Resistenza Avvolgimento: 5.2 Ohm
+// Induttanza Avvolgimento: ??? Henry
+
+// http://ctms.engin.umich.edu/CTMS/index.php?example=MotorSpeed&section=SystemModeling
+
+// (J)     moment of inertia of the rotor     0.01 kg.m^2
+// (b)     motor viscous friction constant    0.1 N.m.s
+// (Ke)    electromotive force constant       0.01 V/rad/sec
+// (Kt)    motor torque constant              0.01 N.m/Amp
+// (R)     electric resistance                1 Ohm
+// (L)     electric inductance                0.5 H
 
 DcMotor::DcMotor(uint forwardPin, uint backwardPin, int gpioHandle, QObject *parent)
     : QObject(parent)
