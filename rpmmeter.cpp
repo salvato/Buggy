@@ -71,16 +71,17 @@ RPMmeter::RPMmeter(uint gpioPin, int gpioHandle, QObject *parent)
         perror("Bad Callback");
         exit(EXIT_FAILURE);
     }
-    encoderTicks = 38;
+    encoderTicksPerTurn = 38.0;
 }
 
 
 double
 RPMmeter::currentSpeed() { // In giri/s
-    double dt = (pUserData->lastTick[inputPin]-pUserData->tick0[inputPin])*1.0e-6;
+    dt = (pUserData->lastTick[inputPin]-pUserData->tick0[inputPin])*1.0e-6;
     if(dt == 0.0) return 0.0;
-    double speed = pUserData->transitionCounter[inputPin] /
-                   (double(encoderTicks)*dt);
+    speed = pUserData->transitionCounter[inputPin] /
+            (encoderTicksPerTurn*dt);
+    //qDebug() << inputPin << pUserData->transitionCounter[inputPin];
     pUserData->transitionCounter[inputPin] = 0;
     pUserData->tick0[inputPin] = pUserData->lastTick[inputPin];
     return speed;
@@ -95,5 +96,5 @@ RPMmeter::resetDistance() {
 
 double
 RPMmeter::traveledDistance() {
-    return pUserData->transitionCounter[inputPin] / double(encoderTicks);
+    return double(pUserData->transitionCounter[inputPin]) / encoderTicksPerTurn;
 }
