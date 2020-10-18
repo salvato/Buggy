@@ -14,6 +14,7 @@ class MotorController : public QObject
 
 public:
     explicit MotorController(DcMotor* motor, RPMmeter* speedMeter, QObject* parent=nullptr);
+    void setPIDmode(int Mode);
 
 public:
 
