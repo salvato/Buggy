@@ -5,6 +5,7 @@
 #include <GLwidget.h>
 #include <motorController.h>
 #include <rpmmeter.h>
+#include <PID_v1.h>
 
 #include <QThread>
 #include <QSettings>
@@ -60,11 +61,11 @@ MainWindow::MainWindow(QWidget *parent)
     CreateRightMotorThread();
 
     // Send PID Parameters to the two Motor Controller
-    emit LPvalueChanged(0.5);
+    emit LPvalueChanged(1.5);
     emit LIvalueChanged(0.0);
     emit LDvalueChanged(0.0);
 
-    emit RPvalueChanged(0.5);
+    emit RPvalueChanged(1.5);
     emit RIvalueChanged(0.0);
     emit RDvalueChanged(0.0);
 
@@ -87,6 +88,14 @@ void
 MainWindow::closeEvent(QCloseEvent *event) {
     Q_UNUSED(event)
     loopTimer.stop();
+    currentLspeed = 0.0;
+    currentRspeed = 0.0;
+    emit LSpeedChanged(currentLspeed);
+    emit RSpeedChanged(currentRspeed);
+    disconnect(pLMotor, SIGNAL(MotorValues(double, double, double)),
+            this, SLOT(onNewLMotorValues(double, double, double)));
+    disconnect(pRMotor, SIGNAL(MotorValues(double, double, double)),
+            this, SLOT(onNewRMotorValues(double, double, double)));
     saveSettings();
 }
 
@@ -193,8 +202,10 @@ MainWindow::onStartStopPushed() {
         connect(pRMotor, SIGNAL(MotorValues(double, double, double)),
                 this, SLOT(onNewRMotorValues(double, double, double)));
 
-        currentLspeed = 1.0;
-        currentRspeed = 1.0;
+        pLMotor->setPIDmode(AUTOMATIC);
+        pRMotor->setPIDmode(AUTOMATIC);
+        currentLspeed = 0.5;
+        currentRspeed = 0.5;
         emit LSpeedChanged(currentLspeed);
         emit RSpeedChanged(currentRspeed);
 
@@ -227,7 +238,7 @@ void
 MainWindow::initPlots() {
     pLeftPlot = new Plot2D(nullptr, "Left Motor");
 
-    pLeftPlot->NewDataSet(1, 2, QColor(255,   0, 255), Plot2D::ipoint, "SetPt");
+    pLeftPlot->NewDataSet(1, 2, QColor(255, 196, 0), Plot2D::iline, "SetPt");
     pLeftPlot->NewDataSet(2, 2, QColor(255, 255,   0), Plot2D::iline, "Speed");
     pLeftPlot->NewDataSet(3, 2, QColor(  0, 255, 255), Plot2D::iline, "PID-Out");
 
@@ -247,7 +258,7 @@ MainWindow::initPlots() {
 
     pRightPlot = new Plot2D(nullptr, "Right Motor");
 
-    pRightPlot->NewDataSet(1, 2, QColor(255,   0, 255), Plot2D::ipoint, "SetPt");
+    pRightPlot->NewDataSet(1, 2, QColor(255, 196,   0), Plot2D::iline, "SetPt");
     pRightPlot->NewDataSet(2, 2, QColor(255, 255,   0), Plot2D::iline, "Speed");
     pRightPlot->NewDataSet(3, 2, QColor(  0, 255, 255), Plot2D::iline, "PID-Out");
 
@@ -303,7 +314,7 @@ MainWindow::keyPressEvent(QKeyEvent *e) {
 void
 MainWindow::onNewLMotorValues(double wantedSpeed, double currentSpeed, double speed) {
     Q_UNUSED(wantedSpeed)
-    //pLeftPlot->NewPoint(1, double(nLeftPlotPoints), wantedSpeed);
+    pLeftPlot->NewPoint(1, double(nLeftPlotPoints), wantedSpeed);
     pLeftPlot->NewPoint(2, double(nLeftPlotPoints), currentSpeed);
     pLeftPlot->NewPoint(3, double(nLeftPlotPoints), speed);
     pLeftPlot->UpdatePlot();
@@ -314,7 +325,7 @@ MainWindow::onNewLMotorValues(double wantedSpeed, double currentSpeed, double sp
 void
 MainWindow::onNewRMotorValues(double wantedSpeed, double currentSpeed, double speed) {
     Q_UNUSED(wantedSpeed)
-    //pRightPlot->NewPoint(1, double(nRightPlotPoints), wantedSpeed);
+    pRightPlot->NewPoint(1, double(nRightPlotPoints), wantedSpeed);
     pRightPlot->NewPoint(2, double(nRightPlotPoints), currentSpeed);
     pRightPlot->NewPoint(3, double(nRightPlotPoints), speed);
     pRightPlot->UpdatePlot();
