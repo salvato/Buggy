@@ -41,5 +41,5 @@ private:
     volatile bool bTerminate;
     double currentP, currentI, currentD;
     double speedMax;
-    int    msSampleTime;
+    int    msSamplingTime;
 };

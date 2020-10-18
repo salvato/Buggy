@@ -14,14 +14,17 @@ MotorController::MotorController(DcMotor* motor, RPMmeter* speedMeter, QObject* 
 {
     speedMax = 8.0;// In giri/s
     targetSpeed = 0.0;
+
     currentP = 0.0;
     currentI = 0.0;
     currentD = 0.0;
     pPid = new PID(currentP, currentI, currentD, DIRECT);
-    msSampleTime = 100;
-    pPid->SetSampleTime(msSampleTime);
+
+    msSamplingTime = 100;
+    pPid->SetSampleTime(msSamplingTime);
     pPid->SetMode(AUTOMATIC);
     pPid->SetOutputLimits(-1.0, 1.0);
+
     bTerminate = false;
 }
 
@@ -40,7 +43,7 @@ MotorController::go() {
     pUpdateTimer->setTimerType(Qt::PreciseTimer);
     connect(pUpdateTimer, SIGNAL(timeout()),
             this, SLOT(updateSpeed()));
-    pUpdateTimer->start(msSampleTime);
+    pUpdateTimer->start(msSamplingTime);
 }
 
 
@@ -50,7 +53,8 @@ MotorController::updateSpeed() {
         currentSpeed = pSpeedMeter->currentSpeed()/speedMax;
         double speed = pPid->Compute(currentSpeed, targetSpeed);
         if(speed < 0.0)
-            pMotor->goBackward(-speed);
+            //pMotor->goBackward(-speed);// Fino a quando il sensore di
+            pMotor->goForward(0.0);// rotazione non fornisce la direzione
         else
             pMotor->goForward(speed);
         emit MotorValues(targetSpeed, currentSpeed, speed);
