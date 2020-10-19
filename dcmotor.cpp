@@ -9,8 +9,8 @@
 // Riduzione 1:48
 // Diametro Ruota 69mm
 
-// Resistenza Avvolgimento: 5.2 Ohm
-// Induttanza Avvolgimento: ??? Henry
+// Resistenza Avvolgimento: 0.94 Ohm   @ 100Hz
+// Induttanza Avvolgimento: 1.8 mHenry @ 100Hz
 
 // http://ctms.engin.umich.edu/CTMS/index.php?example=MotorSpeed&section=SystemModeling
 
