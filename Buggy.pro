@@ -103,7 +103,9 @@ DISTFILES += fshader.glsl \
     BuggyDocs/DcMotorSimscapeModeling.pdf \
     BuggyDocs/DcMotorSimulinkControllerDesign.pdf \
     BuggyDocs/DcMotorSimulinkModeling.pdf \
-    BuggyDocs/DcMotorStateSpace.pdf
+    BuggyDocs/DcMotorStateSpace.pdf \
+    BuggyDocs/Lagging Effect Associated with a Hold.pdf \
+    BuggyDocs/SystemModeling.pdf
 DISTFILES += vshader.glsl
 DISTFILES += cube.png
 DISTFILES += plot.png
