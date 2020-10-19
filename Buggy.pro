@@ -92,6 +92,8 @@ LIBS += -lpthread
 
 
 DISTFILES += fshader.glsl \
+    BuggyDocs/0_DcMotorModel.pdf \
+    BuggyDocs/1_DCMotorSpeedSystemAnalysis.pdf \
     BuggyDocs/DcMotor_Digital_Control.pdf \
     BuggyDocs/DcMotor_Digital_PID_Control.pdf \
     BuggyDocs/DcMotor_PI_Control.pdf \
@@ -105,6 +107,8 @@ DISTFILES += fshader.glsl \
     BuggyDocs/DcMotorSimulinkModeling.pdf \
     BuggyDocs/DcMotorStateSpace.pdf \
     BuggyDocs/Lagging Effect Associated with a Hold.pdf \
+    BuggyDocs/Lagging Effect Associated with a Hold.pdf \
+    BuggyDocs/SystemAnalysis.pdf \
     BuggyDocs/SystemModeling.pdf
 DISTFILES += vshader.glsl
 DISTFILES += cube.png
