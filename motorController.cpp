@@ -47,6 +47,10 @@ MotorController::go() {
 }
 
 
+// Called every msSamplingTime milliseconds to
+// update the motor input.
+// Since this is Linux... the precision of the
+// interval can NOT be guaranteed
 void
 MotorController::updateSpeed() {
     if(!bTerminate) {
