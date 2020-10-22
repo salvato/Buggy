@@ -37,8 +37,8 @@ MotorController::setPIDmode(int Mode) {
 
 void
 MotorController::go() {
-    // The Timer MUST be created when the
-    // Controller Thread has been started
+    // The Timer MUST be created after the
+    // Controller Thread has been started.
     pUpdateTimer = new QTimer();
     pUpdateTimer->setTimerType(Qt::PreciseTimer);
     connect(pUpdateTimer, SIGNAL(timeout()),
