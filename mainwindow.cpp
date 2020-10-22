@@ -61,11 +61,11 @@ MainWindow::MainWindow(QWidget *parent)
     CreateRightMotorThread();
 
     // Send PID Parameters to the two Motor Controller
-    emit LPvalueChanged(1.5);
+    emit LPvalueChanged(5.5);
     emit LIvalueChanged(0.0);
     emit LDvalueChanged(0.0);
 
-    emit RPvalueChanged(1.5);
+    emit RPvalueChanged(5.5);
     emit RIvalueChanged(0.0);
     emit RDvalueChanged(0.0);
 

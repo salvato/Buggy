@@ -33,8 +33,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 
 CONFIG += c++11
 
-SOURCES += main.cpp \
-    dcmotor.cpp
+SOURCES += main.cpp
 SOURCES += robotmove.cpp
 SOURCES += motorController.cpp
 SOURCES += PID_v1.cpp
