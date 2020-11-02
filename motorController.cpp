@@ -37,8 +37,8 @@ MotorController::setPIDmode(int Mode) {
 
 void
 MotorController::go() {
-    // The Timer MUST be created when the
-    // Controller Thread has been started
+    // The Timer MUST be created after the
+    // Controller Thread has been started.
     pUpdateTimer = new QTimer();
     pUpdateTimer->setTimerType(Qt::PreciseTimer);
     connect(pUpdateTimer, SIGNAL(timeout()),
@@ -47,6 +47,10 @@ MotorController::go() {
 }
 
 
+// Called every msSamplingTime milliseconds to
+// update the motor input.
+// Since this is Linux... the precision of the
+// interval can NOT be guaranteed
 void
 MotorController::updateSpeed() {
     if(!bTerminate) {
