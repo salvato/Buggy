@@ -35,8 +35,6 @@ CONFIG += c++11
 
 SOURCES += main.cpp
 SOURCES += robotmove.cpp
-SOURCES += motorController.cpp
-SOURCES += PID_v1.cpp
 SOURCES += axesdialog.cpp
 SOURCES += AxisFrame.cpp
 SOURCES += AxisLimits.cpp
@@ -46,27 +44,13 @@ SOURCES += geometryengine.cpp
 SOURCES += GLwidget.cpp
 SOURCES += plot2d.cpp
 SOURCES += plotpropertiesdlg.cpp
-SOURCES += rpmmeter.cpp
-SOURCES += ADXL345.cpp
-SOURCES += HMC5883L.cpp
-SOURCES += ITG3200.cpp
-SOURCES += MadgwickAHRS.cpp
 SOURCES += robot.cpp
-SOURCES += dcmotor.cpp
 SOURCES += mainwindow.cpp
 
 
 HEADERS += mainwindow.h
 HEADERS += robotmove.h
-HEADERS += motorController.h
-HEADERS += PID_v1.h
-HEADERS += rpmmeter.h
-HEADERS += ADXL345.h
-HEADERS += HMC5883L.h
-HEADERS += ITG3200.h
-HEADERS += MadgwickAHRS.h
 HEADERS += robot.h
-HEADERS += dcmotor.h
 HEADERS += geometryengine.h
 HEADERS += GLwidget.h
 HEADERS += axesdialog.h
@@ -85,7 +69,6 @@ RESOURCES += shaders.qrc
 RESOURCES += textures.qrc
 
 
-LIBS += -lpigpiod_if2 # To include libpigpiod_if2.so from /usr/local/lib
 LIBS += -lrt
 LIBS += -lpthread
 

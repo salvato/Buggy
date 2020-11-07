@@ -1,11 +1,7 @@
 #include <mainwindow.h>
-#include <dcmotor.h>
 #include <robot.h>
 #include <plot2d.h>
 #include <GLwidget.h>
-#include <motorController.h>
-#include <rpmmeter.h>
-#include <PID_v1.h>
 
 #include <QThread>
 #include <QSettings>
@@ -38,52 +34,11 @@ MainWindow::MainWindow(QWidget *parent)
     if(!initGpio())
         exit(EXIT_FAILURE);
 
-    // Create the two Speed Meters objects
-    leftSpeedPin     = 22;
-    rightSpeedPin    = 5;
-    pLeftSpeed  = new RPMmeter(leftSpeedPin,  gpioHostHandle, nullptr);
-    pRightSpeed = new RPMmeter(rightSpeedPin, gpioHostHandle, nullptr);
-
-    // Create the two Motors objects
-    leftForwardPin   = 24;
-    leftBackwardPin  = 23;
-    rightForwardPin  = 27;
-    rightBackwardPin = 17;
-    pLeftMotor  = new DcMotor(leftForwardPin,  leftBackwardPin,  gpioHostHandle);
-    pRightMotor = new DcMotor(rightForwardPin, rightBackwardPin, gpioHostHandle);
-
-    // Create the two Motor Controllers
-    pLMotor = new MotorController(pLeftMotor,  pLeftSpeed);
-    pRMotor = new MotorController(pRightMotor, pRightSpeed);
-
-    // Create the Motor Controller Threads
-    CreateLeftMotorThread();
-    CreateRightMotorThread();
-
-    // Send PID Parameters to the two Motor Controller
-    emit LPvalueChanged(0.5);
-    emit LIvalueChanged(0.0);
-    emit LDvalueChanged(0.0);
-
-    emit RPvalueChanged(0.5);
-    emit RIvalueChanged(0.0);
-    emit RDvalueChanged(0.0);
-
-    // Create the Robot object
-    pRobot = new Robot(pLMotor, pRMotor, parent);
-    connect(pRobot, SIGNAL(sendOrientation(float, float, float, float)),
-            this, SLOT(onUpdateOrientation(float, float, float, float)));
-
     quat0 = QQuaternion(1, 0, 0, 0).conjugated();
-
-    // Start the two Motor Controller Threads
-    emit operate();
 }
 
 
 MainWindow::~MainWindow() {
-    if(gpioHostHandle >= 0)
-        pigpio_stop(gpioHostHandle);
 }
 
 
@@ -91,16 +46,6 @@ void
 MainWindow::closeEvent(QCloseEvent *event) {
     Q_UNUSED(event)
     loopTimer.stop();
-    currentLspeed = 0.0;
-    currentRspeed = 0.0;
-    emit LSpeedChanged(currentLspeed);
-    emit RSpeedChanged(currentRspeed);
-    pLMotor->setPIDmode(MANUAL);
-    pRMotor->setPIDmode(MANUAL);
-    disconnect(pLMotor, SIGNAL(MotorValues(double, double, double)),
-            this, SLOT(onNewLMotorValues(double, double, double)));
-    disconnect(pRMotor, SIGNAL(MotorValues(double, double, double)),
-            this, SLOT(onNewRMotorValues(double, double, double)));
     saveSettings();
 }
 
@@ -121,73 +66,6 @@ MainWindow::saveSettings() {
 }
 
 
-bool
-MainWindow::initGpio() {
-    char host[sizeof("localhost")+1];
-    strcpy(host, "localhost");
-    char port[sizeof("8888")+1];
-    strcpy(port, "8888");
-    gpioHostHandle = pigpio_start(host, port);
-    if(gpioHostHandle < 0)
-        return false;
-    return true;
-}
-
-
-void
-MainWindow::CreateLeftMotorThread() {
-    pLeftMotorThread = new QThread();
-    pLMotor->moveToThread(pLeftMotorThread);
-    connect(pLeftMotorThread, SIGNAL(finished()),
-            this, SLOT(onLeftMotorThreadDone()));
-    connect(this, SIGNAL(operate()),
-            pLMotor, SLOT(go()));
-    connect(this, SIGNAL(stopLMotor()),
-            pLMotor, SLOT(terminate()));
-    connect(this, SIGNAL(LPvalueChanged(double)),
-            pLMotor, SLOT(setP(double)));
-    connect(this, SIGNAL(LIvalueChanged(double)),
-            pLMotor, SLOT(setI(double)));
-    connect(this, SIGNAL(LDvalueChanged(double)),
-            pLMotor, SLOT(setD(double)));
-    connect(this, SIGNAL(LSpeedChanged(double)),
-            pLMotor, SLOT(setSpeed(double)));
-
-    // Start the Motor Controller Thread
-    pLeftMotorThread->start();
-
-    currentLspeed = 0.0;
-    emit LSpeedChanged(currentLspeed);
-}
-
-
-void
-MainWindow::CreateRightMotorThread() {
-    pRightMotorThread = new QThread();
-    pRMotor->moveToThread(pRightMotorThread);
-    connect(pRightMotorThread, SIGNAL(finished()),
-            this, SLOT(onRightMotorThreadDone()));
-    connect(this, SIGNAL(operate()),
-            pRMotor, SLOT(go()));
-    connect(this, SIGNAL(stopRMotor()),
-            pRMotor, SLOT(terminate()));
-    connect(this, SIGNAL(RPvalueChanged(double)),
-            pRMotor, SLOT(setP(double)));
-    connect(this, SIGNAL(RIvalueChanged(double)),
-            pRMotor, SLOT(setI(double)));
-    connect(this, SIGNAL(RDvalueChanged(double)),
-            pRMotor, SLOT(setD(double)));
-    connect(this, SIGNAL(RSpeedChanged(double)),
-            pRMotor, SLOT(setSpeed(double)));
-
-    // Start the Motor Controller Thread
-    pRightMotorThread->start();
-
-    currentRspeed = 0.0;
-    emit RSpeedChanged(currentRspeed);
-}
-
-
 void
 MainWindow::onStartStopPushed() {
     if(pButtonStartStop->text()== QString("Start")) {
@@ -203,31 +81,11 @@ MainWindow::onStartStopPushed() {
         pRightPlot->ClearDataSet(3);
         nRightPlotPoints = 0;
 
-        connect(pLMotor, SIGNAL(MotorValues(double, double, double)),
-                this, SLOT(onNewLMotorValues(double, double, double)));
-        connect(pRMotor, SIGNAL(MotorValues(double, double, double)),
-                this, SLOT(onNewRMotorValues(double, double, double)));
-
-        pLMotor->setPIDmode(AUTOMATIC);
-        pRMotor->setPIDmode(AUTOMATIC);
-        currentLspeed = 0.5;
-        currentRspeed = 0.5;
-        emit LSpeedChanged(currentLspeed);
-        emit RSpeedChanged(currentRspeed);
-
         pButtonStartStop->setText("Stop");
     }
     else {
         currentLspeed = 0.0;
         currentRspeed = 0.0;
-        emit LSpeedChanged(currentLspeed);
-        emit RSpeedChanged(currentRspeed);
-        pLMotor->setPIDmode(MANUAL);
-        pRMotor->setPIDmode(MANUAL);
-        disconnect(pLMotor, SIGNAL(MotorValues(double, double, double)),
-                this, SLOT(onNewLMotorValues(double, double, double)));
-        disconnect(pRMotor, SIGNAL(MotorValues(double, double, double)),
-                this, SLOT(onNewRMotorValues(double, double, double)));
         pButtonStartStop->setText("Start");
     }
 }
@@ -316,40 +174,6 @@ MainWindow::keyPressEvent(QKeyEvent *e) {
     close();
   else
     QWidget::keyPressEvent(e);
-}
-
-
-void
-MainWindow::onNewLMotorValues(double wantedSpeed, double currentSpeed, double speed) {
-    Q_UNUSED(wantedSpeed)
-    pLeftPlot->NewPoint(1, double(nLeftPlotPoints), wantedSpeed);
-    pLeftPlot->NewPoint(2, double(nLeftPlotPoints), currentSpeed);
-    pLeftPlot->NewPoint(3, double(nLeftPlotPoints), speed);
-    pLeftPlot->UpdatePlot();
-    nLeftPlotPoints++;
-}
-
-
-void
-MainWindow::onNewRMotorValues(double wantedSpeed, double currentSpeed, double speed) {
-    Q_UNUSED(wantedSpeed)
-    pRightPlot->NewPoint(1, double(nRightPlotPoints), wantedSpeed);
-    pRightPlot->NewPoint(2, double(nRightPlotPoints), currentSpeed);
-    pRightPlot->NewPoint(3, double(nRightPlotPoints), speed);
-    pRightPlot->UpdatePlot();
-    nRightPlotPoints++;
-}
-
-
-void
-MainWindow::onLeftMotorThreadDone() {
-    qDebug() << "onLeftMotorThreadDone()";
-}
-
-
-void
-MainWindow::onRightMotorThreadDone() {
-    qDebug() << "onRightMotorThreadDone()";
 }
 
 
