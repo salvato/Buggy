@@ -9,6 +9,7 @@
 
 QT_FORWARD_DECLARE_CLASS(GLWidget)
 QT_FORWARD_DECLARE_CLASS(Plot2D)
+QT_FORWARD_DECLARE_CLASS(ControlsDialog)
 QT_FORWARD_DECLARE_CLASS(QPushButton)
 QT_FORWARD_DECLARE_CLASS(QSlider)
 QT_FORWARD_DECLARE_CLASS(QLineEdit)
@@ -47,6 +48,7 @@ private:
     Plot2D*          pLeftPlot;
     Plot2D*          pRightPlot;
     QPushButton*     pButtonStartStop;
+    ControlsDialog*  pControlsDialog;
     QSlider*         pLPslider;
     QSlider*         pLIslider;
     QSlider*         pLDslider;

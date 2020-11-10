@@ -1,6 +1,7 @@
 #include <mainwindow.h>
 #include <plot2d.h>
 #include <GLwidget.h>
+#include "controlsdialog.h"
 
 #include <QSettings>
 #include <QLayout>
@@ -27,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent)
         pStatusBar->showMessage(QString("Unable to open Serial Port !"));
         pButtonStartStop->setDisabled(true);
     }
+    pControlsDialog = new ControlsDialog();
+    pControlsDialog->show();
 }
 
 
