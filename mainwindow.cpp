@@ -20,16 +20,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     receivedCommand = QString();
     baudRate = 9600; // 115200;
-    serialPort.setPortName("/dev/ttyACM0");
-    if(serialPort.isOpen())
-        perror("Serial Port Already Opened !");
-    serialPort.setBaudRate(baudRate);
-    if(!serialPort.open(QIODevice::ReadWrite))
+    serialPortName = QString("/dev/ttyACM0");
+    if(!serialConnect())
         perror("Unable to open Serial Port");
-    serialPort.setParent(this);
-    pStatusBar->showMessage(QString("uController connected to: ttyACM0"));
-    connect(&serialPort, SIGNAL(readyRead()),
-            this, SLOT(onNewDataAvailable()));
 }
 
 
@@ -59,10 +52,31 @@ MainWindow::saveSettings() {
 }
 
 
+bool
+MainWindow::serialConnect() {
+    serialPort.setPortName(serialPortName);
+    if(serialPort.isOpen()) {
+        pStatusBar->showMessage(QString("Serial Port Already Opened !"));
+        return false;
+    }
+    serialPort.setBaudRate(baudRate);
+    if(!serialPort.open(QIODevice::ReadWrite)) {
+        pStatusBar->showMessage(QString("Unable to open Serial Port"));
+        return false;
+    }
+    serialPort.setParent(this);
+    pStatusBar->showMessage(QString("uController connected to: ttyACM0"));
+    connect(&serialPort, SIGNAL(readyRead()),
+            this, SLOT(onNewDataAvailable()));
+    return true;
+}
+
+
 void
 MainWindow::onStartStopPushed() {
     if(pButtonStartStop->text()== QString("Start")) {
         quat0 = QQuaternion(q0, q1, q2, q3).conjugated();
+        t0 = dTime;
         pLeftPlot->ClearDataSet(1);
         pLeftPlot->ClearDataSet(2);
         pLeftPlot->ClearDataSet(3);
@@ -199,16 +213,9 @@ MainWindow::executeCommand(QString command) {
 
         quat1 = QQuaternion(q0, q1, q2, q3)*quat0;
         pGLWidget->setRotation(quat1);
-        pLeftPlot->NewPoint(1, dTime, leftSpeed);
+        pLeftPlot->NewPoint(1, dTime-t0, leftSpeed);
         pGLWidget->update();
         pLeftPlot->UpdatePlot();
     }
 }
 
-
-//void
-//MainWindow::onUpdateOrientation(float q0, float q1, float q2, float q3) {
-//    quat1 = QQuaternion(q0, q1, q2, q3)*quat0;
-//    pGLWidget->setRotation(quat1);
-//    pGLWidget->update();
-//}

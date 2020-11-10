@@ -28,6 +28,7 @@ protected:
     void createButtons();
     void initLayout();
     void initPlots();
+    bool serialConnect();
     void executeCommand(QString command);
 
 private:
@@ -46,14 +47,15 @@ private:
     QStatusBar*      pStatusBar;
 
     QSerialPort serialPort;
+    QString     serialPortName;
     QString     receivedCommand;
     QQuaternion quat0, quat1;
 
-    float q0, q1, q2, q3;
+    float  q0, q1, q2, q3;
     double leftSpeed;
     double leftPath;
-    double dTime;
-    int   nLeftPlotPoints;
-    int   nRightPlotPoints;
-    int   baudRate;
+    double dTime, t0;
+    int    nLeftPlotPoints;
+    int    nRightPlotPoints;
+    int    baudRate;
 };
