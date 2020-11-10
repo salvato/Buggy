@@ -48,13 +48,6 @@ void
 MainWindow::restoreSettings() {
     QSettings settings;
     restoreGeometry(settings.value("Geometry").toByteArray());
-
-    pLPslider->setValue(settings.value(QString("LP_Value"), "0.0").toInt());
-    pLIslider->setValue(settings.value(QString("LI_Value"), "0.0").toInt());
-    pLDslider->setValue(settings.value(QString("LD_Value"), "0.0").toInt());
-    pRPslider->setValue(settings.value(QString("RP_Value"), "0.0").toInt());
-    pRIslider->setValue(settings.value(QString("RI_Value"), "0.0").toInt());
-    pRDslider->setValue(settings.value(QString("RD_Value"), "0.0").toInt());
 }
 
 
@@ -161,43 +154,6 @@ MainWindow::initPlots() {
     nRightPlotPoints = 0;
 }
 
-void
-MainWindow::initControls() {
-    pLPslider = new QSlider(this);
-    pLIslider = new QSlider(this);
-    pLDslider = new QSlider(this);
-
-    pLPslider->setRange(0, 700);
-    pLPslider->setTracking(true);
-    pLIslider->setTracking(true);
-    pLDslider->setTracking(true);
-
-    pRPslider = new QSlider(this);
-    pRIslider = new QSlider(this);
-    pRDslider = new QSlider(this);
-
-    pRPslider->setRange(0, 700);
-    pRPslider->setTracking(true);
-    pRIslider->setTracking(true);
-    pRDslider->setTracking(true);
-
-    pLPedit = new QLineEdit(this);
-    pLIedit = new QLineEdit(this);
-    pLDedit = new QLineEdit(this);
-
-    pLPedit->setText(QString("%1").arg(pLPslider->value()));
-    pLIedit->setText(QString("%1").arg(pLIslider->value()));
-    pLDedit->setText(QString("%1").arg(pLDslider->value()));
-
-    pRPedit = new QLineEdit(this);
-    pRIedit = new QLineEdit(this);
-    pRDedit = new QLineEdit(this);
-
-    pRPedit->setText(QString("%1").arg(pRPslider->value()));
-    pRIedit->setText(QString("%1").arg(pRIslider->value()));
-    pRDedit->setText(QString("%1").arg(pRDslider->value()));
-}
-
 
 void
 MainWindow::initLayout() {
@@ -208,26 +164,9 @@ MainWindow::initLayout() {
     pPlotLayout->addWidget(pLeftPlot);
     pPlotLayout->addWidget(pRightPlot);
 
-    initControls();
-    QGridLayout* pControlLayout = new QGridLayout();
-    pControlLayout->addWidget(pLPslider, 0, 1, 3, 1);
-    pControlLayout->addWidget(pLIslider, 0, 4, 3, 1);
-    pControlLayout->addWidget(pLDslider, 0, 7, 3, 1);
-    pControlLayout->addWidget(pLPedit,   3, 0, 1, 3);
-    pControlLayout->addWidget(pLIedit,   3, 3, 1, 3);
-    pControlLayout->addWidget(pLDedit,   3, 6, 1, 3);
-
-    pControlLayout->addWidget(pRPslider, 0, 10, 3, 1);
-    pControlLayout->addWidget(pRIslider, 0, 13, 3, 1);
-    pControlLayout->addWidget(pRDslider, 0, 16, 3, 1);
-    pControlLayout->addWidget(pRPedit,   3, 9, 1, 3);
-    pControlLayout->addWidget(pRIedit,   3, 12, 1, 3);
-    pControlLayout->addWidget(pRDedit,   3, 15, 1, 3);
-
     QHBoxLayout *firstRow = new QHBoxLayout;
     firstRow->addWidget(pGLWidget);
     firstRow->addLayout(pPlotLayout);
-    firstRow->addLayout(pControlLayout);
 
     createButtons();
     QHBoxLayout *firstButtonRow = new QHBoxLayout;

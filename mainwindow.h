@@ -49,19 +49,6 @@ private:
     Plot2D*          pRightPlot;
     QPushButton*     pButtonStartStop;
     ControlsDialog*  pControlsDialog;
-    QSlider*         pLPslider;
-    QSlider*         pLIslider;
-    QSlider*         pLDslider;
-    QSlider*         pRPslider;
-    QSlider*         pRIslider;
-    QSlider*         pRDslider;
-    QLineEdit*       pLPedit;
-    QLineEdit*       pLIedit;
-    QLineEdit*       pLDedit;
-    QLineEdit*       pRPedit;
-    QLineEdit*       pRIedit;
-    QLineEdit*       pRDedit;
-
     QStatusBar*      pStatusBar;
 
     QSerialPort serialPort;

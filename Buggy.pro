@@ -34,9 +34,8 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 
 CONFIG += c++11
 
-SOURCES += main.cpp \
-    controlsdialog.cpp
-SOURCES +=
+SOURCES += main.cpp
+SOURCES += controlsdialog.cpp
 SOURCES += axesdialog.cpp
 SOURCES += AxisFrame.cpp
 SOURCES += AxisLimits.cpp
@@ -50,10 +49,8 @@ SOURCES +=
 SOURCES += mainwindow.cpp
 
 
-HEADERS += mainwindow.h \
-    controlsdialog.h
-HEADERS +=
-HEADERS +=
+HEADERS += mainwindow.h
+HEADERS += controlsdialog.h
 HEADERS += geometryengine.h
 HEADERS += GLwidget.h
 HEADERS += axesdialog.h
@@ -65,7 +62,7 @@ HEADERS += plot2d.h
 HEADERS += plotpropertiesdlg.h
 
 
-FORMS +=
+FORMS += controlsdialog.ui
 
 
 RESOURCES += shaders.qrc
