@@ -1,9 +1,7 @@
 #include <mainwindow.h>
-#include <robot.h>
 #include <plot2d.h>
 #include <GLwidget.h>
 
-#include <QThread>
 #include <QSettings>
 #include <QLayout>
 #include <QKeyEvent>
@@ -12,17 +10,26 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
+    , pGLWidget(nullptr)
+    , pLeftPlot(nullptr)
+    , pRightPlot(nullptr)
 {
-    pGLWidget     = nullptr;
-    pLeftPlot     = nullptr;
-    pRightPlot    = nullptr;
-
     restoreSettings();
-
-    // Init the GUI Layout
     initLayout();
-
     quat0 = QQuaternion(1, 0, 0, 0).conjugated();
+
+    receivedCommand = QString();
+    baudRate = 9600; // 115200;
+    serialPort.setPortName("/dev/ttyACM0");
+    if(serialPort.isOpen())
+        perror("Serial Port Already Opened !");
+    serialPort.setBaudRate(baudRate);
+    if(!serialPort.open(QIODevice::ReadWrite))
+        perror("Unable to open Serial Port");
+    serialPort.setParent(this);
+    pStatusBar->showMessage(QString("uController connected to: ttyACM0"));
+    connect(&serialPort, SIGNAL(readyRead()),
+            this, SLOT(onNewDataAvailable()));
 }
 
 
@@ -33,7 +40,6 @@ MainWindow::~MainWindow() {
 void
 MainWindow::closeEvent(QCloseEvent *event) {
     Q_UNUSED(event)
-    loopTimer.stop();
     saveSettings();
 }
 
@@ -41,7 +47,6 @@ MainWindow::closeEvent(QCloseEvent *event) {
 void
 MainWindow::restoreSettings() {
     QSettings settings;
-    // Restore Geometry and State of the window
     restoreGeometry(settings.value("Geometry").toByteArray());
 }
 
@@ -54,30 +59,9 @@ MainWindow::saveSettings() {
 }
 
 
-bool
-MainWindow::connectToMicroController() {
-    serialPort.setPortName("/dev/ttyACM0");
-    if(serialPort.isOpen())
-        return false;
-    serialPort.setBaudRate(115200);
-    if(!serialPort.open(QIODevice::ReadWrite))
-        return false;
-    serialPort.setParent(this);
-    //editHostName->setText(QString("uController connected to: %1").arg(info.portName()));
-    return true;
-}
-
-
 void
 MainWindow::onStartStopPushed() {
     if(pButtonStartStop->text()== QString("Start")) {
-        if(!connectToMicroController()) {
-            perror("Unable to connect to uC");
-            return;
-        }
-        connect(&serialPort, SIGNAL(readyRead()),
-                this, SLOT(onNewDataAvailable()));
-        pRobot->getOrientation(&q0, &q1, &q2, &q3);
         quat0 = QQuaternion(q0, q1, q2, q3).conjugated();
         pLeftPlot->ClearDataSet(1);
         pLeftPlot->ClearDataSet(2);
@@ -92,24 +76,7 @@ MainWindow::onStartStopPushed() {
         pButtonStartStop->setText("Stop");
     }
     else {
-        currentLspeed = 0.0;
-        currentRspeed = 0.0;
         pButtonStartStop->setText("Start");
-    }
-}
-
-
-void
-MainWindow::onNewDataAvailable() {
-    receivedCommand += serialPort.readAll();
-    QString sNewCommand;
-    int iPos;
-    iPos = receivedCommand.indexOf("#");
-    while(iPos != -1) {
-        sNewCommand = receivedCommand.left(iPos);
-        executeCommand(sNewCommand);
-        receivedCommand = receivedCommand.mid(iPos+1);
-        iPos = receivedCommand.indexOf("#");
     }
 }
 
@@ -127,7 +94,7 @@ void
 MainWindow::initPlots() {
     pLeftPlot = new Plot2D(nullptr, "Left Motor");
 
-    pLeftPlot->NewDataSet(1, 2, QColor(255, 196, 0), Plot2D::iline, "SetPt");
+    pLeftPlot->NewDataSet(1, 2, QColor(255, 196,   0), Plot2D::iline, "SetPt");
     pLeftPlot->NewDataSet(2, 2, QColor(255, 255,   0), Plot2D::iline, "Speed");
     pLeftPlot->NewDataSet(3, 2, QColor(  0, 255, 255), Plot2D::iline, "PID-Out");
 
@@ -139,7 +106,7 @@ MainWindow::initPlots() {
     pLeftPlot->SetShowDataSet(2, true);
     pLeftPlot->SetShowDataSet(3, true);
 
-    pLeftPlot->SetLimits(0.0, 1.0, -1.1, 1.1, true, false, false, false);
+    pLeftPlot->SetLimits(0.0, 1.0, -1.1, 1.1, true, true, false, false);
     pLeftPlot->UpdatePlot();
     pLeftPlot->show();
 
@@ -159,7 +126,7 @@ MainWindow::initPlots() {
     pRightPlot->SetShowDataSet(2, true);
     pRightPlot->SetShowDataSet(3, true);
 
-    pRightPlot->SetLimits(0.0, 1.0, -1.0, 1.0, true, false, false, false);
+    pRightPlot->SetLimits(0.0, 1.0, -1.0, 1.0, true, true, false, false);
     pRightPlot->UpdatePlot();
     pRightPlot->show();
 
@@ -170,6 +137,7 @@ MainWindow::initPlots() {
 void
 MainWindow::initLayout() {
     pGLWidget = new GLWidget(this);
+
     initPlots();
     QVBoxLayout* pPlotLayout = new (QVBoxLayout);
     pPlotLayout->addWidget(pLeftPlot);
@@ -179,15 +147,17 @@ MainWindow::initLayout() {
     firstRow->addWidget(pGLWidget);
     firstRow->addLayout(pPlotLayout);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addLayout(firstRow);
-    setLayout(mainLayout);
-
     createButtons();
     QHBoxLayout *firstButtonRow = new QHBoxLayout;
     firstButtonRow->addWidget(pButtonStartStop);
 
+    pStatusBar = new QStatusBar();
+
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(firstRow);
     mainLayout->addLayout(firstButtonRow);
+    mainLayout->addWidget(pStatusBar);
+    setLayout(mainLayout);
 }
 
 
@@ -201,8 +171,44 @@ MainWindow::keyPressEvent(QKeyEvent *e) {
 
 
 void
-MainWindow::onUpdateOrientation(float q0, float q1, float q2, float q3) {
-    quat1 = QQuaternion(q0, q1, q2, q3)*quat0;
-    pGLWidget->setRotation(quat1);
-    pGLWidget->update();
+MainWindow::onNewDataAvailable() {
+    receivedCommand += serialPort.readAll();
+    QString sNewCommand;
+    int iPos;
+    iPos = receivedCommand.indexOf("\n");
+    while(iPos != -1) {
+        sNewCommand = receivedCommand.left(iPos);
+        executeCommand(sNewCommand);
+        receivedCommand = receivedCommand.mid(iPos+1);
+        iPos = receivedCommand.indexOf("#");
+    }
 }
+
+
+void
+MainWindow::executeCommand(QString command) {
+    QStringList tokens = command.split(',');
+    if(tokens.length() == 7) {
+        q0        = tokens.at(0).toDouble()/1000.0;
+        q1        = tokens.at(1).toDouble()/1000.0;
+        q2        = tokens.at(2).toDouble()/1000.0;
+        q3        = tokens.at(3).toDouble()/1000.0;
+        leftSpeed = tokens.at(4).toDouble()/100.0;
+        leftPath  = tokens.at(5).toDouble();
+        dTime     = tokens.at(6).toDouble();
+
+        quat1 = QQuaternion(q0, q1, q2, q3)*quat0;
+        pGLWidget->setRotation(quat1);
+        pLeftPlot->NewPoint(1, dTime, leftSpeed);
+        pGLWidget->update();
+        pLeftPlot->UpdatePlot();
+    }
+}
+
+
+//void
+//MainWindow::onUpdateOrientation(float q0, float q1, float q2, float q3) {
+//    quat1 = QQuaternion(q0, q1, q2, q3)*quat0;
+//    pGLWidget->setRotation(quat1);
+//    pGLWidget->update();
+//}
