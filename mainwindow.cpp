@@ -16,13 +16,16 @@ MainWindow::MainWindow(QWidget *parent)
 {
     restoreSettings();
     initLayout();
-    quat0 = QQuaternion(1, 0, 0, 0).conjugated();
 
+    quat0 = QQuaternion(1, 0, 0, 0).conjugated();
     receivedCommand = QString();
     baudRate = 9600; // 115200;
     serialPortName = QString("/dev/ttyACM0");
-    if(!serialConnect())
-        perror("Unable to open Serial Port");
+
+    if(!serialConnect()) {
+        pStatusBar->showMessage(QString("Unable to open Serial Port !"));
+        pButtonStartStop->setDisabled(true);
+    }
 }
 
 
