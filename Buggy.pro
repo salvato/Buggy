@@ -34,7 +34,8 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 
 CONFIG += c++11
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    controlsdialog.cpp
 SOURCES +=
 SOURCES += axesdialog.cpp
 SOURCES += AxisFrame.cpp
@@ -49,7 +50,8 @@ SOURCES +=
 SOURCES += mainwindow.cpp
 
 
-HEADERS += mainwindow.h
+HEADERS += mainwindow.h \
+    controlsdialog.h
 HEADERS +=
 HEADERS +=
 HEADERS += geometryengine.h
