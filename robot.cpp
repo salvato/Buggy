@@ -17,7 +17,7 @@ Robot::Robot(QObject *parent)
 }
 
 
-__suseconds_t
+__useconds_t
 Robot::micros() {
     struct timeval tv;
     gettimeofday(&tv, nullptr);

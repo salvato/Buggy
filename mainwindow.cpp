@@ -17,22 +17,10 @@ MainWindow::MainWindow(QWidget *parent)
     pLeftPlot     = nullptr;
     pRightPlot    = nullptr;
 
-    pLeftSpeed    = nullptr;
-    pRightSpeed   = nullptr;
-
-    pLeftMotor    = nullptr;
-    pRightMotor   = nullptr;
-
-    pRightMotorThread = nullptr;
-    pLeftMotorThread  = nullptr;
-
     restoreSettings();
 
     // Init the GUI Layout
     initLayout();
-
-    if(!initGpio())
-        exit(EXIT_FAILURE);
 
     quat0 = QQuaternion(1, 0, 0, 0).conjugated();
 }
@@ -66,9 +54,29 @@ MainWindow::saveSettings() {
 }
 
 
+bool
+MainWindow::connectToMicroController() {
+    serialPort.setPortName("/dev/ttyACM0");
+    if(serialPort.isOpen())
+        return false;
+    serialPort.setBaudRate(115200);
+    if(!serialPort.open(QIODevice::ReadWrite))
+        return false;
+    serialPort.setParent(this);
+    //editHostName->setText(QString("uController connected to: %1").arg(info.portName()));
+    return true;
+}
+
+
 void
 MainWindow::onStartStopPushed() {
     if(pButtonStartStop->text()== QString("Start")) {
+        if(!connectToMicroController()) {
+            perror("Unable to connect to uC");
+            return;
+        }
+        connect(&serialPort, SIGNAL(readyRead()),
+                this, SLOT(onNewDataAvailable()));
         pRobot->getOrientation(&q0, &q1, &q2, &q3);
         quat0 = QQuaternion(q0, q1, q2, q3).conjugated();
         pLeftPlot->ClearDataSet(1);
@@ -87,6 +95,21 @@ MainWindow::onStartStopPushed() {
         currentLspeed = 0.0;
         currentRspeed = 0.0;
         pButtonStartStop->setText("Start");
+    }
+}
+
+
+void
+MainWindow::onNewDataAvailable() {
+    receivedCommand += serialPort.readAll();
+    QString sNewCommand;
+    int iPos;
+    iPos = receivedCommand.indexOf("#");
+    while(iPos != -1) {
+        sNewCommand = receivedCommand.left(iPos);
+        executeCommand(sNewCommand);
+        receivedCommand = receivedCommand.mid(iPos+1);
+        iPos = receivedCommand.indexOf("#");
     }
 }
 

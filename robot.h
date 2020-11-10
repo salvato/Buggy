@@ -27,14 +27,15 @@ public slots:
     void onTimeToSendData();
 
 protected:
+    __useconds_t micros();
 
 private:
     float samplingFrequency;
 
     QTimer updateTimer;
     QTimer sendDataTimer;
-    __suseconds_t lastUpdate;
-    __suseconds_t now;
+    __useconds_t lastUpdate;
+    __useconds_t now;
     float delta;
     float values[9];
 

@@ -3,6 +3,7 @@
 #include <QWidget>
 #include <QTimer>
 #include <QQuaternion>
+#include <QSerialPort>
 
 
 QT_FORWARD_DECLARE_CLASS(Robot)
@@ -29,6 +30,7 @@ protected:
     void initLayout();
     void initPlots();
     bool initGpio();
+    bool connectToMicroController();
 
 private:
 
@@ -36,7 +38,7 @@ signals:
 
 private slots:
     void onStartStopPushed();
-
+    void onNewDataAvailable();
     void onUpdateOrientation(float q0, float q1, float q2, float q3);
 
 private:
@@ -64,4 +66,7 @@ private:
     float q0, q1, q2, q3;
     int   nLeftPlotPoints;
     int   nRightPlotPoints;
+    QSerialPort   serialPort;
+    int           baudRate;
+    QString      receivedCommand;
 };

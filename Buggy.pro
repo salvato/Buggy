@@ -21,7 +21,9 @@
 
 QT += core
 QT += gui
+QT += multimedia
 QT += widgets
+QT += serialport
 
 
 TARGET = Buggy
@@ -69,29 +71,24 @@ RESOURCES += shaders.qrc
 RESOURCES += textures.qrc
 
 
-LIBS += -lrt
-LIBS += -lpthread
-
-
-DISTFILES += fshader.glsl \
-    BuggyDocs/0_DcMotorModel.pdf \
-    BuggyDocs/1_DCMotorSpeedSystemAnalysis.pdf \
-    BuggyDocs/DcMotor_Digital_Control.pdf \
-    BuggyDocs/DcMotor_Digital_PID_Control.pdf \
-    BuggyDocs/DcMotor_PI_Control.pdf \
-    BuggyDocs/DcMotor_PID_Control.pdf \
-    BuggyDocs/DcMotor_ROOT_Locus.pdf \
-    BuggyDocs/DcMotorControl.pdf \
-    BuggyDocs/DcMotorFrequencyDomain.pdf \
-    BuggyDocs/DcMotorModel.pdf \
-    BuggyDocs/DcMotorSimscapeModeling.pdf \
-    BuggyDocs/DcMotorSimulinkControllerDesign.pdf \
-    BuggyDocs/DcMotorSimulinkModeling.pdf \
-    BuggyDocs/DcMotorStateSpace.pdf \
-    BuggyDocs/Lagging Effect Associated with a Hold.pdf \
-    BuggyDocs/Lagging Effect Associated with a Hold.pdf \
-    BuggyDocs/SystemAnalysis.pdf \
-    BuggyDocs/SystemModeling.pdf
+DISTFILES += fshader.glsl
+DISTFILES += BuggyDocs/0_DcMotorModel.pdf
+DISTFILES += BuggyDocs/1_DCMotorSpeedSystemAnalysis.pdf
+DISTFILES += BuggyDocs/DcMotor_Digital_Control.pdf
+DISTFILES += BuggyDocs/DcMotor_Digital_PID_Control.pdf
+DISTFILES += BuggyDocs/DcMotor_PI_Control.pdf
+DISTFILES += BuggyDocs/DcMotor_PID_Control.pdf
+DISTFILES += BuggyDocs/DcMotor_ROOT_Locus.pdf
+DISTFILES += BuggyDocs/DcMotorControl.pdf
+DISTFILES += BuggyDocs/DcMotorFrequencyDomain.pdf
+DISTFILES += BuggyDocs/DcMotorModel.pdf
+DISTFILES += BuggyDocs/DcMotorSimscapeModeling.pdf
+DISTFILES += BuggyDocs/DcMotorSimulinkControllerDesign.pdf
+DISTFILES += BuggyDocs/DcMotorSimulinkModeling.pdf
+DISTFILES += BuggyDocs/DcMotorStateSpace.pdf
+DISTFILES += BuggyDocs/Lagging Effect Associated with a Hold.pdf
+DISTFILES += BuggyDocs/SystemAnalysis.pdf
+DISTFILES += BuggyDocs/SystemModeling.pdf
 DISTFILES += vshader.glsl
 DISTFILES += cube.png
 DISTFILES += plot.png
