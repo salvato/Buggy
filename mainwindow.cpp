@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     , pGLWidget(nullptr)
     , pLeftPlot(nullptr)
     , pRightPlot(nullptr)
+    , pControlsDialog(nullptr)
 {
     initLayout();
     restoreSettings();
@@ -41,6 +42,10 @@ void
 MainWindow::closeEvent(QCloseEvent *event) {
     Q_UNUSED(event)
     saveSettings();
+    if(pControlsDialog) {
+        pControlsDialog->close();
+        delete pControlsDialog;
+    }
 }
 
 

@@ -2,6 +2,8 @@
 #include "ui_controlsdialog.h"
 
 #include <QSettings>
+#include <QCloseEvent>
+
 
 ControlsDialog::ControlsDialog()
     : pUi(new Ui::ControlsDialog)
@@ -71,6 +73,14 @@ void
 ControlsDialog::closeEvent(QCloseEvent *event) {
     Q_UNUSED(event)
     saveSettings();
+    event->ignore();
+}
+
+void
+ControlsDialog::keyPressEvent(QKeyEvent *e) {
+    // To avoid closing the Plot upon Esc keypress
+    if(e->key() != Qt::Key_Escape)
+        QWidget::keyPressEvent(e);
 }
 
 

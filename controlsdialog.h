@@ -20,6 +20,7 @@ public:
 protected:
     void restoreSettings();
     void saveSettings();
+    void keyPressEvent(QKeyEvent *e);
 
 signals:
     void LPvalueChanged(double Pvalue);
