@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include <QSlider>
 #include <QMessageBox>
+#include <QDebug>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -29,9 +30,9 @@ MainWindow::MainWindow(QWidget *parent)
     if(!serialConnect()) {
         pStatusBar->showMessage(QString("Unable to open Serial Port !"));
         disableUI();
-        pButtonStartStop->setDisabled(true);
     }
     pPIDControlsDialog = new ControlsDialog();
+    connectSignals();
 }
 
 
@@ -262,10 +263,11 @@ MainWindow::onStartStopPushed() {
         pRightPlot->ClearDataSet(2);
         pRightPlot->ClearDataSet(3);
         nRightPlotPoints = 0;
-
+        serialPort.write("Start\n");
         pButtonStartStop->setText("Stop");
     }
     else {
+        serialPort.write("Stop\n");
         pButtonStartStop->setText("Start");
     }
 }
@@ -292,49 +294,49 @@ MainWindow::onNewDataAvailable() {
 
 
 void
-MainWindow::onLPvalueChanged(double Pvalue) {
-    LPvalue = Pvalue;
+MainWindow::onLPvalueChanged(double value) {
+    LPvalue = value;
 }
 
 
 void
-MainWindow::onLIvalueChanged(double Ivalue) {
-    LIvalue = Ivalue;
+MainWindow::onLIvalueChanged(double value) {
+    LIvalue = value;
 }
 
 
 void
-MainWindow::onLDvalueChanged(double Dvalue) {
-    LDvalue = Dvalue;
+MainWindow::onLDvalueChanged(double value) {
+    LDvalue = value;
 }
 
 
 void
-MainWindow::onLSpeedChanged(double speed) {
-    LSpeed = speed;
+MainWindow::onLSpeedChanged(double value) {
+    LSpeed = value;
 }
 
 
 void
-MainWindow::onRPvalueChanged(double Pvalue) {
-    RPvalue = Pvalue;
+MainWindow::onRPvalueChanged(double value) {
+    RPvalue = value;
 }
 
 
 void
-MainWindow::onRIvalueChanged(double Ivalue) {
-    RIvalue = Ivalue;
+MainWindow::onRIvalueChanged(double value) {
+    RIvalue = value;
 }
 
 
 void
-MainWindow::onRDvalueChanged(double Dvalue) {
-    RDvalue = Dvalue;
+MainWindow::onRDvalueChanged(double value) {
+    RDvalue = value;
 }
 
 
 void
-MainWindow::onRSpeedChanged(double speed) {
-    RSpeed = speed;
+MainWindow::onRSpeedChanged(double value) {
+    RSpeed = value;
 }
 

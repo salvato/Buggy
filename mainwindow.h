@@ -47,10 +47,10 @@ private slots:
     void onPIDControlsPushed();
     void onNewDataAvailable();
 
-    void onLPvalueChanged(double Pvalue);
-    void onLIvalueChanged(double Ivalue);
-    void onLDvalueChanged(double Dvalue);
-    void onLSpeedChanged(double speed);
+    void onLPvalueChanged(double value);
+    void onLIvalueChanged(double value);
+    void onLDvalueChanged(double value);
+    void onLSpeedChanged(double value);
 
     void onRPvalueChanged(double Pvalue);
     void onRIvalueChanged(double Ivalue);
