@@ -73,7 +73,6 @@ void
 ControlsDialog::closeEvent(QCloseEvent *event) {
     Q_UNUSED(event)
     saveSettings();
-    event->ignore();
 }
 
 void

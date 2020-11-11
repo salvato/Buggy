@@ -33,7 +33,10 @@ protected:
     void initPlots();
     void initControls();
     bool serialConnect();
-    void executeCommand(QString command);
+    void processData(QString sData);
+    void disableUI();
+    void enableUI();
+    void connectSignals();
 
 private:
 
@@ -41,26 +44,50 @@ signals:
 
 private slots:
     void onStartStopPushed();
+    void onPIDControlsPushed();
     void onNewDataAvailable();
+
+    void onLPvalueChanged(double Pvalue);
+    void onLIvalueChanged(double Ivalue);
+    void onLDvalueChanged(double Dvalue);
+    void onLSpeedChanged(double speed);
+
+    void onRPvalueChanged(double Pvalue);
+    void onRIvalueChanged(double Ivalue);
+    void onRDvalueChanged(double Dvalue);
+    void onRSpeedChanged(double speed);
 
 private:
     GLWidget*        pGLWidget;
     Plot2D*          pLeftPlot;
     Plot2D*          pRightPlot;
     QPushButton*     pButtonStartStop;
-    ControlsDialog*  pControlsDialog;
+    QPushButton*     pButtonPIDControls;
+    ControlsDialog*  pPIDControlsDialog;
     QStatusBar*      pStatusBar;
 
     QSerialPort serialPort;
     QString     serialPortName;
-    QString     receivedCommand;
+    QString     receivedData;
     QQuaternion quat0, quat1;
 
     float  q0, q1, q2, q3;
     double leftSpeed;
     double leftPath;
+    double rightSpeed;
+    double rightPath;
     double dTime, t0;
     int    nLeftPlotPoints;
     int    nRightPlotPoints;
     int    baudRate;
+
+    double LPvalue;
+    double LIvalue;
+    double LDvalue;
+    double LSpeed;
+
+    double RPvalue;
+    double RIvalue;
+    double RDvalue;
+    double RSpeed;
 };

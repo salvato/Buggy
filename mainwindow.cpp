@@ -8,6 +8,7 @@
 #include <QKeyEvent>
 #include <QPushButton>
 #include <QSlider>
+#include <QMessageBox>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -15,22 +16,22 @@ MainWindow::MainWindow(QWidget *parent)
     , pGLWidget(nullptr)
     , pLeftPlot(nullptr)
     , pRightPlot(nullptr)
-    , pControlsDialog(nullptr)
+    , pPIDControlsDialog(nullptr)
 {
     initLayout();
     restoreSettings();
 
     quat0 = QQuaternion(1, 0, 0, 0).conjugated();
-    receivedCommand = QString();
+    receivedData = QString();
     baudRate = 9600; // 115200;
     serialPortName = QString("/dev/ttyACM0");
 
     if(!serialConnect()) {
         pStatusBar->showMessage(QString("Unable to open Serial Port !"));
+        disableUI();
         pButtonStartStop->setDisabled(true);
     }
-    pControlsDialog = new ControlsDialog();
-    pControlsDialog->show();
+    pPIDControlsDialog = new ControlsDialog();
 }
 
 
@@ -41,11 +42,38 @@ MainWindow::~MainWindow() {
 void
 MainWindow::closeEvent(QCloseEvent *event) {
     Q_UNUSED(event)
-    saveSettings();
-    if(pControlsDialog) {
-        pControlsDialog->close();
-        delete pControlsDialog;
+    QMessageBox msgBox;
+    msgBox.setWindowTitle(QString("...Exiting Buggy..."));
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setText(QString("Exiting Program..."));
+    msgBox.setInformativeText(QString("Are you Sure ?"));
+    msgBox.setStandardButtons(QMessageBox::Ok|QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    if(msgBox.exec() == QDialogButtonBox::Ok) {
+        saveSettings();
+        if(pPIDControlsDialog) {
+            pPIDControlsDialog->close();
+            delete pPIDControlsDialog;
+            event->accept();
+        }
     }
+    else {
+        event->ignore();
+    }
+}
+
+
+void
+MainWindow::disableUI() {
+    pButtonStartStop->setDisabled(true);
+    pButtonPIDControls->setDisabled(true);
+}
+
+
+void
+MainWindow::enableUI() {
+    pButtonStartStop->setEnabled(true);
+    pButtonPIDControls->setEnabled(true);
 }
 
 
@@ -85,34 +113,14 @@ MainWindow::serialConnect() {
 
 
 void
-MainWindow::onStartStopPushed() {
-    if(pButtonStartStop->text()== QString("Start")) {
-        quat0 = QQuaternion(q0, q1, q2, q3).conjugated();
-        t0 = dTime;
-        pLeftPlot->ClearDataSet(1);
-        pLeftPlot->ClearDataSet(2);
-        pLeftPlot->ClearDataSet(3);
-        nLeftPlotPoints = 0;
-
-        pRightPlot->ClearDataSet(1);
-        pRightPlot->ClearDataSet(2);
-        pRightPlot->ClearDataSet(3);
-        nRightPlotPoints = 0;
-
-        pButtonStartStop->setText("Stop");
-    }
-    else {
-        pButtonStartStop->setText("Start");
-    }
-}
-
-
-void
 MainWindow::createButtons() {
     pButtonStartStop = new QPushButton("Start", this);
     pButtonStartStop->setEnabled(true);
+    pButtonPIDControls = new QPushButton("PID Ctrl", this);
     connect(pButtonStartStop, SIGNAL(clicked()),
             this, SLOT(onStartStopPushed()));
+    connect(pButtonPIDControls, SIGNAL(clicked()),
+            this, SLOT(onPIDControlsPushed()));
 }
 
 
@@ -176,6 +184,7 @@ MainWindow::initLayout() {
     createButtons();
     QHBoxLayout *firstButtonRow = new QHBoxLayout;
     firstButtonRow->addWidget(pButtonStartStop);
+    firstButtonRow->addWidget(pButtonPIDControls);
 
     pStatusBar = new QStatusBar();
 
@@ -197,23 +206,30 @@ MainWindow::keyPressEvent(QKeyEvent *e) {
 
 
 void
-MainWindow::onNewDataAvailable() {
-    receivedCommand += serialPort.readAll();
-    QString sNewCommand;
-    int iPos;
-    iPos = receivedCommand.indexOf("\n");
-    while(iPos != -1) {
-        sNewCommand = receivedCommand.left(iPos);
-        executeCommand(sNewCommand);
-        receivedCommand = receivedCommand.mid(iPos+1);
-        iPos = receivedCommand.indexOf("#");
-    }
+MainWindow::connectSignals() {
+    connect(pPIDControlsDialog,SIGNAL(LPvalueChanged(double)),
+            this, SLOT(onLPvalueChanged(double)));
+    connect(pPIDControlsDialog,SIGNAL(LIvalueChanged(double)),
+            this, SLOT(onLIvalueChanged(double)));
+    connect(pPIDControlsDialog,SIGNAL(LDvalueChanged(double)),
+            this, SLOT(onLDvalueChanged(double)));
+    connect(pPIDControlsDialog,SIGNAL(LSpeedChanged(double)),
+            this, SLOT(onLSpeedChanged(double)));
+
+    connect(pPIDControlsDialog,SIGNAL(RPvalueChanged(double)),
+            this, SLOT(onRPvalueChanged(double)));
+    connect(pPIDControlsDialog,SIGNAL(RIvalueChanged(double)),
+            this, SLOT(onRIvalueChanged(double)));
+    connect(pPIDControlsDialog,SIGNAL(RDvalueChanged(double)),
+            this, SLOT(onRDvalueChanged(double)));
+    connect(pPIDControlsDialog,SIGNAL(RSpeedChanged(double)),
+            this, SLOT(onRSpeedChanged(double)));
 }
 
 
 void
-MainWindow::executeCommand(QString command) {
-    QStringList tokens = command.split(',');
+MainWindow::processData(QString sData) {
+    QStringList tokens = sData.split(',');
     if(tokens.length() == 7) {
         q0        = tokens.at(0).toDouble()/1000.0;
         q1        = tokens.at(1).toDouble()/1000.0;
@@ -229,5 +245,96 @@ MainWindow::executeCommand(QString command) {
         pGLWidget->update();
         pLeftPlot->UpdatePlot();
     }
+}
+
+
+void
+MainWindow::onStartStopPushed() {
+    if(pButtonStartStop->text()== QString("Start")) {
+        quat0 = QQuaternion(q0, q1, q2, q3).conjugated();
+        t0 = dTime;
+        pLeftPlot->ClearDataSet(1);
+        pLeftPlot->ClearDataSet(2);
+        pLeftPlot->ClearDataSet(3);
+        nLeftPlotPoints = 0;
+
+        pRightPlot->ClearDataSet(1);
+        pRightPlot->ClearDataSet(2);
+        pRightPlot->ClearDataSet(3);
+        nRightPlotPoints = 0;
+
+        pButtonStartStop->setText("Stop");
+    }
+    else {
+        pButtonStartStop->setText("Start");
+    }
+}
+
+
+void
+MainWindow::onPIDControlsPushed() {
+    pPIDControlsDialog->exec();
+}
+
+
+void
+MainWindow::onNewDataAvailable() {
+    receivedData += serialPort.readAll();
+    QString sNewData;
+    int iPos = receivedData.indexOf("\n");
+    while(iPos != -1) {
+        sNewData = receivedData.left(iPos);
+        processData(sNewData);
+        receivedData = receivedData.mid(iPos+1);
+        iPos = receivedData.indexOf("\n");
+    }
+}
+
+
+void
+MainWindow::onLPvalueChanged(double Pvalue) {
+    LPvalue = Pvalue;
+}
+
+
+void
+MainWindow::onLIvalueChanged(double Ivalue) {
+    LIvalue = Ivalue;
+}
+
+
+void
+MainWindow::onLDvalueChanged(double Dvalue) {
+    LDvalue = Dvalue;
+}
+
+
+void
+MainWindow::onLSpeedChanged(double speed) {
+    LSpeed = speed;
+}
+
+
+void
+MainWindow::onRPvalueChanged(double Pvalue) {
+    RPvalue = Pvalue;
+}
+
+
+void
+MainWindow::onRIvalueChanged(double Ivalue) {
+    RIvalue = Ivalue;
+}
+
+
+void
+MainWindow::onRDvalueChanged(double Dvalue) {
+    RDvalue = Dvalue;
+}
+
+
+void
+MainWindow::onRSpeedChanged(double speed) {
+    RSpeed = speed;
 }
 
