@@ -23,16 +23,15 @@ protected:
     void keyPressEvent(QKeyEvent *e);
 
 signals:
-    void LPvalueChanged(double Pvalue);
-    void LIvalueChanged(double Ivalue);
-    void LDvalueChanged(double Dvalue);
-    void LSpeedChanged(double speed);
+    void LPvalueChanged(int Pvalue);
+    void LIvalueChanged(int Ivalue);
+    void LDvalueChanged(int Dvalue);
+    void LSpeedChanged(int speed);
 
-    void RPvalueChanged(double Pvalue);
-    void RIvalueChanged(double Ivalue);
-    void RDvalueChanged(double Dvalue);
-
-    void RSpeedChanged(double speed);
+    void RPvalueChanged(int Pvalue);
+    void RIvalueChanged(int Ivalue);
+    void RDvalueChanged(int Dvalue);
+    void RSpeedChanged(int speed);
 
 private slots:
     void on_LPslider_valueChanged(int value);

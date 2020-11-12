@@ -47,15 +47,15 @@ private slots:
     void onPIDControlsPushed();
     void onNewDataAvailable();
 
-    void onLPvalueChanged(double value);
-    void onLIvalueChanged(double value);
-    void onLDvalueChanged(double value);
-    void onLSpeedChanged(double value);
+    void onLPvalueChanged(int value);
+    void onLIvalueChanged(int value);
+    void onLDvalueChanged(int value);
+    void onLSpeedChanged(int value);
 
-    void onRPvalueChanged(double Pvalue);
-    void onRIvalueChanged(double Ivalue);
-    void onRDvalueChanged(double Dvalue);
-    void onRSpeedChanged(double speed);
+    void onRPvalueChanged(int Pvalue);
+    void onRIvalueChanged(int Ivalue);
+    void onRDvalueChanged(int Dvalue);
+    void onRSpeedChanged(int speed);
 
 private:
     GLWidget*        pGLWidget;

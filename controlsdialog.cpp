@@ -86,42 +86,42 @@ ControlsDialog::keyPressEvent(QKeyEvent *e) {
 void
 ControlsDialog::on_LPslider_valueChanged(int value) {
     pUi->LPedit->setText(QString("%1").arg(value));
-    emit LPvalueChanged(double(value*0.01));
+    emit LPvalueChanged(value);
 }
 
 
 void
 ControlsDialog::on_LIslider_valueChanged(int value) {
     pUi->LIedit->setText(QString("%1").arg(value));
-    emit LIvalueChanged(double(value*0.001));
+    emit LIvalueChanged(value);
 }
 
 
 void
 ControlsDialog::on_LDslider_valueChanged(int value) {
     pUi->LDedit->setText(QString("%1").arg(value));
-    emit LDvalueChanged(double(value*0.01));
+    emit LDvalueChanged(value);
 }
 
 
 void
 ControlsDialog::on_RPslider_valueChanged(int value) {
     pUi->RPedit->setText(QString("%1").arg(value));
-    emit RPvalueChanged(double(value*0.01));
+    emit RPvalueChanged(value);
 }
 
 
 void
 ControlsDialog::on_RIslider_valueChanged(int value) {
     pUi->RIedit->setText(QString("%1").arg(value));
-    emit RIvalueChanged(double(value*0.001));
+    emit RIvalueChanged(value);
 }
 
 
 void
 ControlsDialog::on_RDslider_valueChanged(int value) {
     pUi->RDedit->setText(QString("%1").arg(value));
-    emit RDvalueChanged(double(value*0.01));
+    emit RDvalueChanged(value);
 }
 
 
