@@ -208,23 +208,23 @@ MainWindow::keyPressEvent(QKeyEvent *e) {
 
 void
 MainWindow::connectSignals() {
-    connect(pPIDControlsDialog,SIGNAL(LPvalueChanged(double)),
-            this, SLOT(onLPvalueChanged(double)));
-    connect(pPIDControlsDialog,SIGNAL(LIvalueChanged(double)),
-            this, SLOT(onLIvalueChanged(double)));
-    connect(pPIDControlsDialog,SIGNAL(LDvalueChanged(double)),
-            this, SLOT(onLDvalueChanged(double)));
-    connect(pPIDControlsDialog,SIGNAL(LSpeedChanged(double)),
-            this, SLOT(onLSpeedChanged(double)));
+    connect(pPIDControlsDialog,SIGNAL(LPvalueChanged(int)),
+            this, SLOT(onLPvalueChanged(int)));
+    connect(pPIDControlsDialog,SIGNAL(LIvalueChanged(int)),
+            this, SLOT(onLIvalueChanged(int)));
+    connect(pPIDControlsDialog,SIGNAL(LDvalueChanged(int)),
+            this, SLOT(onLDvalueChanged(int)));
+    connect(pPIDControlsDialog,SIGNAL(LSpeedChanged(int)),
+            this, SLOT(onLSpeedChanged(int)));
 
-    connect(pPIDControlsDialog,SIGNAL(RPvalueChanged(double)),
-            this, SLOT(onRPvalueChanged(double)));
-    connect(pPIDControlsDialog,SIGNAL(RIvalueChanged(double)),
-            this, SLOT(onRIvalueChanged(double)));
-    connect(pPIDControlsDialog,SIGNAL(RDvalueChanged(double)),
-            this, SLOT(onRDvalueChanged(double)));
-    connect(pPIDControlsDialog,SIGNAL(RSpeedChanged(double)),
-            this, SLOT(onRSpeedChanged(double)));
+    connect(pPIDControlsDialog,SIGNAL(RPvalueChanged(int)),
+            this, SLOT(onRPvalueChanged(int)));
+    connect(pPIDControlsDialog,SIGNAL(RIvalueChanged(int)),
+            this, SLOT(onRIvalueChanged(int)));
+    connect(pPIDControlsDialog,SIGNAL(RDvalueChanged(int)),
+            this, SLOT(onRDvalueChanged(int)));
+    connect(pPIDControlsDialog,SIGNAL(RSpeedChanged(int)),
+            this, SLOT(onRSpeedChanged(int)));
 }
 
 
@@ -296,7 +296,7 @@ MainWindow::onNewDataAvailable() {
 void
 MainWindow::onLPvalueChanged(int value) {
     LPvalue = value;
-    QString sMessage = QString("LP,%1\n").arg(int(value*100.0));
+    QString sMessage = QString("Lp%1\n").arg(int(value));
     serialPort.write(sMessage.toLatin1().constData());
 }
 
@@ -304,7 +304,7 @@ MainWindow::onLPvalueChanged(int value) {
 void
 MainWindow::onLIvalueChanged(int value) {
     LIvalue = value;
-    QString sMessage = QString("LI,%1\n").arg(int(value*100.0));
+    QString sMessage = QString("Li%1\n").arg(int(value));
     serialPort.write(sMessage.toLatin1().constData());
 }
 
@@ -312,7 +312,7 @@ MainWindow::onLIvalueChanged(int value) {
 void
 MainWindow::onLDvalueChanged(int value) {
     LDvalue = value;
-    QString sMessage = QString("LD,%1\n").arg(int(value*100.0));
+    QString sMessage = QString("Ld%1\n").arg(int(value));
     serialPort.write(sMessage.toLatin1().constData());
 }
 
@@ -320,7 +320,7 @@ MainWindow::onLDvalueChanged(int value) {
 void
 MainWindow::onLSpeedChanged(int value) {
     LSpeed = value;
-    QString sMessage = QString("LS,%1\n").arg(int(value*100.0));
+    QString sMessage = QString("Ls%1\n").arg(int(value));
     serialPort.write(sMessage.toLatin1().constData());
 }
 
@@ -328,7 +328,7 @@ MainWindow::onLSpeedChanged(int value) {
 void
 MainWindow::onRPvalueChanged(int value) {
     RPvalue = value;
-    QString sMessage = QString("RP,%1\n").arg(int(value*100.0));
+    QString sMessage = QString("Rp%1\n").arg(int(value));
     serialPort.write(sMessage.toLatin1().constData());
 }
 
@@ -336,7 +336,7 @@ MainWindow::onRPvalueChanged(int value) {
 void
 MainWindow::onRIvalueChanged(int value) {
     RIvalue = value;
-    QString sMessage = QString("RI,%1\n").arg(int(value*100.0));
+    QString sMessage = QString("Ri%1\n").arg(int(value));
     serialPort.write(sMessage.toLatin1().constData());
 }
 
@@ -344,7 +344,7 @@ MainWindow::onRIvalueChanged(int value) {
 void
 MainWindow::onRDvalueChanged(int value) {
     RDvalue = value;
-    QString sMessage = QString("RD,%1\n").arg(int(value*100.0));
+    QString sMessage = QString("Rd%1\n").arg(int(value));
     serialPort.write(sMessage.toLatin1().constData());
 }
 
@@ -352,7 +352,7 @@ MainWindow::onRDvalueChanged(int value) {
 void
 MainWindow::onRSpeedChanged(int value) {
     RSpeed = value;
-    QString sMessage = QString("RS,%1\n").arg(int(value*100.0));
+    QString sMessage = QString("Rs%1\n").arg(int(value));
     serialPort.write(sMessage.toLatin1().constData());
 }
 
