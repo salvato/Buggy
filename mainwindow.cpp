@@ -245,6 +245,8 @@ void
 MainWindow::processData(QString sData) {
     bool bUpdateMotors = false;
     QStringList tokens = sData.split(',');
+    if(tokens.isEmpty())
+        return;
     if(tokens.at(0) == "A" && tokens.length() > 4) {
         tokens.removeFirst();
         q0 = tokens.at(0).toDouble()/1000.0;
@@ -259,6 +261,8 @@ MainWindow::processData(QString sData) {
         pGLWidget->setRotation(quat1);
         pGLWidget->update();
     }
+    if(tokens.isEmpty())
+        return;
     if(tokens.at(0) == "M" && tokens.length() > 2) {
         tokens.removeFirst();
         leftSpeed = tokens.at(0).toDouble()/100.0;
@@ -267,13 +271,15 @@ MainWindow::processData(QString sData) {
         tokens.removeFirst();
         bUpdateMotors = true;
     }
+    if(tokens.isEmpty())
+        return;
     if(tokens.at(0) == "T" && tokens.length() > 1) {
         tokens.removeFirst();
         dTime = tokens.at(0).toDouble();
         if(t0 < 0)
             t0 = dTime;
         if(bUpdateMotors) {
-            pLeftPlot->NewPoint(1, dTime-t0, leftSpeed);
+            pLeftPlot->NewPoint(1, (dTime-t0)/1000.0, leftSpeed);
             pLeftPlot->UpdatePlot();
         }
     }
