@@ -33,7 +33,7 @@ ControlsDialog::ControlsDialog()
 
 
 void
-ControlsDialog::show() {
+ControlsDialog::sendParams() {
     // Send PID Parameters to the Motor Controller
     emit LPvalueChanged(double(pUi->LPslider->value()*0.01));
     emit LIvalueChanged(double(pUi->LIslider->value()*0.01));
@@ -42,7 +42,6 @@ ControlsDialog::show() {
     emit RPvalueChanged(double(pUi->RPslider->value()*0.01));
     emit RIvalueChanged(double(pUi->RIslider->value()*0.01));
     emit RDvalueChanged(double(pUi->RDslider->value()*0.01));
-    QDialog::show();
 }
 
 
@@ -90,42 +89,42 @@ ControlsDialog::keyPressEvent(QKeyEvent *e) {
 
 
 void
-ControlsDialog::onLPslider_valueChanged(int value) {
+ControlsDialog::on_LPslider_valueChanged(int value) {
     pUi->LPedit->setText(QString("%1").arg(value));
     emit LPvalueChanged(value);
 }
 
 
 void
-ControlsDialog::onLIslider_valueChanged(int value) {
+ControlsDialog::on_LIslider_valueChanged(int value) {
     pUi->LIedit->setText(QString("%1").arg(value));
     emit LIvalueChanged(value);
 }
 
 
 void
-ControlsDialog::onLDslider_valueChanged(int value) {
+ControlsDialog::on_LDslider_valueChanged(int value) {
     pUi->LDedit->setText(QString("%1").arg(value));
     emit LDvalueChanged(value);
 }
 
 
 void
-ControlsDialog::onRPslider_valueChanged(int value) {
+ControlsDialog::on_RPslider_valueChanged(int value) {
     pUi->RPedit->setText(QString("%1").arg(value));
     emit RPvalueChanged(value);
 }
 
 
 void
-ControlsDialog::onRIslider_valueChanged(int value) {
+ControlsDialog::on_RIslider_valueChanged(int value) {
     pUi->RIedit->setText(QString("%1").arg(value));
     emit RIvalueChanged(value);
 }
 
 
 void
-ControlsDialog::onRDslider_valueChanged(int value) {
+ControlsDialog::on_RDslider_valueChanged(int value) {
     pUi->RDedit->setText(QString("%1").arg(value));
     emit RDvalueChanged(value);
 }

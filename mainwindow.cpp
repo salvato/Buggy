@@ -22,11 +22,11 @@ MainWindow::MainWindow(QWidget *parent)
     initLayout();
     restoreSettings();
 
-    quat0 = QQuaternion(1, 0, 0, 0).conjugated();
-    receivedData = QString();
-    baudRate = 9600; // 115200;
+    quat0          = QQuaternion(1, 0, 0, 0).conjugated();
+    receivedData   = QString();
+    baudRate       = 9600; // 115200;
     serialPortName = QString("/dev/ttyACM0");
-    t0 = -1;
+    t0             = -1;
 
     if(!serialConnect()) {
         pStatusBar->showMessage(QString("Unable to open Serial Port !"));
@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
     pPIDControlsDialog = new ControlsDialog();
     connectSignals();
+    pPIDControlsDialog->sendParams();
 }
 
 
@@ -282,6 +283,11 @@ MainWindow::processData(QString sData) {
             pLeftPlot->NewPoint(1, (dTime-t0)/1000.0, leftSpeed);
             pLeftPlot->UpdatePlot();
         }
+    }
+    if(tokens.isEmpty())
+        return;
+    if(tokens.at(0) == "P") { // Controller Asked the PID Parameters
+        pPIDControlsDialog->sendParams();
     }
 }
 
