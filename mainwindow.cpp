@@ -208,23 +208,26 @@ MainWindow::keyPressEvent(QKeyEvent *e) {
 
 void
 MainWindow::connectSignals() {
-    connect(pPIDControlsDialog,SIGNAL(LPvalueChanged(int)),
+    connect(pPIDControlsDialog, SIGNAL(LPvalueChanged(int)),
             this, SLOT(onLPvalueChanged(int)));
-    connect(pPIDControlsDialog,SIGNAL(LIvalueChanged(int)),
+    connect(pPIDControlsDialog, SIGNAL(LIvalueChanged(int)),
             this, SLOT(onLIvalueChanged(int)));
-    connect(pPIDControlsDialog,SIGNAL(LDvalueChanged(int)),
+    connect(pPIDControlsDialog, SIGNAL(LDvalueChanged(int)),
             this, SLOT(onLDvalueChanged(int)));
-    connect(pPIDControlsDialog,SIGNAL(LSpeedChanged(int)),
+    connect(pPIDControlsDialog, SIGNAL(LSpeedChanged(int)),
             this, SLOT(onLSpeedChanged(int)));
 
-    connect(pPIDControlsDialog,SIGNAL(RPvalueChanged(int)),
+    connect(pPIDControlsDialog, SIGNAL(RPvalueChanged(int)),
             this, SLOT(onRPvalueChanged(int)));
-    connect(pPIDControlsDialog,SIGNAL(RIvalueChanged(int)),
+    connect(pPIDControlsDialog, SIGNAL(RIvalueChanged(int)),
             this, SLOT(onRIvalueChanged(int)));
-    connect(pPIDControlsDialog,SIGNAL(RDvalueChanged(int)),
+    connect(pPIDControlsDialog, SIGNAL(RDvalueChanged(int)),
             this, SLOT(onRDvalueChanged(int)));
-    connect(pPIDControlsDialog,SIGNAL(RSpeedChanged(int)),
+    connect(pPIDControlsDialog, SIGNAL(RSpeedChanged(int)),
             this, SLOT(onRSpeedChanged(int)));
+
+    connect(pPIDControlsDialog, SIGNAL(ControlsDone()),
+            this, SLOT(onHidePIDControls()));
 }
 
 
@@ -275,7 +278,14 @@ MainWindow::onStartStopPushed() {
 
 void
 MainWindow::onPIDControlsPushed() {
-    pPIDControlsDialog->exec();
+    pPIDControlsDialog->show();
+    pButtonPIDControls->setDisabled(true);
+}
+
+
+void
+MainWindow::onHidePIDControls() {
+    pButtonPIDControls->setEnabled(true);
 }
 
 

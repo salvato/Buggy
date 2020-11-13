@@ -16,6 +16,7 @@ class ControlsDialog : public QDialog
 public:
     ControlsDialog();
     void closeEvent(QCloseEvent *event);
+    void show();
 
 protected:
     void restoreSettings();
@@ -32,6 +33,7 @@ signals:
     void RIvalueChanged(int Ivalue);
     void RDvalueChanged(int Dvalue);
     void RSpeedChanged(int speed);
+    void ControlsDone();
 
 private slots:
     void on_LPslider_valueChanged(int value);

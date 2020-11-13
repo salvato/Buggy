@@ -57,6 +57,8 @@ private slots:
     void onRDvalueChanged(int Dvalue);
     void onRSpeedChanged(int speed);
 
+    void onHidePIDControls();
+
 private:
     GLWidget*        pGLWidget;
     Plot2D*          pLeftPlot;

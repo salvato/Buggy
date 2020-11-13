@@ -29,7 +29,11 @@ ControlsDialog::ControlsDialog()
     pUi->RPedit->setText(QString("%1").arg(pUi->RPslider->value()));
     pUi->RIedit->setText(QString("%1").arg(pUi->RIslider->value()));
     pUi->RDedit->setText(QString("%1").arg(pUi->RDslider->value()));
+}
 
+
+void
+ControlsDialog::show() {
     // Send PID Parameters to the Motor Controller
     emit LPvalueChanged(double(pUi->LPslider->value()*0.01));
     emit LIvalueChanged(double(pUi->LIslider->value()*0.01));
@@ -38,6 +42,7 @@ ControlsDialog::ControlsDialog()
     emit RPvalueChanged(double(pUi->RPslider->value()*0.01));
     emit RIvalueChanged(double(pUi->RIslider->value()*0.01));
     emit RDvalueChanged(double(pUi->RDslider->value()*0.01));
+    QDialog::show();
 }
 
 
@@ -73,6 +78,7 @@ void
 ControlsDialog::closeEvent(QCloseEvent *event) {
     Q_UNUSED(event)
     saveSettings();
+    emit ControlsDone();
 }
 
 void
