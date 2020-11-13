@@ -36,13 +36,13 @@ signals:
     void ControlsDone();
 
 private slots:
-    void on_LPslider_valueChanged(int value);
-    void on_LIslider_valueChanged(int value);
-    void on_LDslider_valueChanged(int value);
+    void onLPslider_valueChanged(int value);
+    void onLIslider_valueChanged(int value);
+    void onLDslider_valueChanged(int value);
 
-    void on_RPslider_valueChanged(int value);
-    void on_RIslider_valueChanged(int value);
-    void on_RDslider_valueChanged(int value);
+    void onRPslider_valueChanged(int value);
+    void onRIslider_valueChanged(int value);
+    void onRDslider_valueChanged(int value);
 
     void changeSpeed();
 

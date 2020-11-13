@@ -90,42 +90,42 @@ ControlsDialog::keyPressEvent(QKeyEvent *e) {
 
 
 void
-ControlsDialog::on_LPslider_valueChanged(int value) {
+ControlsDialog::onLPslider_valueChanged(int value) {
     pUi->LPedit->setText(QString("%1").arg(value));
     emit LPvalueChanged(value);
 }
 
 
 void
-ControlsDialog::on_LIslider_valueChanged(int value) {
+ControlsDialog::onLIslider_valueChanged(int value) {
     pUi->LIedit->setText(QString("%1").arg(value));
     emit LIvalueChanged(value);
 }
 
 
 void
-ControlsDialog::on_LDslider_valueChanged(int value) {
+ControlsDialog::onLDslider_valueChanged(int value) {
     pUi->LDedit->setText(QString("%1").arg(value));
     emit LDvalueChanged(value);
 }
 
 
 void
-ControlsDialog::on_RPslider_valueChanged(int value) {
+ControlsDialog::onRPslider_valueChanged(int value) {
     pUi->RPedit->setText(QString("%1").arg(value));
     emit RPvalueChanged(value);
 }
 
 
 void
-ControlsDialog::on_RIslider_valueChanged(int value) {
+ControlsDialog::onRIslider_valueChanged(int value) {
     pUi->RIedit->setText(QString("%1").arg(value));
     emit RIvalueChanged(value);
 }
 
 
 void
-ControlsDialog::on_RDslider_valueChanged(int value) {
+ControlsDialog::onRDslider_valueChanged(int value) {
     pUi->RDedit->setText(QString("%1").arg(value));
     emit RDvalueChanged(value);
 }

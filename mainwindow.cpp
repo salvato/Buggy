@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     receivedData = QString();
     baudRate = 9600; // 115200;
     serialPortName = QString("/dev/ttyACM0");
+    t0 = -1;
 
     if(!serialConnect()) {
         pStatusBar->showMessage(QString("Unable to open Serial Port !"));
@@ -107,6 +108,7 @@ MainWindow::serialConnect() {
     }
     serialPort.setParent(this);
     pStatusBar->showMessage(QString("uController connected to: ttyACM0"));
+    serialPort.readAll(); // Discard Input Buffer
     connect(&serialPort, SIGNAL(readyRead()),
             this, SLOT(onNewDataAvailable()));
     return true;
@@ -127,6 +129,9 @@ MainWindow::createButtons() {
 
 void
 MainWindow::initPlots() {
+    /////////////////////////
+    // Init Left Motor Plot !
+    /////////////////////////
     pLeftPlot = new Plot2D(nullptr, "Left Motor");
 
     pLeftPlot->NewDataSet(1, 2, QColor(255, 196,   0), Plot2D::iline, "SetPt");
@@ -142,11 +147,15 @@ MainWindow::initPlots() {
     pLeftPlot->SetShowDataSet(3, true);
 
     pLeftPlot->SetLimits(0.0, 1.0, -1.1, 1.1, true, true, false, false);
+    pLeftPlot->setMaxPoints(600);
     pLeftPlot->UpdatePlot();
     pLeftPlot->show();
 
     nLeftPlotPoints = 0;
 
+    //////////////////////////
+    // Init Right Motor Plot !
+    //////////////////////////
     pRightPlot = new Plot2D(nullptr, "Right Motor");
 
     pRightPlot->NewDataSet(1, 2, QColor(255, 196,   0), Plot2D::iline, "SetPt");
@@ -162,6 +171,7 @@ MainWindow::initPlots() {
     pRightPlot->SetShowDataSet(3, true);
 
     pRightPlot->SetLimits(0.0, 1.0, -1.0, 1.0, true, true, false, false);
+    pRightPlot->setMaxPoints(600);
     pRightPlot->UpdatePlot();
     pRightPlot->show();
 
@@ -233,21 +243,39 @@ MainWindow::connectSignals() {
 
 void
 MainWindow::processData(QString sData) {
+    bool bUpdateMotors = false;
     QStringList tokens = sData.split(',');
-    if(tokens.length() == 7) {
-        q0        = tokens.at(0).toDouble()/1000.0;
-        q1        = tokens.at(1).toDouble()/1000.0;
-        q2        = tokens.at(2).toDouble()/1000.0;
-        q3        = tokens.at(3).toDouble()/1000.0;
-        leftSpeed = tokens.at(4).toDouble()/100.0;
-        leftPath  = tokens.at(5).toDouble();
-        dTime     = tokens.at(6).toDouble();
-
+    if(tokens.at(0) == "A" && tokens.length() > 4) {
+        tokens.removeFirst();
+        q0 = tokens.at(0).toDouble()/1000.0;
+        tokens.removeFirst();
+        q1 = tokens.at(0).toDouble()/1000.0;
+        tokens.removeFirst();
+        q2 = tokens.at(0).toDouble()/1000.0;
+        tokens.removeFirst();
+        q3 = tokens.at(0).toDouble()/1000.0;
+        tokens.removeFirst();
         quat1 = QQuaternion(q0, q1, q2, q3)*quat0;
         pGLWidget->setRotation(quat1);
-        pLeftPlot->NewPoint(1, dTime-t0, leftSpeed);
         pGLWidget->update();
-        pLeftPlot->UpdatePlot();
+    }
+    if(tokens.at(0) == "M" && tokens.length() > 2) {
+        tokens.removeFirst();
+        leftSpeed = tokens.at(0).toDouble()/100.0;
+        tokens.removeFirst();
+        leftPath = tokens.at(0).toDouble();
+        tokens.removeFirst();
+        bUpdateMotors = true;
+    }
+    if(tokens.at(0) == "T" && tokens.length() > 1) {
+        tokens.removeFirst();
+        dTime = tokens.at(0).toDouble();
+        if(t0 < 0)
+            t0 = dTime;
+        if(bUpdateMotors) {
+            pLeftPlot->NewPoint(1, dTime-t0, leftSpeed);
+            pLeftPlot->UpdatePlot();
+        }
     }
 }
 
