@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
     , pRightPlot(nullptr)
     , pPIDControlsDialog(nullptr)
 {
+    setWindowIcon(QIcon(":/plot.png"));
     initLayout();
     restoreSettings();
 
@@ -37,9 +38,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&connectionTimer, SIGNAL(timeout()),
             this, SLOT(onTryToConnect()));
 
+    disableUI();
     if(!serialConnect()) {
         pStatusBar->showMessage(QString("Unable to open Serial Port !"));
-        disableUI();
         connectionTimer.start(300);
     }
     else {
@@ -69,6 +70,8 @@ MainWindow::closeEvent(QCloseEvent *event) {
             delete pPIDControlsDialog;
             event->accept();
         }
+        if(serialPort.isOpen())
+            serialPort.close();
     }
     else {
         event->ignore();
@@ -110,15 +113,13 @@ MainWindow::saveSettings() {
 bool
 MainWindow::serialConnect() {
     serialPort.setPortName(serialPortName);
-    if(serialPort.isOpen()) {
-        pStatusBar->showMessage(QString("Serial Port Already Opened !"));
-        return false;
-    }
-    serialPort.setBaudRate(baudRate);
+    if(serialPort.isOpen())
+        serialPort.close();
     if(!serialPort.open(QIODevice::ReadWrite)) {
         pStatusBar->showMessage(QString("Unable to open Serial Port"));
         return false;
     }
+    serialPort.setBaudRate(baudRate);
     serialPort.setParent(this);
     pStatusBar->showMessage(QString("uController connected to: ttyACM0"));
     serialPort.readAll(); // Discard Input Buffer
@@ -319,7 +320,6 @@ void
 MainWindow::onTryToConnect() {
     if(serialConnect()) {
         connectionTimer.stop();
-        pButtonConnect->setEnabled(true);
     }
 }
 
@@ -331,6 +331,21 @@ MainWindow::onConnectPushed() {
     enableUI();
     pButtonConnect->setDisabled(true);
     keepAliveTimer.start(500);
+}
+
+
+void
+MainWindow::onKeepAlive() {
+    if(bStillConnected) {
+        serialPort.write("K\n");
+        bStillConnected = false;
+    }
+    else {
+        keepAliveTimer.stop();
+        disableUI();
+        pStatusBar->showMessage(QString("Buggy Disconnected !"));
+        connectionTimer.start(500);
+    }
 }
 
 
@@ -448,20 +463,6 @@ MainWindow::onRSpeedChanged(int value) {
     RSpeed = value;
     QString sMessage = QString("Rs%1\n").arg(int(value));
     serialPort.write(sMessage.toLatin1().constData());
-}
-
-
-void
-MainWindow::onKeepAlive() {
-    if(bStillConnected) {
-        serialPort.write("K\n");
-        bStillConnected = false;
-    }
-    else {
-        keepAliveTimer.stop();
-        disableUI();
-        connectionTimer.start(300);
-    }
 }
 
 
