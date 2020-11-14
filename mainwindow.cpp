@@ -28,13 +28,12 @@ MainWindow::MainWindow(QWidget *parent)
     serialPortName = QString("/dev/ttyACM0");
     t0             = -1;
 
+    disableUI();
     if(!serialConnect()) {
         pStatusBar->showMessage(QString("Unable to open Serial Port !"));
-        disableUI();
     }
     pPIDControlsDialog = new ControlsDialog();
     connectSignals();
-    pPIDControlsDialog->sendParams();
 }
 
 
@@ -286,8 +285,17 @@ MainWindow::processData(QString sData) {
     }
     if(tokens.isEmpty())
         return;
-    if(tokens.at(0) == "P") { // Controller Asked the PID Parameters
+    if(tokens.at(0) == "P") { // Buggy Asked the PID Parameters
+        tokens.removeFirst();
         pPIDControlsDialog->sendParams();
+    }
+    if(tokens.isEmpty())
+        return;
+    if(tokens.at(0) == "Buggy Ready") { // Buggy is Raedy to Start
+        tokens.removeFirst();
+        pPIDControlsDialog->sendParams();
+        serialPort.write("G\n");
+        enableUI();
     }
 }
 
@@ -306,11 +314,12 @@ MainWindow::onStartStopPushed() {
         pRightPlot->ClearDataSet(2);
         pRightPlot->ClearDataSet(3);
         nRightPlotPoints = 0;
-        serialPort.write("Start\n");
+        pPIDControlsDialog->sendParams();
+        serialPort.write("G\n");
         pButtonStartStop->setText("Stop");
     }
     else {
-        serialPort.write("Stop\n");
+        serialPort.write("H\n");
         pButtonStartStop->setText("Start");
     }
 }
