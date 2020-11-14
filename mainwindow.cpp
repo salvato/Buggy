@@ -32,15 +32,15 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&keepAliveTimer, SIGNAL(timeout()),
             this, SLOT(onKeepAlive()));
 
-    pPIDControlsDialog = new ControlsDialog();
-    connectSignals();
-
     connect(&connectionTimer, SIGNAL(timeout()),
             this, SLOT(onTryToConnect()));
 
+    pPIDControlsDialog = new ControlsDialog();
+    connectSignals();
+
     disableUI();
     if(!serialConnect()) {
-        pStatusBar->showMessage(QString("Unable to open Serial Port !"));
+        pStatusBar->showMessage(QString("Unable to Open Serial Port !"));
         connectionTimer.start(300);
     }
     else {
