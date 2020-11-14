@@ -35,13 +35,12 @@ ControlsDialog::ControlsDialog()
 void
 ControlsDialog::sendParams() {
     // Send PID Parameters to the Motor Controller
-    emit LPvalueChanged(double(pUi->LPslider->value()*0.01));
-    emit LIvalueChanged(double(pUi->LIslider->value()*0.01));
-    emit LDvalueChanged(double(pUi->LDslider->value()*0.01));
-
-    emit RPvalueChanged(double(pUi->RPslider->value()*0.01));
-    emit RIvalueChanged(double(pUi->RIslider->value()*0.01));
-    emit RDvalueChanged(double(pUi->RDslider->value()*0.01));
+    emit LPvalueChanged(pUi->LPslider->value());
+    emit LIvalueChanged(pUi->LIslider->value());
+    emit LDvalueChanged(pUi->LDslider->value());
+    emit RPvalueChanged(pUi->RPslider->value());
+    emit RIvalueChanged(pUi->RIslider->value());
+    emit RDvalueChanged(pUi->RDslider->value());
 }
 
 
@@ -79,6 +78,7 @@ ControlsDialog::closeEvent(QCloseEvent *event) {
     saveSettings();
     emit ControlsDone();
 }
+
 
 void
 ControlsDialog::keyPressEvent(QKeyEvent *e) {

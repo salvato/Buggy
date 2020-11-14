@@ -29,11 +29,15 @@ MainWindow::MainWindow(QWidget *parent)
     t0             = -1;
 
     disableUI();
+    connect(&keepAliveTimer, SIGNAL(timeout()),
+            this, SLOT(onKeepAlive()));
+
+    pPIDControlsDialog = new ControlsDialog();
+    connectSignals();
+
     if(!serialConnect()) {
         pStatusBar->showMessage(QString("Unable to open Serial Port !"));
     }
-    pPIDControlsDialog = new ControlsDialog();
-    connectSignals();
 }
 
 
@@ -295,6 +299,7 @@ MainWindow::processData(QString sData) {
         tokens.removeFirst();
         pPIDControlsDialog->sendParams();
         serialPort.write("G\n");
+        keepAliveTimer.start(500);
         enableUI();
     }
 }
@@ -414,4 +419,11 @@ MainWindow::onRSpeedChanged(int value) {
     QString sMessage = QString("Rs%1\n").arg(int(value));
     serialPort.write(sMessage.toLatin1().constData());
 }
+
+
+void
+MainWindow::onKeepAlive() {
+    serialPort.write("K\n");
+}
+
 

@@ -5,6 +5,7 @@
 #include <QByteArray>
 #include <QSerialPort>
 #include <QStatusBar>
+#include <QTimer>
 
 
 QT_FORWARD_DECLARE_CLASS(GLWidget)
@@ -58,6 +59,7 @@ private slots:
     void onRSpeedChanged(int speed);
 
     void onHidePIDControls();
+    void onKeepAlive();
 
 private:
     GLWidget*        pGLWidget;
@@ -72,6 +74,7 @@ private:
     QString     serialPortName;
     QString     receivedData;
     QQuaternion quat0, quat1;
+    QTimer      keepAliveTimer;
 
     float  q0, q1, q2, q3;
     double leftSpeed;
