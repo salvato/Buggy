@@ -44,6 +44,8 @@ private:
 signals:
 
 private slots:
+    void onTryToConnect();
+    void onConnectPushed();
     void onStartStopPushed();
     void onPIDControlsPushed();
     void onNewDataAvailable();
@@ -65,6 +67,7 @@ private:
     GLWidget*        pGLWidget;
     Plot2D*          pLeftPlot;
     Plot2D*          pRightPlot;
+    QPushButton*     pButtonConnect;
     QPushButton*     pButtonStartStop;
     QPushButton*     pButtonPIDControls;
     ControlsDialog*  pPIDControlsDialog;
@@ -74,6 +77,7 @@ private:
     QString     serialPortName;
     QString     receivedData;
     QQuaternion quat0, quat1;
+    QTimer      connectionTimer;
     QTimer      keepAliveTimer;
 
     float  q0, q1, q2, q3;
@@ -95,4 +99,6 @@ private:
     double RIvalue;
     double RDvalue;
     double RSpeed;
+
+    bool bStillConnected;
 };
