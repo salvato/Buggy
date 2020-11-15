@@ -39,13 +39,8 @@ MainWindow::MainWindow(QWidget *parent)
     connectSignals();
 
     disableUI();
-    if(!serialConnect()) {
-        pStatusBar->showMessage(QString("Unable to Open Serial Port !"));
-        connectionTimer.start(300);
-    }
-    else {
-        pButtonConnect->setEnabled(true);
-    }
+    pStatusBar->showMessage(QString("Wait: Connecting to Buggy..."));
+    connectionTimer.start(300);
 }
 
 
@@ -121,10 +116,10 @@ MainWindow::serialConnect() {
     }
     serialPort.setBaudRate(baudRate);
     serialPort.setParent(this);
-    pStatusBar->showMessage(QString("uController connected to: ttyACM0"));
     serialPort.readAll(); // Discard Input Buffer
     connect(&serialPort, SIGNAL(readyRead()),
             this, SLOT(onNewDataAvailable()));
+    pStatusBar->showMessage(QString("uController connected to: ttyACM0"));
     return true;
 }
 
@@ -263,55 +258,52 @@ void
 MainWindow::processData(QString sData) {
     bool bUpdateMotors = false;
     QStringList tokens = sData.split(',');
-    if(tokens.isEmpty())
-        return;
-    if(tokens.at(0) == "A" && tokens.length() > 4) {
-        tokens.removeFirst();
-        q0 = tokens.at(0).toDouble()/1000.0;
-        tokens.removeFirst();
-        q1 = tokens.at(0).toDouble()/1000.0;
-        tokens.removeFirst();
-        q2 = tokens.at(0).toDouble()/1000.0;
-        tokens.removeFirst();
-        q3 = tokens.at(0).toDouble()/1000.0;
-        tokens.removeFirst();
-        quat1 = QQuaternion(q0, q1, q2, q3)*quat0;
-        pGLWidget->setRotation(quat1);
-        pGLWidget->update();
-    }
-    if(tokens.isEmpty())
-        return;
-    if(tokens.at(0) == "M" && tokens.length() > 2) {
-        tokens.removeFirst();
-        leftSpeed = tokens.at(0).toDouble()/100.0;
-        tokens.removeFirst();
-        leftPath = tokens.at(0).toDouble();
-        tokens.removeFirst();
-        bUpdateMotors = true;
-    }
-    if(tokens.isEmpty())
-        return;
-    if(tokens.at(0) == "T" && tokens.length() > 1) {
-        tokens.removeFirst();
-        dTime = tokens.at(0).toDouble();
-        if(t0 < 0)
-            t0 = dTime;
-        if(bUpdateMotors) {
-            pLeftPlot->NewPoint(1, (dTime-t0)/1000.0, leftSpeed);
-            pLeftPlot->UpdatePlot();
+    while(!tokens.isEmpty()) {
+        QString sHeader = tokens.first();
+        int nTokens = tokens.length();
+        if(sHeader == "A" && nTokens > 4) {
+            tokens.removeFirst();
+            q0 = tokens.first().toDouble()/1000.0;
+            tokens.removeFirst();
+            q1 = tokens.first().toDouble()/1000.0;
+            tokens.removeFirst();
+            q2 = tokens.first().toDouble()/1000.0;
+            tokens.removeFirst();
+            q3 = tokens.first().toDouble()/1000.0;
+            tokens.removeFirst();
+            quat1 = QQuaternion(q0, q1, q2, q3)*quat0;
+            pGLWidget->setRotation(quat1);
+            pGLWidget->update();
         }
-    }
-    if(tokens.isEmpty())
-        return;
-    if(tokens.at(0) == "P") { // Buggy Asked the PID Parameters
-        tokens.removeFirst();
-        pPIDControlsDialog->sendParams();
-    }
-    if(tokens.isEmpty())
-        return;
-    if(tokens.at(0) == "Buggy Ready") { // Buggy is Raedy to Start
-        tokens.removeFirst();
-        pButtonConnect->setEnabled(true);
+        else if(sHeader == "M" && nTokens > 2) {
+            tokens.removeFirst();
+            leftSpeed = tokens.first().toDouble()/100.0;
+            tokens.removeFirst();
+            leftPath = tokens.first().toDouble();
+            tokens.removeFirst();
+            bUpdateMotors = true;
+        }
+        else if(sHeader == "T" && nTokens > 1) {
+            tokens.removeFirst();
+            dTime = tokens.first().toDouble();
+            if(t0 < 0)
+                t0 = dTime;
+            if(bUpdateMotors) {
+                pLeftPlot->NewPoint(1, (dTime-t0)/1000.0, leftSpeed);
+                pLeftPlot->UpdatePlot();
+            }
+        }
+        else if(sHeader == "P") { // Buggy Asked the PID Parameters
+            tokens.removeFirst();
+            pPIDControlsDialog->sendParams();
+        }
+        else if(sHeader == "Buggy Ready") { // Buggy is Ready to Start
+            tokens.removeFirst();
+            pButtonConnect->setEnabled(true);
+        }
+        else { // Unknown token
+            tokens.removeFirst();
+        }
     }
 }
 
