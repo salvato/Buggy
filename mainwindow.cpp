@@ -67,10 +67,10 @@ MainWindow::closeEvent(QCloseEvent *event) {
         if(pPIDControlsDialog) {
             pPIDControlsDialog->close();
             delete pPIDControlsDialog;
-            event->accept();
         }
         if(serialPort.isOpen())
             serialPort.close();
+        event->accept();
     }
     else {
         event->ignore();
@@ -349,7 +349,7 @@ MainWindow::onKeepAlive() {
 void
 MainWindow::onTimeToChangeSpeed() {
     LSpeed = 1.0-LSpeed;
-    QString sMessage = QString("Ls%1\n").arg(100*int(3.0*LSpeed+1.0));
+    QString sMessage = QString("Ls%1\n").arg(int(100*(LSpeed+0.5)));
     serialPort.write(sMessage.toLatin1().constData());
 }
 
@@ -369,7 +369,7 @@ MainWindow::onStartStopPushed() {
         pRightPlot->ClearDataSet(3);
         nRightPlotPoints = 0;
         changeSpeedTimer.start(4000);
-        QString sMessage = QString("Ls%1\n").arg(100*int(3.0*LSpeed+1.0));
+        QString sMessage = QString("Ls%1\n").arg(int(100*LSpeed+0.5));
         serialPort.write(sMessage.toLatin1().constData());
         pButtonStartStop->setText("Stop");
     }
