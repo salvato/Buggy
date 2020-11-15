@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     disableUI();
     pStatusBar->showMessage(QString("Wait: Connecting to Buggy..."));
-    connectionTimer.start(300);
+    connectionTimer.start(500);
 }
 
 
@@ -111,7 +111,7 @@ MainWindow::serialConnect() {
     if(serialPort.isOpen())
         serialPort.close();
     if(!serialPort.open(QIODevice::ReadWrite)) {
-        pStatusBar->showMessage(QString("Unable to open Serial Port"));
+        pStatusBar->showMessage(QString("No Buggy Connected Till Now..."));
         return false;
     }
     serialPort.setBaudRate(baudRate);
@@ -119,7 +119,7 @@ MainWindow::serialConnect() {
     serialPort.readAll(); // Discard Input Buffer
     connect(&serialPort, SIGNAL(readyRead()),
             this, SLOT(onNewDataAvailable()));
-    pStatusBar->showMessage(QString("uController connected to: ttyACM0"));
+    pStatusBar->showMessage(QString("Buggy Connected to: ttyACM0"));
     return true;
 }
 
@@ -329,8 +329,8 @@ MainWindow::onConnectPushed() {
 void
 MainWindow::onKeepAlive() {
     if(bStillConnected) {
-        serialPort.write("K\n");
         bStillConnected = false;
+        serialPort.write("K\n");
     }
     else {
         keepAliveTimer.stop();
@@ -355,7 +355,6 @@ MainWindow::onStartStopPushed() {
         pRightPlot->ClearDataSet(2);
         pRightPlot->ClearDataSet(3);
         nRightPlotPoints = 0;
-        pPIDControlsDialog->sendParams();
         serialPort.write("G\n");
         pButtonStartStop->setText("Stop");
     }
@@ -381,8 +380,8 @@ MainWindow::onHidePIDControls() {
 
 void
 MainWindow::onNewDataAvailable() {
-    receivedData += serialPort.readAll();
     bStillConnected = true;
+    receivedData += serialPort.readAll();
     QString sNewData;
     int iPos = receivedData.indexOf("\n");
     while(iPos != -1) {

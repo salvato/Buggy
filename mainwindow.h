@@ -100,5 +100,5 @@ private:
     double RDvalue;
     double RSpeed;
 
-    bool bStillConnected;
+    volatile bool bStillConnected;
 };
