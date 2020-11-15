@@ -44,7 +44,7 @@ private slots:
     void on_RIslider_valueChanged(int value);
     void on_RDslider_valueChanged(int value);
 
-    void changeSpeed();
+    void changeSpeed(double speed);
 
 private:
     Ui::ControlsDialog*  pUi;

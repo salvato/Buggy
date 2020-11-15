@@ -27,13 +27,17 @@ MainWindow::MainWindow(QWidget *parent)
     receivedData   = QString();
     baudRate       = 9600; // 115200;
     serialPortName = QString("/dev/ttyACM0");
-    t0             = -1;
+    t0             =-1.0;
+    LSpeed         = 1.0;
 
     connect(&keepAliveTimer, SIGNAL(timeout()),
             this, SLOT(onKeepAlive()));
 
     connect(&connectionTimer, SIGNAL(timeout()),
             this, SLOT(onTryToConnect()));
+
+    connect(&changeSpeedTimer, SIGNAL(timeout()),
+            this, SLOT(onTimeToChangeSpeed()));
 
     pPIDControlsDialog = new ControlsDialog();
     connectSignals();
@@ -119,15 +123,16 @@ MainWindow::serialConnect() {
     serialPort.readAll(); // Discard Input Buffer
     connect(&serialPort, SIGNAL(readyRead()),
             this, SLOT(onNewDataAvailable()));
-    pStatusBar->showMessage(QString("Buggy Connected to: ttyACM0"));
+    pStatusBar->showMessage(QString("Buggy Ready to Connect via ttyACM0"));
+    bConnected = false;
     return true;
 }
 
 
 void
 MainWindow::createButtons() {
-    pButtonConnect     = new QPushButton("Connect", this);
-    pButtonStartStop   = new QPushButton("Start", this);
+    pButtonConnect     = new QPushButton("Connect",  this);
+    pButtonStartStop   = new QPushButton("Start",    this);
     pButtonPIDControls = new QPushButton("PID Ctrl", this);
 
     connect(pButtonConnect, SIGNAL(clicked()),
@@ -298,8 +303,8 @@ MainWindow::processData(QString sData) {
             pPIDControlsDialog->sendParams();
         }
         else if(sHeader == "Buggy Ready") { // Buggy is Ready to Start
-            tokens.removeFirst();
             pButtonConnect->setEnabled(true);
+            tokens.clear();
         }
         else { // Unknown token
             tokens.removeFirst();
@@ -318,19 +323,19 @@ MainWindow::onTryToConnect() {
 
 void
 MainWindow::onConnectPushed() {
+    serialPort.write("K\n"); // Keep Alive message
     pPIDControlsDialog->sendParams();
-    serialPort.write("G\n");
     enableUI();
-    pButtonConnect->setDisabled(true);
-    keepAliveTimer.start(500);
+    keepAliveTimer.start(100);
 }
 
 
 void
 MainWindow::onKeepAlive() {
-    if(bStillConnected) {
-        bStillConnected = false;
+    if(bConnected) {
+        bConnected = false;
         serialPort.write("K\n");
+        pButtonConnect->setDisabled(true);
     }
     else {
         keepAliveTimer.stop();
@@ -338,6 +343,14 @@ MainWindow::onKeepAlive() {
         pStatusBar->showMessage(QString("Buggy Disconnected !"));
         connectionTimer.start(500);
     }
+}
+
+
+void
+MainWindow::onTimeToChangeSpeed() {
+    LSpeed = 1.0-LSpeed;
+    QString sMessage = QString("Ls%1\n").arg(100*int(3.0*LSpeed+1.0));
+    serialPort.write(sMessage.toLatin1().constData());
 }
 
 
@@ -355,10 +368,13 @@ MainWindow::onStartStopPushed() {
         pRightPlot->ClearDataSet(2);
         pRightPlot->ClearDataSet(3);
         nRightPlotPoints = 0;
-        serialPort.write("G\n");
+        changeSpeedTimer.start(4000);
+        QString sMessage = QString("Ls%1\n").arg(100*int(3.0*LSpeed+1.0));
+        serialPort.write(sMessage.toLatin1().constData());
         pButtonStartStop->setText("Stop");
     }
     else {
+        changeSpeedTimer.stop();
         serialPort.write("H\n");
         pButtonStartStop->setText("Start");
     }
@@ -380,7 +396,7 @@ MainWindow::onHidePIDControls() {
 
 void
 MainWindow::onNewDataAvailable() {
-    bStillConnected = true;
+    bConnected = true;
     receivedData += serialPort.readAll();
     QString sNewData;
     int iPos = receivedData.indexOf("\n");

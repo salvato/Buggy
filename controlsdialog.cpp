@@ -131,10 +131,8 @@ ControlsDialog::on_RDslider_valueChanged(int value) {
 
 
 void
-ControlsDialog::changeSpeed() {
-//    currentLspeed = 1.0 - currentLspeed;
-//    currentRspeed = 1.0 - currentRspeed;
-//    emit LSpeedChanged(currentLspeed);
+ControlsDialog::changeSpeed(double speed) {
+    emit LSpeedChanged(speed);
 //    emit RSpeedChanged(currentRspeed);
 }
 

@@ -62,6 +62,7 @@ private slots:
 
     void onHidePIDControls();
     void onKeepAlive();
+    void onTimeToChangeSpeed();
 
 private:
     GLWidget*        pGLWidget;
@@ -79,6 +80,7 @@ private:
     QQuaternion quat0, quat1;
     QTimer      connectionTimer;
     QTimer      keepAliveTimer;
+    QTimer      changeSpeedTimer;
 
     float  q0, q1, q2, q3;
     double leftSpeed;
@@ -100,5 +102,5 @@ private:
     double RDvalue;
     double RSpeed;
 
-    volatile bool bStillConnected;
+    volatile bool bConnected;
 };
