@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     quat0          = QQuaternion(1, 0, 0, 0).conjugated();
     receivedData   = QString();
-    baudRate       = 9600; // 115200;
+    baudRate       = QSerialPort::Baud9600;
     serialPortName = QString("/dev/ttyACM0");
     t0             =-1.0;
     LSpeed         = 1.0;
