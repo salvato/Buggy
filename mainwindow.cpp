@@ -326,7 +326,7 @@ MainWindow::onConnectPushed() {
     serialPort.write("K\n"); // Keep Alive message
     pPIDControlsDialog->sendParams();
     enableUI();
-    keepAliveTimer.start(100);
+    keepAliveTimer.start(1000);
 }
 
 
