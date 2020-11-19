@@ -9,7 +9,6 @@
 #include <QPushButton>
 #include <QSlider>
 #include <QMessageBox>
-#include <QDebug>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -323,19 +322,28 @@ MainWindow::onTryToConnect() {
 
 void
 MainWindow::onConnectPushed() {
-    serialPort.write("K\n"); // Keep Alive message
-    pPIDControlsDialog->sendParams();
-    enableUI();
-    keepAliveTimer.start(1000);
+    if(pButtonConnect->text() == QString("Connect")) {
+        serialPort.write("K\n"); // Keep Alive message
+        pPIDControlsDialog->sendParams();
+        enableUI();
+        keepAliveTimer.start(100);
+        pButtonConnect->setText("Disconnect");
+        pStatusBar->showMessage(QString("Buggy Connected !"));
+    }
+    else {
+        disableUI();
+        keepAliveTimer.stop();
+        pButtonConnect->setText("Connect");
+        pStatusBar->showMessage(QString("Buggy Disconnected !"));
+        connectionTimer.start(500);
+    }
 }
 
 
 void
 MainWindow::onKeepAlive() {
     if(bConnected) {
-        bConnected = false;
         serialPort.write("K\n");
-        pButtonConnect->setDisabled(true);
     }
     else {
         keepAliveTimer.stop();
