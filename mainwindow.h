@@ -71,6 +71,7 @@ private:
     QPushButton*     pButtonConnect;
     QPushButton*     pButtonStartStop;
     QPushButton*     pButtonPIDControls;
+    QLineEdit*       pEditObstacleDistance;
     ControlsDialog*  pPIDControlsDialog;
     QStatusBar*      pStatusBar;
 
@@ -102,5 +103,9 @@ private:
     double RDvalue;
     double RSpeed;
 
-    volatile bool bConnected;
+    double obstacleDistance;
+    bool   bUpdateObstacleDistance;
+    bool   bUpdateMotors;
+
+    bool   bConnected;
 };

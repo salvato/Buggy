@@ -213,6 +213,8 @@ MainWindow::initLayout() {
     firstButtonRow->addWidget(pButtonConnect);
     firstButtonRow->addWidget(pButtonStartStop);
     firstButtonRow->addWidget(pButtonPIDControls);
+    pEditObstacleDistance = new QLineEdit();
+    firstButtonRow->addWidget(pEditObstacleDistance);
 
     pStatusBar = new QStatusBar();
 
@@ -260,7 +262,8 @@ MainWindow::connectSignals() {
 
 void
 MainWindow::processData(QString sData) {
-    bool bUpdateMotors = false;
+    bUpdateMotors = false;
+    bUpdateObstacleDistance = false;
     QStringList tokens = sData.split(',');
     while(!tokens.isEmpty()) {
         QString sHeader = tokens.first();
@@ -279,13 +282,24 @@ MainWindow::processData(QString sData) {
             pGLWidget->setRotation(quat1);
             pGLWidget->update();
         }
-        else if(sHeader == "M" && nTokens > 2) {
+        else if(sHeader == "M" && nTokens > 4) {
             tokens.removeFirst();
             leftSpeed = tokens.first().toDouble()/100.0;
             tokens.removeFirst();
             leftPath = tokens.first().toDouble();
             tokens.removeFirst();
+            rightSpeed = tokens.first().toDouble()/100.0;
+            tokens.removeFirst();
+            rightPath = tokens.first().toDouble();
+            tokens.removeFirst();
             bUpdateMotors = true;
+        }
+        else if(sHeader == "D") {
+            tokens.removeFirst();
+            obstacleDistance = tokens.first().toDouble();
+            tokens.removeFirst();
+            pEditObstacleDistance->setText(QString("%1").arg(obstacleDistance));
+            bUpdateObstacleDistance = true;
         }
         else if(sHeader == "T" && nTokens > 1) {
             tokens.removeFirst();
@@ -295,6 +309,8 @@ MainWindow::processData(QString sData) {
             if(bUpdateMotors) {
                 pLeftPlot->NewPoint(1, (dTime-t0)/1000.0, leftSpeed);
                 pLeftPlot->UpdatePlot();
+                pRightPlot->NewPoint(1, (dTime-t0)/1000.0, rightSpeed);
+                pRightPlot->UpdatePlot();
             }
         }
         else if(sHeader == "P") { // Buggy Asked the PID Parameters
