@@ -357,7 +357,7 @@ MainWindow::onKeepAlive() {
 void
 MainWindow::onTimeToChangeSpeed() {
     LSpeed = 1.0-LSpeed;
-    QString sMessage = QString("Ls%1\n").arg(int(100*(LSpeed+0.5)));
+    QString sMessage = QString("Ls%1\n").arg(int(100*(LSpeed+0.3)));
     serialPort.write(sMessage.toLatin1().constData());
 }
 
