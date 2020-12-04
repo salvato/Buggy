@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     serialPortName = QString("/dev/ttyACM0");
     t0             =-1.0;
     LSpeed         = 1.0;
+    RSpeed         = 1.0;
 
     connect(&keepAliveTimer, SIGNAL(timeout()),
             this, SLOT(onKeepAlive()));
@@ -373,7 +374,10 @@ MainWindow::onKeepAlive() {
 void
 MainWindow::onTimeToChangeSpeed() {
     LSpeed = 1.0-LSpeed;
-    QString sMessage = QString("Ls%1\n").arg(int(100*(LSpeed+0.3)));
+    RSpeed = 1.0-RSpeed;
+    QString sMessage = QString("Ls%1\nRs%2\n")
+                       .arg(int(100*(LSpeed+1.3)))
+                       .arg(int(100*(RSpeed+1.3)));
     serialPort.write(sMessage.toLatin1().constData());
 }
 
@@ -393,7 +397,9 @@ MainWindow::onStartStopPushed() {
         pRightPlot->ClearDataSet(3);
         nRightPlotPoints = 0;
         changeSpeedTimer.start(4000);
-        QString sMessage = QString("Ls%1\n").arg(int(100*LSpeed+0.5));
+        QString sMessage = QString("Ls%1\nRs%2\n")
+                           .arg(int(100.0*LSpeed+0.5))
+                           .arg(int(100.0*RSpeed+0.5));
         serialPort.write(sMessage.toLatin1().constData());
         pButtonStartStop->setText("Stop");
     }
