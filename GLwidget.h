@@ -52,6 +52,7 @@
 #define GLWIDGET_H
 
 #include "geometryengine.h"
+#include "GrCamera.h"
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
@@ -71,7 +72,7 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    explicit GLWidget(QWidget *parent = nullptr);
+    explicit GLWidget(CGrCamera *myCamera, QWidget *parent = nullptr);
     ~GLWidget() override;
     void setRotation(float q0, float q1, float q2, float q3);
     void setRotation(QQuaternion newRotation);
@@ -80,6 +81,10 @@ protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent* event) override;
 
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
@@ -89,12 +94,16 @@ protected:
 
 private:
     QOpenGLShaderProgram program;
-    GeometryEngine *geometries;
+    GeometryEngine* geometries;
+    CGrCamera* camera;
 
-    QOpenGLTexture *texture;
+    QOpenGLTexture* texture;
 
-    QMatrix4x4 projection;
+    QMatrix4x4  projection;
     QQuaternion rotation;
+    qreal       aspect;
+    const qreal zNear = 0.1;
+    const qreal zFar  = 100.0;
 };
 
 #endif // GLWIDGET_H

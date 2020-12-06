@@ -24,11 +24,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     quat0          = QQuaternion(1, 0, 0, 0).conjugated();
     receivedData   = QString();
-    baudRate       = QSerialPort::Baud9600;
+    baudRate       = QSerialPort::Baud38400;
     serialPortName = QString("/dev/ttyACM0");
     t0             =-1.0;
-    LSpeed         = 1.0;
-    RSpeed         = 1.0;
+    LSpeed         = 0.0;
+    RSpeed         = 0.0;
+    iSign          = 1;
 
     connect(&keepAliveTimer, SIGNAL(timeout()),
             this, SLOT(onKeepAlive()));
@@ -109,6 +110,16 @@ MainWindow::saveSettings() {
 }
 
 
+void
+MainWindow::initCamera() {
+  // Set(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ)
+  camera.Set(0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+  camera.FieldOfView(45.0);
+  camera.MouseMode(CGrCamera::PITCHYAW);
+  camera.Gravity(false);
+}
+
+
 bool
 MainWindow::serialConnect() {
     serialPort.setPortName(serialPortName);
@@ -151,7 +162,7 @@ MainWindow::initPlots() {
     /////////////////////////
     pLeftPlot = new Plot2D(nullptr, "Left Motor");
 
-    pLeftPlot->NewDataSet(1, 2, QColor(255, 196,   0), Plot2D::iline, "SetPt");
+    pLeftPlot->NewDataSet(1, 2, QColor(128, 128, 255), Plot2D::iline, "SetPt");
     pLeftPlot->NewDataSet(2, 2, QColor(255, 255,   0), Plot2D::iline, "Speed");
     pLeftPlot->NewDataSet(3, 2, QColor(  0, 255, 255), Plot2D::iline, "PID-Out");
 
@@ -175,7 +186,7 @@ MainWindow::initPlots() {
     //////////////////////////
     pRightPlot = new Plot2D(nullptr, "Right Motor");
 
-    pRightPlot->NewDataSet(1, 2, QColor(255, 196,   0), Plot2D::iline, "SetPt");
+    pRightPlot->NewDataSet(1, 2, QColor(128, 128, 255), Plot2D::iline, "SetPt");
     pRightPlot->NewDataSet(2, 2, QColor(255, 255,   0), Plot2D::iline, "Speed");
     pRightPlot->NewDataSet(3, 2, QColor(  0, 255, 255), Plot2D::iline, "PID-Out");
 
@@ -198,7 +209,8 @@ MainWindow::initPlots() {
 
 void
 MainWindow::initLayout() {
-    pGLWidget = new GLWidget(this);
+    initCamera();
+    pGLWidget = new GLWidget(&camera, this);
 
     initPlots();
     QVBoxLayout* pPlotLayout = new QVBoxLayout();
@@ -308,9 +320,11 @@ MainWindow::processData(QString sData) {
             if(t0 < 0)
                 t0 = dTime;
             if(bUpdateMotors) {
-                pLeftPlot->NewPoint(1, (dTime-t0)/1000.0, leftSpeed);
+                pLeftPlot->NewPoint(2, (dTime-t0)/1000.0, leftSpeed);
+                pLeftPlot->NewPoint(1, (dTime-t0)/1000.0, LSpeed/100.0);
                 pLeftPlot->UpdatePlot();
-                pRightPlot->NewPoint(1, (dTime-t0)/1000.0, rightSpeed);
+                pRightPlot->NewPoint(2, (dTime-t0)/1000.0, rightSpeed);
+                pRightPlot->NewPoint(1, (dTime-t0)/1000.0, RSpeed/100.0);
                 pRightPlot->UpdatePlot();
             }
         }
@@ -373,11 +387,14 @@ MainWindow::onKeepAlive() {
 
 void
 MainWindow::onTimeToChangeSpeed() {
-    LSpeed = 1.0-LSpeed;
-    RSpeed = 1.0-RSpeed;
+    if((LSpeed > 255) || (LSpeed < -255)) {
+        iSign = -iSign;
+    }
+    LSpeed += iSign;
+    RSpeed += iSign;
     QString sMessage = QString("Ls%1\nRs%2\n")
-                       .arg(int(100*(LSpeed+1.3)))
-                       .arg(int(100*(RSpeed+1.3)));
+                       .arg(LSpeed)
+                       .arg(RSpeed);
     serialPort.write(sMessage.toLatin1().constData());
 }
 
@@ -396,10 +413,10 @@ MainWindow::onStartStopPushed() {
         pRightPlot->ClearDataSet(2);
         pRightPlot->ClearDataSet(3);
         nRightPlotPoints = 0;
-        changeSpeedTimer.start(4000);
+        changeSpeedTimer.start(20);
         QString sMessage = QString("Ls%1\nRs%2\n")
-                           .arg(int(100.0*LSpeed+0.5))
-                           .arg(int(100.0*RSpeed+0.5));
+                           .arg(LSpeed)
+                           .arg(RSpeed);
         serialPort.write(sMessage.toLatin1().constData());
         pButtonStartStop->setText("Stop");
     }

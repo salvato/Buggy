@@ -53,8 +53,8 @@
 #include <QVector2D>
 #include <QVector3D>
 
-struct VertexData
-{
+struct
+VertexData {
     QVector3D position;
     QVector2D texCoord;
 };
@@ -64,11 +64,9 @@ GeometryEngine::GeometryEngine()
     : indexBuf(QOpenGLBuffer::IndexBuffer)
 {
     initializeOpenGLFunctions();
-
     // Generate 2 VBOs
     arrayBuf.create();
     indexBuf.create();
-
     // Initializes cube geometry and transfers it to VBOs
     initCubeGeometry();
 }
@@ -87,28 +85,28 @@ GeometryEngine::initCubeGeometry() {
     // is different.
     VertexData vertices[] = {
         // Vertex data for face 0
-        {QVector3D(-1.0f, -1.0f,  1.0f), QVector2D(0.0f, 0.0f)},  // v0
+        {QVector3D(-1.0f, -1.0f,  1.0f), QVector2D(0.0f,  0.0f)}, // v0
         {QVector3D( 1.0f, -1.0f,  1.0f), QVector2D(0.33f, 0.0f)}, // v1
-        {QVector3D(-1.0f,  1.0f,  1.0f), QVector2D(0.0f, 0.5f)},  // v2
+        {QVector3D(-1.0f,  1.0f,  1.0f), QVector2D(0.0f,  0.5f)}, // v2
         {QVector3D( 1.0f,  1.0f,  1.0f), QVector2D(0.33f, 0.5f)}, // v3
 
         // Vertex data for face 1
         {QVector3D( 1.0f, -1.0f,  1.0f), QVector2D( 0.0f, 0.5f)}, // v4
         {QVector3D( 1.0f, -1.0f, -1.0f), QVector2D(0.33f, 0.5f)}, // v5
-        {QVector3D( 1.0f,  1.0f,  1.0f), QVector2D(0.0f, 1.0f)},  // v6
+        {QVector3D( 1.0f,  1.0f,  1.0f), QVector2D(0.0f,  1.0f)}, // v6
         {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(0.33f, 1.0f)}, // v7
 
         // Vertex data for face 2
         {QVector3D( 1.0f, -1.0f, -1.0f), QVector2D(0.66f, 0.5f)}, // v8
-        {QVector3D(-1.0f, -1.0f, -1.0f), QVector2D(1.0f, 0.5f)},  // v9
+        {QVector3D(-1.0f, -1.0f, -1.0f), QVector2D(1.0f,  0.5f)}, // v9
         {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(0.66f, 1.0f)}, // v10
-        {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(1.0f, 1.0f)},  // v11
+        {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(1.0f,  1.0f)}, // v11
 
         // Vertex data for face 3
         {QVector3D(-1.0f, -1.0f, -1.0f), QVector2D(0.66f, 0.0f)}, // v12
-        {QVector3D(-1.0f, -1.0f,  1.0f), QVector2D(1.0f, 0.0f)},  // v13
+        {QVector3D(-1.0f, -1.0f,  1.0f), QVector2D(1.0f,  0.0f)}, // v13
         {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(0.66f, 0.5f)}, // v14
-        {QVector3D(-1.0f,  1.0f,  1.0f), QVector2D(1.0f, 0.5f)},  // v15
+        {QVector3D(-1.0f,  1.0f,  1.0f), QVector2D(1.0f,  0.5f)}, // v15
 
         // Vertex data for face 4
         {QVector3D(-1.0f, -1.0f, -1.0f), QVector2D(0.33f, 0.0f)}, // v16
@@ -141,11 +139,11 @@ GeometryEngine::initCubeGeometry() {
 
     // Transfer vertex data to VBO 0
     arrayBuf.bind();
-    arrayBuf.allocate(vertices, 24 * sizeof(VertexData));
+    arrayBuf.allocate(vertices, 24*sizeof(VertexData));
 
     // Transfer index data to VBO 1
     indexBuf.bind();
-    indexBuf.allocate(indices, 34 * sizeof(GLushort));
+    indexBuf.allocate(indices, 34*sizeof(GLushort));
 }
 
 

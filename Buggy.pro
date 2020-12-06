@@ -34,7 +34,8 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 
 CONFIG += c++11
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    GrCamera.cpp
 SOURCES += controlsdialog.cpp
 SOURCES += axesdialog.cpp
 SOURCES += AxisFrame.cpp
@@ -49,7 +50,8 @@ SOURCES +=
 SOURCES += mainwindow.cpp
 
 
-HEADERS += mainwindow.h
+HEADERS += mainwindow.h \
+    GrCamera.h
 HEADERS += controlsdialog.h
 HEADERS += geometryengine.h
 HEADERS += GLwidget.h
