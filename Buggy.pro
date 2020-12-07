@@ -21,6 +21,7 @@
 
 QT += core
 QT += gui
+QT += opengl
 QT += widgets
 QT += serialport
 
