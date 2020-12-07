@@ -196,9 +196,13 @@ CGrCamera::ComputeFrame() {
 
     _Subtract(m_eye, m_center, m_cameraz);
     _Normalize(m_cameraz);
-    _Cross(m_cameraz, m_up, m_camerax);
-    _Normalize(m_camerax);
-    _Cross(m_cameraz, m_camerax, m_cameray);
+    double camerax[3] = {m_camerax.x(), m_camerax.y(), m_camerax.z()};
+    _Cross(m_cameraz, m_up, camerax);
+    _Normalize(camerax);
+    m_camerax = QVector3D(camerax[0], camerax[1], camerax[2]);
+    double cameray[3] = {m_cameray.x(), m_cameray.y(), m_cameray.z()};
+    _Cross(m_cameraz, camerax, cameray);
+    m_cameray = QVector3D(cameray[0], cameray[1], cameray[2]);
 }
 
 
@@ -434,8 +438,8 @@ CGrCamera::CameraDistance() {
 inline void 
 CGrCamera::RotCamera(double m[4][4]) {
     _Identity(m);
-    m[0][0] = m_camerax[0]; m[0][1] = m_camerax[1]; m[0][2] = m_camerax[2];
-    m[1][0] = m_cameray[0]; m[1][1] = m_cameray[1]; m[1][2] = m_cameray[2];
+    m[0][0] = m_camerax.x(); m[0][1] = m_camerax.y(); m[0][2] = m_camerax.z();
+    m[1][0] = m_cameray.x(); m[1][1] = m_cameray.y(); m[1][2] = m_cameray.z();
     m[2][0] = m_cameraz[0]; m[2][1] = m_cameraz[1]; m[2][2] = m_cameraz[2];
 }
 
@@ -443,8 +447,8 @@ CGrCamera::RotCamera(double m[4][4]) {
 inline void 
 CGrCamera::UnRotCamera(double m[4][4]) {
     _Identity(m);
-    m[0][0] = m_camerax[0]; m[1][0] = m_camerax[1]; m[2][0] = m_camerax[2];
-    m[0][1] = m_cameray[0]; m[1][1] = m_cameray[1]; m[2][1] = m_cameray[2];
+    m[0][0] = m_camerax.x(); m[1][0] = m_camerax.y(); m[2][0] = m_camerax.z();
+    m[0][1] = m_cameray.x(); m[1][1] = m_cameray.y(); m[2][1] = m_cameray.z();
     m[0][2] = m_cameraz[0]; m[1][2] = m_cameraz[1]; m[2][2] = m_cameraz[2];
 }
 
