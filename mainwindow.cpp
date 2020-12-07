@@ -17,32 +17,20 @@ MainWindow::MainWindow(QWidget *parent)
     , pLeftPlot(nullptr)
     , pRightPlot(nullptr)
     , pPIDControlsDialog(nullptr)
+    , serialPortName(QString("/dev/ttyACM0"))
+    , receivedData(QString())
+    , quat0(QQuaternion(1, 0, 0, 0).conjugated())
+    , t0(-1.0)
+    , baudRate(QSerialPort::Baud38400)
+    , LSpeed(0.0)
+    , RSpeed(0.0)
+    , iSign(1)
 {
     setWindowIcon(QIcon(":/plot.png"));
     initLayout();
     restoreSettings();
-
-    quat0          = QQuaternion(1, 0, 0, 0).conjugated();
-    receivedData   = QString();
-    baudRate       = QSerialPort::Baud38400;
-    serialPortName = QString("/dev/ttyACM0");
-    t0             =-1.0;
-    LSpeed         = 0.0;
-    RSpeed         = 0.0;
-    iSign          = 1;
-
-    connect(&keepAliveTimer, SIGNAL(timeout()),
-            this, SLOT(onKeepAlive()));
-
-    connect(&connectionTimer, SIGNAL(timeout()),
-            this, SLOT(onTryToConnect()));
-
-    connect(&changeSpeedTimer, SIGNAL(timeout()),
-            this, SLOT(onTimeToChangeSpeed()));
-
     pPIDControlsDialog = new ControlsDialog();
     connectSignals();
-
     disableUI();
     pStatusBar->showMessage(QString("Wait: Connecting to Buggy..."));
     connectionTimer.start(500);
@@ -251,6 +239,13 @@ MainWindow::keyPressEvent(QKeyEvent *e) {
 
 void
 MainWindow::connectSignals() {
+    connect(&keepAliveTimer, SIGNAL(timeout()),
+            this, SLOT(onKeepAlive()));
+    connect(&connectionTimer, SIGNAL(timeout()),
+            this, SLOT(onTryToConnect()));
+    connect(&changeSpeedTimer, SIGNAL(timeout()),
+            this, SLOT(onTimeToChangeSpeed()));
+
     connect(pPIDControlsDialog, SIGNAL(LPvalueChanged(int)),
             this, SLOT(onLPvalueChanged(int)));
     connect(pPIDControlsDialog, SIGNAL(LIvalueChanged(int)),
