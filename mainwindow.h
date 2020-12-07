@@ -80,6 +80,7 @@ private:
 
     QSerialPort serialPort;
     QString     serialPortName;
+    int         baudRate;
     QString     receivedData;
     QQuaternion quat0, quat1;
     QTimer      connectionTimer;
@@ -94,7 +95,6 @@ private:
     double dTime, t0;
     int    nLeftPlotPoints;
     int    nRightPlotPoints;
-    int    baudRate;
 
     double LPvalue;
     double LIvalue;
