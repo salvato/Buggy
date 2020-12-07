@@ -113,8 +113,10 @@ MainWindow::saveSettings() {
 void
 MainWindow::initCamera() {
   // Set(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ)
-  camera.Set(0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-  camera.FieldOfView(45.0);
+  camera.Set(0.0,  10.0, 0.0,
+             0.0,  0.0,  0.0,
+             0.0,  0.0, -1.0);
+  camera.FieldOfView(90.0);
   camera.MouseMode(CGrCamera::PITCHYAW);
   camera.Gravity(false);
 }

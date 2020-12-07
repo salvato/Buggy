@@ -145,12 +145,10 @@ GLWidget::paintGL() {
     viewMatrix.setToIdentity();
     viewMatrix.lookAt(QVector3D(camera->EyeX(),    camera->EyeY(),    camera->EyeZ()),    // Camera position in World Space
                       QVector3D(camera->CenterX(), camera->CenterY(), camera->CenterZ()), // Looking at the origin
-                      QVector3D(camera->UpX(),     camera->UpY(),     camera->UpZ())      // Head is up (set to 0,-1,0 to look upside-down)
-                     );
+                      QVector3D(camera->UpX(),     camera->UpY(),     camera->UpZ()));    // Head is up (set to 0,-1,0 to look upside-down)
 
-    QMatrix4x4 model;
     model.setToIdentity();
-    model.translate(0.0, 0.0, -5.0);
+    model.translate(0.0, 0.0, 0.0);
     model.rotate(rotation);
     program.setUniformValue("mvp_matrix", projection * viewMatrix * model);
     program.setUniformValue("texture", 0);

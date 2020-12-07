@@ -101,6 +101,7 @@ private:
 
     QMatrix4x4  projection;
     QMatrix4x4  viewMatrix;
+    QMatrix4x4  model;
     QQuaternion rotation;
     qreal       aspect;
     const qreal zNear = 0.1;

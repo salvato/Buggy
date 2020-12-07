@@ -139,7 +139,7 @@ _MultiplyPoint(double m[4][4], double p[3]) {
 
 CGrCamera::CGrCamera() {
     m_mousemode = PITCHYAW;
-    m_gravity = true;
+    m_gravity = false;
     Set(0.0, 0.0, 30.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
     FieldOfView(70.0);
 }
