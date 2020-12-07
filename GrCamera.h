@@ -36,10 +36,10 @@ public:
     double UpY();
     double UpZ();
 
-    const double *Center() const {return m_center;}
-    double CenterX() const {return m_center[0];}
-    double CenterY() const {return m_center[1];}
-    double CenterZ() const {return m_center[2];}
+    double *Center();
+    double CenterX();
+    double CenterY();
+    double CenterZ();
 
     bool Gravity() const {return m_gravity;}
     enum eMouseMode {PANTILT, ROLLMOVE, PITCHYAW, DOLLYXY};
@@ -50,7 +50,7 @@ public:
 
 private:
     QVector3D m_up;
-    double m_center[3];
+    QVector3D m_center;
     double m_eye[3];
 
     double m_fieldofview;
