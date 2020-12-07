@@ -134,13 +134,6 @@ MainWindow::createButtons() {
     pButtonConnect     = new QPushButton("Connect",  this);
     pButtonStartStop   = new QPushButton("Start",    this);
     pButtonPIDControls = new QPushButton("PID Ctrl", this);
-
-    connect(pButtonConnect, SIGNAL(clicked()),
-            this, SLOT(onConnectPushed()));
-    connect(pButtonStartStop, SIGNAL(clicked()),
-            this, SLOT(onStartStopPushed()));
-    connect(pButtonPIDControls, SIGNAL(clicked()),
-            this, SLOT(onPIDControlsPushed()));
 }
 
 
@@ -245,6 +238,13 @@ MainWindow::connectSignals() {
             this, SLOT(onTryToConnect()));
     connect(&changeSpeedTimer, SIGNAL(timeout()),
             this, SLOT(onTimeToChangeSpeed()));
+
+    connect(pButtonConnect, SIGNAL(clicked()),
+            this, SLOT(onConnectPushed()));
+    connect(pButtonStartStop, SIGNAL(clicked()),
+            this, SLOT(onStartStopPushed()));
+    connect(pButtonPIDControls, SIGNAL(clicked()),
+            this, SLOT(onPIDControlsPushed()));
 
     connect(pPIDControlsDialog, SIGNAL(LPvalueChanged(int)),
             this, SLOT(onLPvalueChanged(int)));
