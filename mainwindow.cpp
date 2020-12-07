@@ -112,13 +112,12 @@ MainWindow::saveSettings() {
 
 void
 MainWindow::initCamera() {
-  // Set(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ)
-  camera.Set(0.0,  10.0, 0.0,
-             0.0,  0.0,  0.0,
-             0.0,  0.0, -1.0);
-  camera.FieldOfView(90.0);
-  camera.MouseMode(CGrCamera::PITCHYAW);
-  camera.Gravity(false);
+    camera.Set(0.0, 10.0,  0.0,  // Eye
+               0.0,  0.0,  0.0,  // Center
+               0.0,  0.0, -1.0); // Up Vector
+    camera.FieldOfView(90.0);
+    camera.MouseMode(CGrCamera::PITCHYAW);
+    camera.Gravity(false);
 }
 
 
@@ -243,10 +242,10 @@ MainWindow::initLayout() {
 
 void
 MainWindow::keyPressEvent(QKeyEvent *e) {
-  if(e->key() == Qt::Key_Escape)
-    close();
-  else
-    QWidget::keyPressEvent(e);
+    if(e->key() == Qt::Key_Escape)
+        close();
+    else
+        QWidget::keyPressEvent(e);
 }
 
 
@@ -395,8 +394,8 @@ MainWindow::onTimeToChangeSpeed() {
     LSpeed += iSign;
     RSpeed += iSign;
     QString sMessage = QString("Ls%1\nRs%2\n")
-                       .arg(LSpeed)
-                       .arg(RSpeed);
+            .arg(LSpeed)
+            .arg(RSpeed);
     serialPort.write(sMessage.toLatin1().constData());
 }
 
@@ -417,8 +416,8 @@ MainWindow::onStartStopPushed() {
         nRightPlotPoints = 0;
         changeSpeedTimer.start(20);
         QString sMessage = QString("Ls%1\nRs%2\n")
-                           .arg(LSpeed)
-                           .arg(RSpeed);
+                .arg(LSpeed)
+                .arg(RSpeed);
         serialPort.write(sMessage.toLatin1().constData());
         pButtonStartStop->setText("Stop");
     }
