@@ -148,6 +148,30 @@ CGrCamera::CGrCamera() {
 CGrCamera::~CGrCamera() {
 }
 
+double*
+CGrCamera::Up() {
+    static double up[] = {m_up.x(), m_up.y(), m_up.z()};
+    return up;
+}
+
+
+double
+CGrCamera::UpX() {
+    return m_up.x();
+}
+
+
+double
+CGrCamera::UpY() {
+    return m_up.y();
+}
+
+
+double
+CGrCamera::UpZ() {
+    return m_up.z();
+}
+
 
 void 
 CGrCamera::Set(double p_eyex, double p_eyey, double p_eyez, double p_centerx, double p_centery, double p_centerz, double p_upx, double p_upy, double p_upz) {
@@ -194,14 +218,19 @@ CGrCamera::ComputeFrame() {
         m_up[2] = 0;
     }
 
-    _Subtract(m_eye, m_center, m_cameraz);
-    _Normalize(m_cameraz);
+    double cameraz[3] = {m_cameraz.x(), m_cameraz.y(), m_cameraz.z()};
+    _Subtract(m_eye, m_center, cameraz);
+    _Normalize(cameraz);
+    m_cameraz = QVector3D(cameraz[0], cameraz[1], cameraz[2]);
+
     double camerax[3] = {m_camerax.x(), m_camerax.y(), m_camerax.z()};
-    _Cross(m_cameraz, m_up, camerax);
+    double up[3] = {m_up.x(), m_up.y(), m_up.z()};
+    _Cross(cameraz, up, camerax);
     _Normalize(camerax);
     m_camerax = QVector3D(camerax[0], camerax[1], camerax[2]);
+
     double cameray[3] = {m_cameray.x(), m_cameray.y(), m_cameray.z()};
-    _Cross(m_cameraz, camerax, cameray);
+    _Cross(cameraz, camerax, cameray);
     m_cameray = QVector3D(cameray[0], cameray[1], cameray[2]);
 }
 
@@ -226,7 +255,9 @@ CGrCamera::Pan(double d) {
     _Multiply(ucen, rot, cen, t);
 
     _MultiplyPoint(t, m_center);
-    _MultiplyPoint(t, m_up);
+    double up[3] = {m_up.x(), m_up.y(), m_up.z()};
+    _MultiplyPoint(t, up);
+    m_up = QVector3D(up[0], up[1], up[2]);
 
     ComputeFrame();
 }
@@ -248,7 +279,9 @@ CGrCamera::Tilt(double d) {
     _Multiply(ucen, rot, cen, t);
 
     _MultiplyPoint(t, m_center);
-    _MultiplyPoint(t, m_up);
+    double up[3] = {m_up.x(), m_up.y(), m_up.z()};
+    _MultiplyPoint(t, up);
+    m_up = QVector3D(up[0], up[1], up[2]);
 
     ComputeFrame();
 }
@@ -270,7 +303,9 @@ CGrCamera::Roll(double d) {
     _Multiply(ucen, rot, cen, t);
 
     _MultiplyPoint(t, m_center);
-    _MultiplyPoint(t, m_up);
+    double up[3] = {m_up.x(), m_up.y(), m_up.z()};
+    _MultiplyPoint(t, up);
+    m_up = QVector3D(up[0], up[1], up[2]);
 
     ComputeFrame();
 }
@@ -297,7 +332,9 @@ CGrCamera::Yaw(double d) {
     _Multiply(ucen, rot, cen, b);
 
     _MultiplyPoint(b, m_eye);
-    _MultiplyPoint(b, m_up);
+    double up[3] = {m_up.x(), m_up.y(), m_up.z()};
+    _MultiplyPoint(b, up);
+    m_up = QVector3D(up[0], up[1], up[2]);
 
     ComputeFrame();
 }
@@ -319,8 +356,9 @@ CGrCamera::Pitch(double d) {
     _Multiply(ucen, rot, cen, a);
 
     _MultiplyPoint(a, m_eye);
-    _MultiplyPoint(a, m_up);
-
+    double up[3] = {m_up.x(), m_up.y(), m_up.z()};
+    _MultiplyPoint(a, up);
+    m_up = QVector3D(up[0], up[1], up[2]);
     ComputeFrame();
 }
 
@@ -440,7 +478,7 @@ CGrCamera::RotCamera(double m[4][4]) {
     _Identity(m);
     m[0][0] = m_camerax.x(); m[0][1] = m_camerax.y(); m[0][2] = m_camerax.z();
     m[1][0] = m_cameray.x(); m[1][1] = m_cameray.y(); m[1][2] = m_cameray.z();
-    m[2][0] = m_cameraz[0]; m[2][1] = m_cameraz[1]; m[2][2] = m_cameraz[2];
+    m[2][0] = m_cameraz.x(); m[2][1] = m_cameraz.y(); m[2][2] = m_cameraz.z();
 }
 
 
@@ -449,7 +487,7 @@ CGrCamera::UnRotCamera(double m[4][4]) {
     _Identity(m);
     m[0][0] = m_camerax.x(); m[1][0] = m_camerax.y(); m[2][0] = m_camerax.z();
     m[0][1] = m_cameray.x(); m[1][1] = m_cameray.y(); m[2][1] = m_cameray.z();
-    m[0][2] = m_cameraz[0]; m[1][2] = m_cameraz[1]; m[2][2] = m_cameraz[2];
+    m[0][2] = m_cameraz.x(); m[1][2] = m_cameraz.y(); m[2][2] = m_cameraz.z();
 }
 
 

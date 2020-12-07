@@ -27,18 +27,20 @@ public:
     double FieldOfView() const {return m_fieldofview;}
 
     const double *Eye() const {return m_eye;}
-    const double *Center() const {return m_center;}
-    const double *Up() const {return m_up;}
-
     double EyeX() const {return m_eye[0];}
     double EyeY() const {return m_eye[1];}
     double EyeZ() const {return m_eye[2];}
+
+    double* Up();
+    double UpX();
+    double UpY();
+    double UpZ();
+
+    const double *Center() const {return m_center;}
     double CenterX() const {return m_center[0];}
     double CenterY() const {return m_center[1];}
     double CenterZ() const {return m_center[2];}
-    double UpX() const {return m_up[0];}
-    double UpY() const {return m_up[1];}
-    double UpZ() const {return m_up[2];}
+
     bool Gravity() const {return m_gravity;}
     enum eMouseMode {PANTILT, ROLLMOVE, PITCHYAW, DOLLYXY};
     void MouseMode(eMouseMode m) {m_mousemode = m;}
@@ -47,7 +49,7 @@ public:
     void MouseMove(int x, int y);
 
 private:
-    double m_up[3];
+    QVector3D m_up;
     double m_center[3];
     double m_eye[3];
 
@@ -62,7 +64,7 @@ private:
     // The camera frame.
     QVector3D m_camerax;
     QVector3D m_cameray;
-    double m_cameraz[3];
+    QVector3D m_cameraz;
 
     void RotCamera(double m[4][4]);
     void UnRotCamera(double m[4][4]);
