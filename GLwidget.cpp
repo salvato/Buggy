@@ -140,10 +140,19 @@ void
 GLWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     texture->bind();
-    QMatrix4x4 matrix;
-    matrix.translate(0.0, 0.0, -5.0);
-    matrix.rotate(rotation);
-    program.setUniformValue("mvp_matrix", projection * matrix);
+
+    // Camera matrix
+    viewMatrix.setToIdentity();
+    viewMatrix.lookAt(QVector3D(camera->EyeX(),    camera->EyeY(),    camera->EyeZ()),    // Camera position in World Space
+                      QVector3D(camera->CenterX(), camera->CenterY(), camera->CenterZ()), // Looking at the origin
+                      QVector3D(camera->UpX(),     camera->UpY(),     camera->UpZ())      // Head is up (set to 0,-1,0 to look upside-down)
+                     );
+
+    QMatrix4x4 model;
+    model.setToIdentity();
+    model.translate(0.0, 0.0, -5.0);
+    model.rotate(rotation);
+    program.setUniformValue("mvp_matrix", projection * viewMatrix * model);
     program.setUniformValue("texture", 0);
     geometries->drawCubeGeometry(&program);
 }
@@ -159,6 +168,7 @@ GLWidget::mousePressEvent(QMouseEvent *event) {
         camera->MouseDown(event->x(), event->y());
         event->accept();
     }
+    update();
 }
 
 
@@ -171,6 +181,7 @@ GLWidget::mouseReleaseEvent(QMouseEvent *event) {
         camera->MouseMode(CGrCamera::PITCHYAW);
         event->accept();
     }
+    update();
 }
 
 
@@ -183,6 +194,7 @@ GLWidget::mouseMoveEvent(QMouseEvent *event) {
         camera->MouseMove(event->x(), event->y());
         event->accept();
     }
+    update();
 }
 
 
@@ -195,5 +207,6 @@ GLWidget::wheelEvent(QWheelEvent* event) {
         camera->MouseMove(0, -numDegrees.y());
         camera->MouseMode(CGrCamera::PITCHYAW);
         event->accept();
+        update();
     }
 }

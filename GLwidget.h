@@ -100,6 +100,7 @@ private:
     QOpenGLTexture* texture;
 
     QMatrix4x4  projection;
+    QMatrix4x4  viewMatrix;
     QQuaternion rotation;
     qreal       aspect;
     const qreal zNear = 0.1;
