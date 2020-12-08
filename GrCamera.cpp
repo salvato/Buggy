@@ -198,6 +198,31 @@ CGrCamera::CenterZ() {
 }
 
 
+double*
+CGrCamera::Eye() {
+    static double eye[] = {m_eye.x(), m_eye.y(), m_eye.z()};
+    return eye;
+}
+
+
+double
+CGrCamera::EyeX() {
+    return m_eye.x();
+}
+
+
+double
+CGrCamera::EyeY() {
+    return m_eye.y();
+}
+
+
+double
+CGrCamera::EyeZ() {
+    return m_eye.z();
+}
+
+
 void 
 CGrCamera::Set(double p_eyex, double p_eyey, double p_eyez, double p_centerx, double p_centery, double p_centerz, double p_upx, double p_upy, double p_upz) {
     m_eye[0] = p_eyex;
@@ -245,7 +270,8 @@ CGrCamera::ComputeFrame() {
 
     double cameraz[3] = {m_cameraz.x(), m_cameraz.y(), m_cameraz.z()};
     double center[3] = {m_center.x(), m_center.y(), m_center.z()};
-    _Subtract(m_eye, center, cameraz);
+    double eye[3] = {m_eye.x(), m_eye.y(), m_eye.z()};
+    _Subtract(eye, center, cameraz);
     _Normalize(cameraz);
     m_cameraz = QVector3D(cameraz[0], cameraz[1], cameraz[2]);
 
@@ -351,19 +377,21 @@ CGrCamera::Roll(double d) {
 void 
 CGrCamera::Yaw(double d) {
     double ucen[4][4];
-    _Translate(ucen, m_center[0], m_center[1], m_center[2]);
+    _Translate(ucen, m_center.x(), m_center.y(), m_center.z());
 
     double rot[4][4];
     RotCameraY(rot, d);
 
     double cen[4][4];
-    _Translate(cen, -m_center[0], -m_center[1], -m_center[2]);
+    _Translate(cen, -m_center.x(), -m_center.y(), -m_center.z());
 
     double b[4][4];
-
     _Multiply(ucen, rot, cen, b);
 
-    _MultiplyPoint(b, m_eye);
+    double eye[3] = {m_eye.x(), m_eye.y(), m_eye.z()};
+    _MultiplyPoint(b, eye);
+    m_eye = QVector3D(eye[0], eye[1], eye[2]);
+
     double up[3] = {m_up.x(), m_up.y(), m_up.z()};
     _MultiplyPoint(b, up);
     m_up = QVector3D(up[0], up[1], up[2]);
@@ -375,19 +403,21 @@ CGrCamera::Yaw(double d) {
 void 
 CGrCamera::Pitch(double d) {
     double ucen[4][4];
-    _Translate(ucen, m_center[0], m_center[1], m_center[2]);
+    _Translate(ucen, m_center.x(), m_center.y(), m_center.z());
 
     double rot[4][4];
     RotCameraX(rot, d);
 
     double cen[4][4];
-    _Translate(cen, -m_center[0], -m_center[1], -m_center[2]);
+    _Translate(cen, -m_center.x(), -m_center.y(), -m_center.z());
 
     double a[4][4];
-
     _Multiply(ucen, rot, cen, a);
 
-    _MultiplyPoint(a, m_eye);
+    double eye[3] = {m_eye.x(), m_eye.y(), m_eye.z()};
+    _MultiplyPoint(a, eye);
+    m_eye = QVector3D(eye[0], eye[1], eye[2]);
+
     double up[3] = {m_up.x(), m_up.y(), m_up.z()};
     _MultiplyPoint(a, up);
     m_up = QVector3D(up[0], up[1], up[2]);
@@ -408,7 +438,9 @@ CGrCamera::Dolly(double x, double y, double z) {
     double center[3] = {m_center.x(), m_center.y(), m_center.z()};
     _MultiplyPoint(t, center);
     m_center = QVector3D(center[0], center[1], center[2]);
-    _MultiplyPoint(t, m_eye);
+    double eye[3] = {m_eye.x(), m_eye.y(), m_eye.z()};
+    _MultiplyPoint(t, eye);
+    m_eye = QVector3D(eye[0], eye[1], eye[2]);
 
     // Frame does not change...
 }
@@ -419,7 +451,9 @@ CGrCamera::DollyCamera(double x, double y, double z) {
     double t[4][4];
     DollyHelper(t, x, y, z);
 
-    _MultiplyPoint(t, m_eye);
+    double eye[3] = {m_eye.x(), m_eye.y(), m_eye.z()};
+    _MultiplyPoint(t, eye);
+    m_eye = QVector3D(eye[0], eye[1], eye[2]);
     ComputeFrame();
 }
 
@@ -505,7 +539,8 @@ double
 CGrCamera::CameraDistance() {
     double view[3];
     double center[3] = {m_center.x(), m_center.y(), m_center.z()};
-    _Subtract(m_eye, center, view);
+    double eye[3] = {m_eye.x(), m_eye.y(), m_eye.z()};
+    _Subtract(eye, center, view);
     return _Length(view);
 }
 

@@ -26,10 +26,10 @@ public:
     void FieldOfView(double f) {m_fieldofview = f;}
     double FieldOfView() const {return m_fieldofview;}
 
-    const double *Eye() const {return m_eye;}
-    double EyeX() const {return m_eye[0];}
-    double EyeY() const {return m_eye[1];}
-    double EyeZ() const {return m_eye[2];}
+    double* Eye();
+    double EyeX();
+    double EyeY();
+    double EyeZ();
 
     double* Up();
     double UpX();
@@ -51,7 +51,7 @@ public:
 private:
     QVector3D m_up;
     QVector3D m_center;
-    double m_eye[3];
+    QVector3D m_eye;
 
     double m_fieldofview;
     int m_mousey;
