@@ -19,21 +19,6 @@ const double GR_DTOR = GR_PI / 180.;      // Converts degrees to radians
 
 // Some linear algebra helper routines
 
-inline double 
-_Length(const double *a) {
-    return sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2]);
-}
-
-
-inline void 
-_Normalize(double *a) {
-    double len = _Length(a);
-    a[0] /= len;
-    a[1] /= len;
-    a[2] /= len;
-}
-
-
 inline void 
 _Identity(double t[4][4]) {
     for(int i=0;  i<4;  i++)
