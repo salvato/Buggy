@@ -18,13 +18,6 @@ const double GR_DTOR = GR_PI / 180.;      // Converts degrees to radians
 
 
 // Some linear algebra helper routines
-inline void 
-_Subtract(const double *a, const double *b, double *c) {
-    c[0] = a[0] - b[0];
-    c[1] = a[1] - b[1];
-    c[2] = a[2] - b[2];
-}
-
 
 inline double 
 _Length(const double *a) {
@@ -38,14 +31,6 @@ _Normalize(double *a) {
     a[0] /= len;
     a[1] /= len;
     a[2] /= len;
-}
-
-
-inline void 
-_Cross(const double *a, const double *b, double *c) {
-    c[0] = a[1]*b[2] - a[2]*b[1];
-    c[1] = a[2]*b[0] - a[0]*b[2];
-    c[2] = a[0]*b[1] - a[1]*b[0];
 }
 
 
@@ -263,27 +248,15 @@ CGrCamera::Set3dv(const double *p_eye, const double *p_center, const double *p_u
 void 
 CGrCamera::ComputeFrame() {
     if(m_gravity) {
-        m_up[0] = 0;
-        m_up[1] = 1;
-        m_up[2] = 0;
+        m_up.setX(0);
+        m_up.setY(1);
+        m_up.setZ(0);
     }
-
-    double cameraz[3] = {m_cameraz.x(), m_cameraz.y(), m_cameraz.z()};
-    double center[3] = {m_center.x(), m_center.y(), m_center.z()};
-    double eye[3] = {m_eye.x(), m_eye.y(), m_eye.z()};
-    _Subtract(eye, center, cameraz);
-    _Normalize(cameraz);
-    m_cameraz = QVector3D(cameraz[0], cameraz[1], cameraz[2]);
-
-    double camerax[3] = {m_camerax.x(), m_camerax.y(), m_camerax.z()};
-    double up[3] = {m_up.x(), m_up.y(), m_up.z()};
-    _Cross(cameraz, up, camerax);
-    _Normalize(camerax);
-    m_camerax = QVector3D(camerax[0], camerax[1], camerax[2]);
-
-    double cameray[3] = {m_cameray.x(), m_cameray.y(), m_cameray.z()};
-    _Cross(cameraz, camerax, cameray);
-    m_cameray = QVector3D(cameray[0], cameray[1], cameray[2]);
+    m_cameraz = m_eye - m_center;
+    m_cameraz.normalize();
+    m_camerax = m_camerax.crossProduct(m_cameraz, m_up);
+    m_camerax.normalize();
+    m_cameray = m_cameray.crossProduct(m_cameraz, m_camerax);
 }
 
 
@@ -537,11 +510,7 @@ CGrCamera::Gravity(bool p_gravity) {
 //
 double 
 CGrCamera::CameraDistance() {
-    double view[3];
-    double center[3] = {m_center.x(), m_center.y(), m_center.z()};
-    double eye[3] = {m_eye.x(), m_eye.y(), m_eye.z()};
-    _Subtract(eye, center, view);
-    return _Length(view);
+    return (m_eye-m_center).length();
 }
 
 
