@@ -118,6 +118,7 @@ CGrCamera::CGrCamera() {
 CGrCamera::~CGrCamera() {
 }
 
+
 QVector3D
 CGrCamera::Up() {
     return m_up;
@@ -215,9 +216,8 @@ CGrCamera::Set3dv(const double *p_eye, const double *p_center, const double *p_u
 //
 void 
 CGrCamera::ComputeFrame() {
-    if(m_gravity) {
+    if(m_gravity)
         m_up = QVector3D(0.0, 1.0, 0.0);
-    }
     m_cameraz = m_eye - m_center;
     m_cameraz.normalize();
     m_camerax = m_camerax.crossProduct(m_cameraz, m_up);
@@ -226,31 +226,16 @@ CGrCamera::ComputeFrame() {
 }
 
 
-//
-// Camera rotation operations.  These function rotate the camera
-// around the eye position.
-//
+// Camera rotation operations.
+// These function rotate the camera around the eye position.
 void 
 CGrCamera::Pan(double d) {
-    double ucen[4][4];
-    _Translate(ucen, m_eye[0], m_eye[1], m_eye[2]);
-
-    double rot[4][4];
-    RotCameraY(rot, d);
-
-    double cen[4][4];
-    _Translate(cen, -m_eye[0], -m_eye[1], -m_eye[2]);
-
-    double t[4][4];
-    _Multiply(ucen, rot, cen, t);
-
-    double center[3] = {m_center.x(), m_center.y(), m_center.z()};
-    _MultiplyPoint(t, center);
-    m_center = QVector3D(center[0], center[1], center[2]);
-
-    double up[3] = {m_up.x(), m_up.y(), m_up.z()};
-    _MultiplyPoint(t, up);
-    m_up = QVector3D(up[0], up[1], up[2]);
+    QMatrix4x4 transform;
+    transform.translate(-m_eye);        // Move to Origin
+    transform.rotate(d, 0.0, 1.0, 0.0); // Then Rotate around Y
+    transform.translate(m_eye);         // Back to the original position
+    m_center = transform * m_center;    // Apply the transformation
+    m_up     = transform * m_up;        // ...Idem...
 
     ComputeFrame();
 }
@@ -258,26 +243,12 @@ CGrCamera::Pan(double d) {
 
 void 
 CGrCamera::Tilt(double d) {
-    double ucen[4][4];
-    _Translate(ucen, m_eye[0], m_eye[1], m_eye[2]);
-
-    double rot[4][4];
-    RotCameraX(rot, d);
-
-    double cen[4][4];
-    _Translate(cen, -m_eye[0], -m_eye[1], -m_eye[2]);
-
-    double t[4][4];
-
-    _Multiply(ucen, rot, cen, t);
-
-    double center[3] = {m_center.x(), m_center.y(), m_center.z()};
-    _MultiplyPoint(t, center);
-    m_center = QVector3D(center[0], center[1], center[2]);
-
-    double up[3] = {m_up.x(), m_up.y(), m_up.z()};
-    _MultiplyPoint(t, up);
-    m_up = QVector3D(up[0], up[1], up[2]);
+    QMatrix4x4 transform;
+    transform.translate(-m_eye);        // Move to Origin
+    transform.rotate(d, 1.0, 0.0, 0.0); // Then Rotate around X
+    transform.translate(m_eye);         // Back to the original position
+    m_center = transform * m_center;    // Apply the transformation
+    m_up     = transform * m_up;        // ...Idem...
 
     ComputeFrame();
 }
@@ -290,17 +261,16 @@ CGrCamera::Roll(double d) {
     transform.rotate(d, 0.0, 0.0, 1.0); // Then Rotate around Z
     transform.translate(m_eye);         // Back to the original position
     m_center = transform * m_center;    // Apply the transformation
-    m_up  = transform * m_up;           // ...Idem...
+    m_up     = transform * m_up;        // ...Idem...
 
     ComputeFrame();
 }
 
 
-//
-// Center rotation operations.  These function rotate the camera around 
-// the center location.  Note that camera roll and center roll would
-// be the same thing.  So, we only need Yaw and Pitch.
-//
+// Center rotation operations.
+// These function rotate the camera around the center location.
+// Note that camera roll and center roll would be the same thing.
+// So, we only need Yaw and Pitch.
 void 
 CGrCamera::Yaw(double d) {
     QMatrix4x4 transform;
