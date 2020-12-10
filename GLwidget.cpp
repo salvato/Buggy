@@ -143,15 +143,15 @@ GLWidget::paintGL() {
 
     // Camera matrix
     viewMatrix.setToIdentity();
-    viewMatrix.lookAt(QVector3D(camera->EyeX(),    camera->EyeY(),    camera->EyeZ()),    // Camera position in World Space
-                      QVector3D(camera->CenterX(), camera->CenterY(), camera->CenterZ()), // Looking at the origin
-                      QVector3D(camera->UpX(),     camera->UpY(),     camera->UpZ()));    // Head is up (set to 0,-1,0 to look upside-down)
+    viewMatrix.lookAt(camera->Eye(), camera->Center(), camera->Up());
 
     model.setToIdentity();
     model.translate(0.0, 0.0, 0.0);
     model.rotate(rotation);
-    program.setUniformValue("mvp_matrix", projection * viewMatrix * model);
+
+    program.setUniformValue("mvp_matrix", projection*viewMatrix*model);
     program.setUniformValue("texture", 0);
+
     geometries->drawCubeGeometry(&program);
 }
 
@@ -166,7 +166,6 @@ GLWidget::mousePressEvent(QMouseEvent *event) {
         camera->MouseDown(event->x(), event->y());
         event->accept();
     }
-    update();
 }
 
 
