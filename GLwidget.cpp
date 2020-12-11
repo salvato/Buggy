@@ -81,7 +81,7 @@ GLWidget::minimumSizeHint() const {
 
 QSize
 GLWidget::sizeHint() const {
-    return QSize(400, 400);
+    return QSize(800, 800);
 }
 
 
@@ -140,6 +140,65 @@ GLWidget::initTextures() {
     roomTexture->setMinificationFilter(QOpenGLTexture::Nearest);
     roomTexture->setMagnificationFilter(QOpenGLTexture::Linear);
     roomTexture->setWrapMode(QOpenGLTexture::Repeat);
+
+/*
+    const QImage posx = QImage(":/images/posx.jpg").mirrored();
+    const QImage posy = QImage(":/images/posy.jpg").mirrored();
+    const QImage posz = QImage(":/images/posz.jpg").mirrored();
+    const QImage negx = QImage(":/images/negx.jpg").mirrored();
+    const QImage negy = QImage(":/images/negy.jpg").mirrored();
+    const QImage negz = QImage(":/images/negz.jpg").mirrored();
+
+    roomTexture = new QOpenGLTexture(QOpenGLTexture::TargetCubeMap);
+    roomTexture->create();
+    roomTexture->setSize(posx.width(), posx.height(), posx.depth());
+    roomTexture->setFormat(QOpenGLTexture::RGBA8_UNorm);
+    roomTexture->allocateStorage();
+    roomTexture->setData(0, 0, QOpenGLTexture::CubeMapPositiveX,
+                            QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+                            (const void*)posx.constBits(), 0);
+    roomTexture->setData(0, 0, QOpenGLTexture::CubeMapPositiveY,
+                            QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+                            (const void*)posy.constBits(), 0);
+    roomTexture->setData(0, 0, QOpenGLTexture::CubeMapPositiveZ,
+                            QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+                            (const void*)posz.constBits(), 0);
+    roomTexture->setData(0, 0, QOpenGLTexture::CubeMapNegativeX,
+                            QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+                            (const void*)negx.constBits(), 0);
+    roomTexture->setData(0, 0, QOpenGLTexture::CubeMapNegativeY,
+                            QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+                            (const void*)negy.constBits(), 0);
+    roomTexture->setData(0, 0, QOpenGLTexture::CubeMapNegativeZ,
+                            QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+                            (const void*)negz.constBits(), 0);
+
+
+
+The fragment shader snippet is as follows
+
+.....
+varying vec3 v_TexCoord;
+uniform samplerCube qt_Environment;
+.....
+
+vec4 evaluateColor(in vec3 normal, in vec3 texCoord)
+{
+    vec3 finalColor ....
+    .....
+    .....
+
+    finalColor += textureCube(qt_Environment, texCoord).rgb;
+    return vec4( finalColor, c_one );
+}
+
+void main(void)
+{
+    gl_FragColor = evaluateColor(v_Normal, v_TexCoord);
+}
+
+*/
+
 }
 
 

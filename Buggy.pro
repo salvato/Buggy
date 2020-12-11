@@ -37,6 +37,7 @@ CONFIG += c++11
 
 SOURCES += main.cpp \
     GrCamera.cpp \
+    skyboxwidget.cpp \
     trackball.cpp
 SOURCES += controlsdialog.cpp
 SOURCES += axesdialog.cpp
@@ -54,6 +55,7 @@ SOURCES += mainwindow.cpp
 
 HEADERS += mainwindow.h \
     GrCamera.h \
+    skyboxwidget.h \
     trackball.h
 HEADERS += controlsdialog.h
 HEADERS += geometryengine.h
