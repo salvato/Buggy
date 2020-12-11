@@ -101,7 +101,6 @@ GLWidget::initializeGL() {
     initShaders();
     initTextures();
     glEnable(GL_DEPTH_TEST); // Enable depth buffer
-    glEnable(GL_CULL_FACE);  // Enable back face culling
     geometries = new GeometryEngine;
 }
 
@@ -152,7 +151,16 @@ GLWidget::paintGL() {
     program.setUniformValue("mvp_matrix", projection*viewMatrix*model);
     program.setUniformValue("texture", 0);
 
+    glEnable(GL_CULL_FACE);  // Enable back face culling
     geometries->drawCubeGeometry(&program);
+
+    model.setToIdentity();
+    model.translate(0.0, 0.0, 0.0);
+    model.scale(10.0);
+    glDisable(GL_CULL_FACE);  // Disable back face culling
+    program.setUniformValue("mvp_matrix", projection*viewMatrix*model);
+    geometries->drawCubeGeometry(&program);
+
 }
 
 
