@@ -107,14 +107,22 @@ GLWidget::initializeGL() {
 
 void
 GLWidget::initShaders() {
-    if(!program.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vshader.glsl"))
+    if(!program.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/cube.vert")) {
+        perror("Missing Cube Vertex Shader");
         close();
-    if(!program.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fshader.glsl"))
+    }
+    if(!program.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/cube.frag")) {
+        perror("Missing Cube Fragment Shader");
         close();
-    if(!program.link())
+    }
+    if(!program.link()) {
+        perror("Cube Shader linking Error");
         close();
-    if(!program.bind()) // Bind shader pipeline for use
+    }
+    if(!program.bind()) {// Bind shader pipeline for use
+        perror("Cube Shader binding Error");
         close();
+    }
 }
 
 

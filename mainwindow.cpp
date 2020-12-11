@@ -1,3 +1,5 @@
+// sudo apt-get install freeglut3-dev
+
 #include <mainwindow.h>
 #include <plot2d.h>
 #include <GLwidget.h>
