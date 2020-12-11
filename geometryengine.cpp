@@ -61,20 +61,21 @@ VertexData {
 
 
 GeometryEngine::GeometryEngine()
-    : indexBuf(QOpenGLBuffer::IndexBuffer)
+    : cubeVertexBuf(QOpenGLBuffer::VertexBuffer)
+    , cubeIndexBuf(QOpenGLBuffer::IndexBuffer)
 {
     initializeOpenGLFunctions();
     // Generate 2 VBOs
-    arrayBuf.create();
-    indexBuf.create();
+    cubeVertexBuf.create();
+    cubeIndexBuf.create();
     // Initializes cube geometry and transfers it to VBOs
     initCubeGeometry();
 }
 
 
 GeometryEngine::~GeometryEngine() {
-    arrayBuf.destroy();
-    indexBuf.destroy();
+    cubeVertexBuf.destroy();
+    cubeIndexBuf.destroy();
 }
 
 
@@ -138,20 +139,20 @@ GeometryEngine::initCubeGeometry() {
     };
 
     // Transfer vertex data to VBO 0
-    arrayBuf.bind();
-    arrayBuf.allocate(vertices, 24*sizeof(VertexData));
+    cubeVertexBuf.bind();
+    cubeVertexBuf.allocate(vertices, 24*sizeof(VertexData));
 
     // Transfer index data to VBO 1
-    indexBuf.bind();
-    indexBuf.allocate(indices, 34*sizeof(GLushort));
+    cubeIndexBuf.bind();
+    cubeIndexBuf.allocate(indices, 34*sizeof(GLushort));
 }
 
 
 void
 GeometryEngine::drawCubeGeometry(QOpenGLShaderProgram *program) {
     // Tell OpenGL which VBOs to use
-    arrayBuf.bind();
-    indexBuf.bind();
+    cubeVertexBuf.bind();
+    cubeIndexBuf.bind();
 
     // Offset for position
     quintptr offset = 0;

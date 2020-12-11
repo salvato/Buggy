@@ -66,8 +66,8 @@ public:
 private:
     void initCubeGeometry();
 
-    QOpenGLBuffer arrayBuf;
-    QOpenGLBuffer indexBuf;
+    QOpenGLBuffer cubeVertexBuf;
+    QOpenGLBuffer cubeIndexBuf;
 };
 
 #endif // GEOMETRYENGINE_H

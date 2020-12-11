@@ -57,14 +57,17 @@ GLWidget::GLWidget(CGrCamera* myCamera, QWidget *parent)
     : QOpenGLWidget(parent)
     , geometries(nullptr)
     , camera(myCamera)
-    , texture(nullptr)
+    , cubeTexture(nullptr)
+    , zNear(0.1)
+    , zFar(1300.0)
+
 {
 }
 
 
 GLWidget::~GLWidget() {
     makeCurrent();
-    delete texture;
+    delete cubeTexture;
     delete geometries;
     doneCurrent();
 }
@@ -128,10 +131,15 @@ GLWidget::initShaders() {
 
 void
 GLWidget::initTextures() {
-    texture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
-    texture->setMinificationFilter(QOpenGLTexture::Nearest);
-    texture->setMagnificationFilter(QOpenGLTexture::Linear);
-    texture->setWrapMode(QOpenGLTexture::Repeat);
+    cubeTexture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
+    cubeTexture->setMinificationFilter(QOpenGLTexture::Nearest);
+    cubeTexture->setMagnificationFilter(QOpenGLTexture::Linear);
+    cubeTexture->setWrapMode(QOpenGLTexture::Repeat);
+
+    roomTexture = new QOpenGLTexture(QImage(":/Pavimento.jpg").mirrored());
+    roomTexture->setMinificationFilter(QOpenGLTexture::Nearest);
+    roomTexture->setMagnificationFilter(QOpenGLTexture::Linear);
+    roomTexture->setWrapMode(QOpenGLTexture::Repeat);
 }
 
 
@@ -146,25 +154,27 @@ GLWidget::resizeGL(int w, int h) {
 void
 GLWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    texture->bind();
 
     // Camera matrix
     viewMatrix.setToIdentity();
     viewMatrix.lookAt(camera->Eye(), camera->Center(), camera->Up());
 
     model.setToIdentity();
-    model.translate(0.0, 0.0, 0.0);
+    model.translate(0.0, 1.0, 0.0);
     model.rotate(rotation);
 
     program.setUniformValue("mvp_matrix", projection*viewMatrix*model);
     program.setUniformValue("texture", 0);
 
     glEnable(GL_CULL_FACE);  // Enable back face culling
+    cubeTexture->bind();
     geometries->drawCubeGeometry(&program);
 
+    roomTexture->bind();
     model.setToIdentity();
+    model.translate(0.0, 100.0, 0.0);
+    model.scale(100);
     model.translate(0.0, 0.0, 0.0);
-    model.scale(10.0);
     glDisable(GL_CULL_FACE);  // Disable back face culling
     program.setUniformValue("mvp_matrix", projection*viewMatrix*model);
     geometries->drawCubeGeometry(&program);

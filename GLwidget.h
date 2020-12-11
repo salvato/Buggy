@@ -97,15 +97,16 @@ private:
     GeometryEngine* geometries;
     CGrCamera* camera;
 
-    QOpenGLTexture* texture;
+    QOpenGLTexture* cubeTexture;
+    QOpenGLTexture* roomTexture;
 
     QMatrix4x4  projection;
     QMatrix4x4  viewMatrix;
     QMatrix4x4  model;
     QQuaternion rotation;
     qreal       aspect;
-    const qreal zNear = 0.1;
-    const qreal zFar  = 100.0;
+    const qreal zNear;
+    const qreal zFar;
 };
 
 #endif // GLWIDGET_H
