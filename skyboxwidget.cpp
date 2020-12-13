@@ -16,9 +16,9 @@ SkyboxWidget::SkyboxWidget(const QString& frontImagePath,
     , mFrontImagePath(frontImagePath)
     , mBackImagePath(backImagePath)
     , mTopImagePath(topImagePath)
-    , mBottomImagePath(bottomImagePath),
-    mLeftImagePath(leftImagePath),
-    mRightImagePath(rightImagePath)
+    , mBottomImagePath(bottomImagePath)
+    , mLeftImagePath(leftImagePath)
+    , mRightImagePath(rightImagePath)
 {
     mLookAt.eye =    {+0.0f, +0.0f, +0.0f};
     mLookAt.center = {+0.0f, +0.0f, -1.0f};

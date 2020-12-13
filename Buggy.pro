@@ -72,8 +72,9 @@ HEADERS += plotpropertiesdlg.h
 FORMS += controlsdialog.ui
 
 
-RESOURCES += shaders.qrc
-RESOURCES += textures.qrc
+RESOURCES += shaders.qrc \
+    textures.qrc
+RESOURCES +=
 
 
 LIBS += -lrt

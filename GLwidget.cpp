@@ -58,6 +58,7 @@ GLWidget::GLWidget(CGrCamera* myCamera, QWidget *parent)
     , geometries(nullptr)
     , camera(myCamera)
     , cubeTexture(nullptr)
+    , roomTexture(nullptr)
     , zNear(0.1)
     , zFar(1300.0)
 
@@ -105,6 +106,53 @@ GLWidget::initializeGL() {
     initTextures();
     glEnable(GL_DEPTH_TEST); // Enable depth buffer
     geometries = new GeometryEngine;
+    QVector3D vertices[] =
+    {
+        {-1.0f,  1.0f, -1.0f},
+        {-1.0f, -1.0f, -1.0f},
+        {+1.0f, -1.0f, -1.0f},
+        {+1.0f, -1.0f, -1.0f},
+        {+1.0f, +1.0f, -1.0f},
+        {-1.0f, +1.0f, -1.0f},
+
+        {-1.0f, -1.0f, +1.0f},
+        {-1.0f, -1.0f, -1.0f},
+        {-1.0f, +1.0f, -1.0f},
+        {-1.0f, +1.0f, -1.0f},
+        {-1.0f, +1.0f, +1.0f},
+        {-1.0f, -1.0f, +1.0f},
+
+        {+1.0f, -1.0f, -1.0f},
+        {+1.0f, -1.0f, +1.0f},
+        {+1.0f, +1.0f, +1.0f},
+        {+1.0f, +1.0f, +1.0f},
+        {+1.0f, +1.0f, -1.0f},
+        {+1.0f, -1.0f, -1.0f},
+
+        {-1.0f, -1.0f, +1.0f},
+        {-1.0f, +1.0f, +1.0f},
+        {+1.0f, +1.0f, +1.0f},
+        {+1.0f, +1.0f, +1.0f},
+        {+1.0f, -1.0f, +1.0f},
+        {-1.0f, -1.0f, +1.0f},
+
+        {-1.0f, +1.0f, -1.0f},
+        {+1.0f, +1.0f, -1.0f},
+        {+1.0f, +1.0f, +1.0f},
+        {+1.0f, +1.0f, +1.0f},
+        {-1.0f, +1.0f, +1.0f},
+        {-1.0f, +1.0f, -1.0f},
+
+        {-1.0f, -1.0f, -1.0f},
+        {-1.0f, -1.0f, +1.0f},
+        {+1.0f, -1.0f, -1.0f},
+        {+1.0f, -1.0f, -1.0f},
+        {-1.0f, -1.0f, +1.0f},
+        {+1.0f, -1.0f, +1.0f}
+    };
+    mVertexBuf.create();
+    mVertexBuf.bind();
+    mVertexBuf.allocate(vertices, 36*sizeof(QVector3D));
 }
 
 
@@ -126,6 +174,19 @@ GLWidget::initShaders() {
         perror("Cube Shader binding Error");
         close();
     }
+
+    if(!mProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/room.vert")) {
+        perror("Missing Room Vertex Shader");
+        close();
+    }
+    if(!mProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/room.frag")) {
+        perror("Missing Room Fragment Shader");
+        close();
+    }
+    if(!mProgram.link()) {
+        perror("Room Shader linking Error");
+        close();
+    }
 }
 
 
@@ -136,69 +197,40 @@ GLWidget::initTextures() {
     cubeTexture->setMagnificationFilter(QOpenGLTexture::Linear);
     cubeTexture->setWrapMode(QOpenGLTexture::Repeat);
 
-    roomTexture = new QOpenGLTexture(QImage(":/Pavimento.jpg").mirrored());
-    roomTexture->setMinificationFilter(QOpenGLTexture::Nearest);
-    roomTexture->setMagnificationFilter(QOpenGLTexture::Linear);
-    roomTexture->setWrapMode(QOpenGLTexture::Repeat);
-
-/*
-    const QImage posx = QImage(":/images/posx.jpg").mirrored();
-    const QImage posy = QImage(":/images/posy.jpg").mirrored();
-    const QImage posz = QImage(":/images/posz.jpg").mirrored();
-    const QImage negx = QImage(":/images/negx.jpg").mirrored();
-    const QImage negy = QImage(":/images/negy.jpg").mirrored();
-    const QImage negz = QImage(":/images/negz.jpg").mirrored();
+    const QImage posx = QImage(":/Pietra.jpg").convertToFormat(QImage::Format_RGBA8888);
+    const QImage negx = QImage(":/Pietra.jpg").convertToFormat(QImage::Format_RGBA8888);
+    const QImage posy = QImage(":/Pietra.jpg").convertToFormat(QImage::Format_RGBA8888);
+    const QImage negy = QImage(":/Pavimento.jpg").convertToFormat(QImage::Format_RGBA8888);
+    const QImage posz = QImage(":/Pietra.jpg").convertToFormat(QImage::Format_RGBA8888);
+    const QImage negz = QImage(":/Pietra.jpg").convertToFormat(QImage::Format_RGBA8888);
 
     roomTexture = new QOpenGLTexture(QOpenGLTexture::TargetCubeMap);
-    roomTexture->create();
     roomTexture->setSize(posx.width(), posx.height(), posx.depth());
     roomTexture->setFormat(QOpenGLTexture::RGBA8_UNorm);
     roomTexture->allocateStorage();
+
     roomTexture->setData(0, 0, QOpenGLTexture::CubeMapPositiveX,
-                            QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-                            (const void*)posx.constBits(), 0);
+                         QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+                         posx.constBits(), Q_NULLPTR);
     roomTexture->setData(0, 0, QOpenGLTexture::CubeMapPositiveY,
-                            QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-                            (const void*)posy.constBits(), 0);
+                         QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+                         posy.constBits(), Q_NULLPTR);
     roomTexture->setData(0, 0, QOpenGLTexture::CubeMapPositiveZ,
-                            QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-                            (const void*)posz.constBits(), 0);
+                         QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+                         posz.constBits(), Q_NULLPTR);
     roomTexture->setData(0, 0, QOpenGLTexture::CubeMapNegativeX,
-                            QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-                            (const void*)negx.constBits(), 0);
+                         QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+                         negx.constBits(), Q_NULLPTR);
     roomTexture->setData(0, 0, QOpenGLTexture::CubeMapNegativeY,
-                            QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-                            (const void*)negy.constBits(), 0);
+                         QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+                         negy.constBits(), Q_NULLPTR);
     roomTexture->setData(0, 0, QOpenGLTexture::CubeMapNegativeZ,
-                            QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-                            (const void*)negz.constBits(), 0);
+                         QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+                         negz.constBits(), Q_NULLPTR);
 
-
-
-The fragment shader snippet is as follows
-
-.....
-varying vec3 v_TexCoord;
-uniform samplerCube qt_Environment;
-.....
-
-vec4 evaluateColor(in vec3 normal, in vec3 texCoord)
-{
-    vec3 finalColor ....
-    .....
-    .....
-
-    finalColor += textureCube(qt_Environment, texCoord).rgb;
-    return vec4( finalColor, c_one );
-}
-
-void main(void)
-{
-    gl_FragColor = evaluateColor(v_Normal, v_TexCoord);
-}
-
-*/
-
+    roomTexture->setMinificationFilter(QOpenGLTexture::Nearest);
+    roomTexture->setMagnificationFilter(QOpenGLTexture::Linear);
+    roomTexture->setWrapMode(QOpenGLTexture::Repeat);
 }
 
 
@@ -218,10 +250,16 @@ GLWidget::paintGL() {
     viewMatrix.setToIdentity();
     viewMatrix.lookAt(camera->Eye(), camera->Center(), camera->Up());
 
+    // Model matrix
     model.setToIdentity();
     model.translate(0.0, 1.0, 0.0);
     model.rotate(rotation);
 
+    // Bind shader pipeline for use
+    if(!program.bind()) {
+        perror("Cube Shader binding Error");
+        close();
+    }
     program.setUniformValue("mvp_matrix", projection*viewMatrix*model);
     program.setUniformValue("texture", 0);
 
@@ -230,13 +268,22 @@ GLWidget::paintGL() {
     geometries->drawCubeGeometry(&program);
 
     roomTexture->bind();
+    mProgram.bind();
+
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+    int vertexLocation = mProgram.attributeLocation("a_position");
+    mProgram.enableAttributeArray(vertexLocation);
+    mProgram.setAttributeBuffer("aPosition", GL_FLOAT, 0, 3, sizeof(QVector3D));
+
+    mProgram.setUniformValue("uTexture", 0);
+
     model.setToIdentity();
-    model.translate(0.0, 100.0, 0.0);
-    model.scale(100);
     model.translate(0.0, 0.0, 0.0);
+    model.scale(1.0);
+    model.translate(2.0, 2.0, 0.0);
     glDisable(GL_CULL_FACE);  // Disable back face culling
-    program.setUniformValue("mvp_matrix", projection*viewMatrix*model);
-    geometries->drawCubeGeometry(&program);
+    mProgram.setUniformValue("mvp_matrix", projection*viewMatrix*model);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
 }
 

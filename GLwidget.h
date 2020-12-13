@@ -94,11 +94,13 @@ protected:
 
 private:
     QOpenGLShaderProgram program;
+    QOpenGLShaderProgram mProgram;
     GeometryEngine* geometries;
     CGrCamera* camera;
 
     QOpenGLTexture* cubeTexture;
     QOpenGLTexture* roomTexture;
+    QOpenGLBuffer   mVertexBuf;
 
     QMatrix4x4  projection;
     QMatrix4x4  viewMatrix;
