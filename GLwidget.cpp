@@ -236,15 +236,8 @@ GLWidget::initTextures() {
                          QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
                          negz.constBits(), Q_NULLPTR);
 
-//    roomTexture->setWrapMode(QOpenGLTexture::ClampToEdge);
-//    roomTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-//    roomTexture->setMagnificationFilter(QOpenGLTexture::LinearMipMapLinear);
-//    roomTexture->generateMipMaps();
-//    if(roomTexture->textureId() == 0)
-//        exit(EXIT_FAILURE);
-
-//    roomTexture->setMinificationFilter(QOpenGLTexture::Nearest);
-//    roomTexture->setMagnificationFilter(QOpenGLTexture::Linear);
+    roomTexture->setMinificationFilter(QOpenGLTexture::Nearest);
+    roomTexture->setMagnificationFilter(QOpenGLTexture::Linear);
     roomTexture->setWrapMode(QOpenGLTexture::Repeat);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 }
@@ -295,7 +288,7 @@ GLWidget::paintGL() {
     mProgram.setUniformValue("uTexture", 0);
 
     model.setToIdentity();
-    model.scale(100.0);
+    model.scale(100.0, 300.0, 300.0);
     model.translate(0.0, 1.0, 0.0);
     glDisable(GL_CULL_FACE);  // Disable back face culling
 

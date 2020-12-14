@@ -49,7 +49,7 @@
 ****************************************************************************/
 
 #include "trackball.h"
-#include<QtMath>
+#include <QtMath>
 #include <QLineF>
 
 //============================================================================//
@@ -83,50 +83,45 @@ void
 TrackBall::move(const QPointF& p, const QQuaternion &transformation) {
     if (!m_pressed)
         return;
-
     QTime currentTime = QTime::currentTime();
     int msecs = m_lastTime.msecsTo(currentTime);
     if (msecs <= 20)
         return;
-
     switch (m_mode) {
-    case Plane:
-        {
-            QLineF delta(m_lastPos, p);
-            const float angleDelta = qRadiansToDegrees(float(delta.length()));
-            m_angularVelocity = angleDelta / msecs;
-            m_axis = QVector3D(-delta.dy(), delta.dx(), 0.0f).normalized();
-            m_axis = transformation.rotatedVector(m_axis);
-            m_rotation = QQuaternion::fromAxisAndAngle(m_axis, angleDelta) * m_rotation;
-        }
-        break;
-    case Sphere:
-        {
-            QVector3D lastPos3D = QVector3D(m_lastPos.x(), m_lastPos.y(), 0.0f);
-            float sqrZ = 1 - QVector3D::dotProduct(lastPos3D, lastPos3D);
-            if (sqrZ > 0)
-                lastPos3D.setZ(std::sqrt(sqrZ));
-            else
-                lastPos3D.normalize();
+        case Plane:
+            {
+                QLineF delta(m_lastPos, p);
+                const float angleDelta = qRadiansToDegrees(float(delta.length()));
+                m_angularVelocity = angleDelta / msecs;
+                m_axis = QVector3D(-delta.dy(), delta.dx(), 0.0f).normalized();
+                m_axis = transformation.rotatedVector(m_axis);
+                m_rotation = QQuaternion::fromAxisAndAngle(m_axis, angleDelta) * m_rotation;
+            }
+            break;
 
-            QVector3D currentPos3D = QVector3D(p.x(), p.y(), 0.0f);
-            sqrZ = 1 - QVector3D::dotProduct(currentPos3D, currentPos3D);
-            if (sqrZ > 0)
-                currentPos3D.setZ(std::sqrt(sqrZ));
-            else
-                currentPos3D.normalize();
-
-            m_axis = QVector3D::crossProduct(lastPos3D, currentPos3D);
-            float angle = qRadiansToDegrees(std::asin(m_axis.length()));
-
-            m_angularVelocity = angle / msecs;
-            m_axis.normalize();
-            m_axis = transformation.rotatedVector(m_axis);
-            m_rotation = QQuaternion::fromAxisAndAngle(m_axis, angle) * m_rotation;
-        }
-        break;
-    }
-
+        case Sphere:
+            {
+                QVector3D lastPos3D = QVector3D(m_lastPos.x(), m_lastPos.y(), 0.0f);
+                float sqrZ = 1 - QVector3D::dotProduct(lastPos3D, lastPos3D);
+                if (sqrZ > 0)
+                    lastPos3D.setZ(std::sqrt(sqrZ));
+                else
+                    lastPos3D.normalize();
+                QVector3D currentPos3D = QVector3D(p.x(), p.y(), 0.0f);
+                sqrZ = 1 - QVector3D::dotProduct(currentPos3D, currentPos3D);
+                if (sqrZ > 0)
+                    currentPos3D.setZ(std::sqrt(sqrZ));
+                else
+                    currentPos3D.normalize();
+                m_axis = QVector3D::crossProduct(lastPos3D, currentPos3D);
+                float angle = qRadiansToDegrees(std::asin(m_axis.length()));
+                m_angularVelocity = angle / msecs;
+                m_axis.normalize();
+                m_axis = transformation.rotatedVector(m_axis);
+                m_rotation = QQuaternion::fromAxisAndAngle(m_axis, angle) * m_rotation;
+            }
+            break;
+    } // switch (m_mode)
 
     m_lastPos = p;
     m_lastTime = currentTime;
@@ -159,7 +154,6 @@ QQuaternion
 TrackBall::rotation() const {
     if (m_paused || m_pressed)
         return m_rotation;
-
     QTime currentTime = QTime::currentTime();
     float angle = m_angularVelocity * m_lastTime.msecsTo(currentTime);
     return QQuaternion::fromAxisAndAngle(m_axis, angle) * m_rotation;
