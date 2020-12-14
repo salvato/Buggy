@@ -58,10 +58,9 @@ GLWidget::GLWidget(CGrCamera* myCamera, QWidget *parent)
     , geometries(nullptr)
     , camera(myCamera)
     , cubeTexture(nullptr)
-    , roomTexture(nullptr)
+    //, roomTexture(nullptr)
     , zNear(0.1)
     , zFar(1300.0)
-
 {
 }
 
@@ -108,51 +107,59 @@ GLWidget::initializeGL() {
     geometries = new GeometryEngine;
     QVector3D vertices[] =
     {
-        {-1.0f,  1.0f, -1.0f},
-        {-1.0f, -1.0f, -1.0f},
-        {+1.0f, -1.0f, -1.0f},
-        {+1.0f, -1.0f, -1.0f},
-        {+1.0f, +1.0f, -1.0f},
-        {-1.0f, +1.0f, -1.0f},
+        // Vertex data for face 0
+        {QVector3D(-1.0f, -1.0f,  1.0f)}, // v0
+        {QVector3D( 1.0f, -1.0f,  1.0f)}, // v1
+        {QVector3D(-1.0f,  1.0f,  1.0f)}, // v2
+        {QVector3D( 1.0f,  1.0f,  1.0f)}, // v3
 
-        {-1.0f, -1.0f, +1.0f},
-        {-1.0f, -1.0f, -1.0f},
-        {-1.0f, +1.0f, -1.0f},
-        {-1.0f, +1.0f, -1.0f},
-        {-1.0f, +1.0f, +1.0f},
-        {-1.0f, -1.0f, +1.0f},
+        // Vertex data for face 1
+        {QVector3D( 1.0f, -1.0f,  1.0f)}, // v4
+        {QVector3D( 1.0f, -1.0f, -1.0f)}, // v5
+        {QVector3D( 1.0f,  1.0f,  1.0f)}, // v6
+        {QVector3D( 1.0f,  1.0f, -1.0f)}, // v7
 
-        {+1.0f, -1.0f, -1.0f},
-        {+1.0f, -1.0f, +1.0f},
-        {+1.0f, +1.0f, +1.0f},
-        {+1.0f, +1.0f, +1.0f},
-        {+1.0f, +1.0f, -1.0f},
-        {+1.0f, -1.0f, -1.0f},
+        // Vertex data for face 2
+        {QVector3D( 1.0f, -1.0f, -1.0f)}, // v8
+        {QVector3D(-1.0f, -1.0f, -1.0f)}, // v9
+        {QVector3D( 1.0f,  1.0f, -1.0f)}, // v10
+        {QVector3D(-1.0f,  1.0f, -1.0f)}, // v11
 
-        {-1.0f, -1.0f, +1.0f},
-        {-1.0f, +1.0f, +1.0f},
-        {+1.0f, +1.0f, +1.0f},
-        {+1.0f, +1.0f, +1.0f},
-        {+1.0f, -1.0f, +1.0f},
-        {-1.0f, -1.0f, +1.0f},
+        // Vertex data for face 3
+        {QVector3D(-1.0f, -1.0f, -1.0f)}, // v12
+        {QVector3D(-1.0f, -1.0f,  1.0f)}, // v13
+        {QVector3D(-1.0f,  1.0f, -1.0f)}, // v14
+        {QVector3D(-1.0f,  1.0f,  1.0f)}, // v15
 
-        {-1.0f, +1.0f, -1.0f},
-        {+1.0f, +1.0f, -1.0f},
-        {+1.0f, +1.0f, +1.0f},
-        {+1.0f, +1.0f, +1.0f},
-        {-1.0f, +1.0f, +1.0f},
-        {-1.0f, +1.0f, -1.0f},
+        // Vertex data for face 4
+        {QVector3D(-1.0f, -1.0f, -1.0f)}, // v16
+        {QVector3D( 1.0f, -1.0f, -1.0f)}, // v17
+        {QVector3D(-1.0f, -1.0f,  1.0f)}, // v18
+        {QVector3D( 1.0f, -1.0f,  1.0f)}, // v19
 
-        {-1.0f, -1.0f, -1.0f},
-        {-1.0f, -1.0f, +1.0f},
-        {+1.0f, -1.0f, -1.0f},
-        {+1.0f, -1.0f, -1.0f},
-        {-1.0f, -1.0f, +1.0f},
-        {+1.0f, -1.0f, +1.0f}
+        // Vertex data for face 5
+        {QVector3D(-1.0f,  1.0f,  1.0f)}, // v20
+        {QVector3D( 1.0f,  1.0f,  1.0f)}, // v21
+        {QVector3D(-1.0f,  1.0f, -1.0f)}, // v22
+        {QVector3D( 1.0f,  1.0f, -1.0f)}  // v23
     };
-    mVertexBuf.create();
-    mVertexBuf.bind();
-    mVertexBuf.allocate(vertices, 36*sizeof(QVector3D));
+    GLushort indices[] = {
+         0,  1,  2,  3,  3,     // Face 0 - triangle strip ( v0,  v1,  v2,  v3)
+         4,  4,  5,  6,  7,  7, // Face 1 - triangle strip ( v4,  v5,  v6,  v7)
+         8,  8,  9, 10, 11, 11, // Face 2 - triangle strip ( v8,  v9, v10, v11)
+        12, 12, 13, 14, 15, 15, // Face 3 - triangle strip (v12, v13, v14, v15)
+        16, 16, 17, 18, 19, 19, // Face 4 - triangle strip (v16, v17, v18, v19)
+        20, 20, 21, 22, 23      // Face 5 - triangle strip (v20, v21, v22, v23)
+    };
+
+    // Transfer index data to VBO 0
+    roomVertexBuf.create();
+    roomVertexBuf.bind();
+    roomVertexBuf.allocate(vertices, 36*sizeof(QVector3D));
+
+    // Transfer index data to VBO 1
+    roomIndexBuf.bind();
+    roomIndexBuf.allocate(indices, 34*sizeof(GLushort));
 }
 
 
@@ -192,7 +199,8 @@ GLWidget::initShaders() {
 
 void
 GLWidget::initTextures() {
-    cubeTexture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
+    const QImage cubeImage = QImage(":/cube.png").mirrored();
+    cubeTexture = new QOpenGLTexture(cubeImage);
     cubeTexture->setMinificationFilter(QOpenGLTexture::Nearest);
     cubeTexture->setMagnificationFilter(QOpenGLTexture::Linear);
     cubeTexture->setWrapMode(QOpenGLTexture::Repeat);
@@ -203,7 +211,20 @@ GLWidget::initTextures() {
     const QImage negy = QImage(":/Pavimento.jpg").convertToFormat(QImage::Format_RGBA8888);
     const QImage posz = QImage(":/Pietra.jpg").convertToFormat(QImage::Format_RGBA8888);
     const QImage negz = QImage(":/Pietra.jpg").convertToFormat(QImage::Format_RGBA8888);
-
+/*
+    glGenTextures(1, &roomTexture);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, roomTexture);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) posx.bits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) posy.bits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) posz.bits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) negx.bits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) negy.bits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) negz.bits());
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_REPEAT);
+*/
     roomTexture = new QOpenGLTexture(QOpenGLTexture::TargetCubeMap);
     roomTexture->setSize(posx.width(), posx.height(), posx.depth());
     roomTexture->setFormat(QOpenGLTexture::RGBA8_UNorm);
@@ -228,9 +249,17 @@ GLWidget::initTextures() {
                          QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
                          negz.constBits(), Q_NULLPTR);
 
-    roomTexture->setMinificationFilter(QOpenGLTexture::Nearest);
-    roomTexture->setMagnificationFilter(QOpenGLTexture::Linear);
-    roomTexture->setWrapMode(QOpenGLTexture::Repeat);
+    roomTexture->setWrapMode(QOpenGLTexture::ClampToEdge);
+    roomTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    roomTexture->setMagnificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    roomTexture->generateMipMaps();
+    if(roomTexture->textureId() == 0)
+        exit(EXIT_FAILURE);
+
+//    roomTexture->setMinificationFilter(QOpenGLTexture::Nearest);
+//    roomTexture->setMagnificationFilter(QOpenGLTexture::Linear);
+//    roomTexture->setWrapMode(QOpenGLTexture::Repeat);
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 }
 
 
@@ -267,6 +296,9 @@ GLWidget::paintGL() {
     cubeTexture->bind();
     geometries->drawCubeGeometry(&program);
 
+    roomVertexBuf.bind();
+    roomIndexBuf.bind();
+//    glBindTexture(GL_TEXTURE_CUBE_MAP, roomTexture);
     roomTexture->bind();
     mProgram.bind();
 
@@ -283,7 +315,9 @@ GLWidget::paintGL() {
     model.translate(2.0, 2.0, 0.0);
     glDisable(GL_CULL_FACE);  // Disable back face culling
     mProgram.setUniformValue("mvp_matrix", projection*viewMatrix*model);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    // Draw cube geometry using indices from VBO 1
+    glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_SHORT, 0);
 
 }
 

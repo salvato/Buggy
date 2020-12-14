@@ -100,7 +100,9 @@ private:
 
     QOpenGLTexture* cubeTexture;
     QOpenGLTexture* roomTexture;
-    QOpenGLBuffer   mVertexBuf;
+    //GLuint roomTexture;
+    QOpenGLBuffer   roomVertexBuf;
+    QOpenGLBuffer   roomIndexBuf;
 
     QMatrix4x4  projection;
     QMatrix4x4  viewMatrix;
