@@ -58,7 +58,7 @@ GLWidget::GLWidget(CGrCamera* myCamera, QWidget *parent)
     , geometries(nullptr)
     , camera(myCamera)
     , cubeTexture(nullptr)
-    //, roomTexture(nullptr)
+    , roomTexture(nullptr)
     , zNear(0.1)
     , zFar(1300.0)
 {
@@ -211,20 +211,7 @@ GLWidget::initTextures() {
     const QImage negy = QImage(":/Pavimento.jpg").convertToFormat(QImage::Format_RGBA8888);
     const QImage posz = QImage(":/Pietra.jpg").convertToFormat(QImage::Format_RGBA8888);
     const QImage negz = QImage(":/Pietra.jpg").convertToFormat(QImage::Format_RGBA8888);
-/*
-    glGenTextures(1, &roomTexture);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, roomTexture);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) posx.bits());
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) posy.bits());
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) posz.bits());
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) negx.bits());
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) negy.bits());
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) negz.bits());
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_REPEAT);
-*/
+
     roomTexture = new QOpenGLTexture(QOpenGLTexture::TargetCubeMap);
     roomTexture->setSize(posx.width(), posx.height(), posx.depth());
     roomTexture->setFormat(QOpenGLTexture::RGBA8_UNorm);
@@ -249,16 +236,16 @@ GLWidget::initTextures() {
                          QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
                          negz.constBits(), Q_NULLPTR);
 
-    roomTexture->setWrapMode(QOpenGLTexture::ClampToEdge);
-    roomTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    roomTexture->setMagnificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    roomTexture->generateMipMaps();
-    if(roomTexture->textureId() == 0)
-        exit(EXIT_FAILURE);
+//    roomTexture->setWrapMode(QOpenGLTexture::ClampToEdge);
+//    roomTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+//    roomTexture->setMagnificationFilter(QOpenGLTexture::LinearMipMapLinear);
+//    roomTexture->generateMipMaps();
+//    if(roomTexture->textureId() == 0)
+//        exit(EXIT_FAILURE);
 
 //    roomTexture->setMinificationFilter(QOpenGLTexture::Nearest);
 //    roomTexture->setMagnificationFilter(QOpenGLTexture::Linear);
-//    roomTexture->setWrapMode(QOpenGLTexture::Repeat);
+    roomTexture->setWrapMode(QOpenGLTexture::Repeat);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 }
 
@@ -298,7 +285,6 @@ GLWidget::paintGL() {
 
     roomVertexBuf.bind();
     roomIndexBuf.bind();
-//    glBindTexture(GL_TEXTURE_CUBE_MAP, roomTexture);
     roomTexture->bind();
     mProgram.bind();
 
@@ -306,14 +292,13 @@ GLWidget::paintGL() {
     int vertexLocation = mProgram.attributeLocation("a_position");
     mProgram.enableAttributeArray(vertexLocation);
     mProgram.setAttributeBuffer("aPosition", GL_FLOAT, 0, 3, sizeof(QVector3D));
-
     mProgram.setUniformValue("uTexture", 0);
 
     model.setToIdentity();
-    model.translate(0.0, 0.0, 0.0);
-    model.scale(1.0);
-    model.translate(2.0, 2.0, 0.0);
+    model.scale(100.0);
+    model.translate(0.0, 1.0, 0.0);
     glDisable(GL_CULL_FACE);  // Disable back face culling
+
     mProgram.setUniformValue("mvp_matrix", projection*viewMatrix*model);
 
     // Draw cube geometry using indices from VBO 1

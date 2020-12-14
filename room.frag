@@ -1,5 +1,8 @@
+#version 430 core
+#extension GL_NV_shadow_samplers_cube : enable
+
 uniform samplerCube uTexture;
-varying vec3 vTexCoord;
+in vec3 vTexCoord;
 
 void
 main(void) {

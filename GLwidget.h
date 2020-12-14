@@ -95,12 +95,11 @@ protected:
 private:
     QOpenGLShaderProgram program;
     QOpenGLShaderProgram mProgram;
-    GeometryEngine* geometries;
-    CGrCamera* camera;
+    GeometryEngine*      geometries;
+    CGrCamera*           camera;
 
     QOpenGLTexture* cubeTexture;
     QOpenGLTexture* roomTexture;
-    //GLuint roomTexture;
     QOpenGLBuffer   roomVertexBuf;
     QOpenGLBuffer   roomIndexBuf;
 
