@@ -107,7 +107,7 @@ MainWindow::initCamera() {
                0.0,  0.0, -1.0); // Up Vector
     camera.FieldOfView(90.0);
     camera.MouseMode(CGrCamera::PITCHYAW);
-    camera.Gravity(false);
+    camera.Gravity(true);
 }
 
 

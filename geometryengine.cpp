@@ -149,7 +149,7 @@ GeometryEngine::initCubeGeometry() {
 
 
 void
-GeometryEngine::drawCubeGeometry(QOpenGLShaderProgram *program) {
+GeometryEngine::drawCube(QOpenGLShaderProgram *program) {
     // Tell OpenGL which VBOs to use
     cubeVertexBuf.bind();
     cubeIndexBuf.bind();
@@ -169,6 +169,22 @@ GeometryEngine::drawCubeGeometry(QOpenGLShaderProgram *program) {
     int texcoordLocation = program->attributeLocation("a_texcoord");
     program->enableAttributeArray(texcoordLocation);
     program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
+
+    // Draw cube geometry using indices from VBO 1
+    glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_SHORT, 0);
+}
+
+
+void
+GeometryEngine::drawRoom(QOpenGLShaderProgram *program) {
+    // Tell OpenGL which VBOs to use
+    cubeVertexBuf.bind();
+    cubeIndexBuf.bind();
+
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+    int vertexLocation = program->attributeLocation("a_position");
+    program->enableAttributeArray(vertexLocation);
+    program->setAttributeBuffer("a_position", GL_FLOAT, 0, 3, sizeof(VertexData));
 
     // Draw cube geometry using indices from VBO 1
     glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_SHORT, 0);
