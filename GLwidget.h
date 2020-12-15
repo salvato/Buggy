@@ -96,7 +96,8 @@ private:
     CGrCamera*           camera;
 
     QOpenGLTexture*      cubeTexture;
-    QOpenGLTexture*      roomTexture;
+//    QOpenGLTexture*      roomTexture;
+    GLuint roomTexture;
     QOpenGLTexture*      floorTexture;
 
     QOpenGLShaderProgram cubeProgram;

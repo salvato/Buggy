@@ -71,7 +71,7 @@ private:
 
     QOpenGLBuffer cubeVertexBuf;
     QOpenGLBuffer cubeIndexBuf;
-    QOpenGLBuffer floorVertexBuf;
+    GLuint        floorVertexBuf;
 };
 
 #endif // GEOMETRYENGINE_H

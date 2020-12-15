@@ -63,14 +63,13 @@ VertexData {
 GeometryEngine::GeometryEngine()
     : cubeVertexBuf(QOpenGLBuffer::VertexBuffer)
     , cubeIndexBuf(QOpenGLBuffer::IndexBuffer)
-    , floorVertexBuf(QOpenGLBuffer::VertexBuffer)
 {
     initializeOpenGLFunctions();
     // Generate needed VBOs
     cubeVertexBuf.create();
     cubeIndexBuf.create();
-    floorVertexBuf.create();
 
+    glGenBuffers(1, &floorVertexBuf);
     // Initializes geometries and transfers them to VBOs
     initCubeGeometry();
     initFloorGeometry();
@@ -86,16 +85,16 @@ GeometryEngine::~GeometryEngine() {
 void
 GeometryEngine::initFloorGeometry() {
     QVector3D vertices[] = {
-        QVector3D(-1.0f, -1.0f, -1.0f),
-        QVector3D( 1.0f, -1.0f, -1.0f),
-        QVector3D( 1.0f, -1.0f,  1.0f),
+        QVector3D(-1.0f,  0.0f, -1.0f),
+        QVector3D( 1.0f,  0.0f,  1.0f),
+        QVector3D( 1.0f,  0.0f, -1.0f),
 
-        QVector3D( 1.0f, -1.0f,  1.0f),
-        QVector3D(-1.0f, -1.0f, -1.0f),
-        QVector3D(-1.0f, -1.0f, -1.0f)
+        QVector3D( 1.0f,  0.0f,  1.0f),
+        QVector3D(-1.0f,  0.0f, -1.0f),
+        QVector3D(-1.0f,  0.0f,  1.0f)
     };
-    floorVertexBuf.bind();
-    floorVertexBuf.allocate(vertices, 6*sizeof(QVector3D));
+    glBindBuffer(GL_ARRAY_BUFFER, floorVertexBuf);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 }
 
 
@@ -213,14 +212,22 @@ GeometryEngine::drawRoom(QOpenGLShaderProgram *program) {
 
 void
 GeometryEngine::drawFloor(QOpenGLShaderProgram *program) {
-    // Tell OpenGL which VBOs to use
-    floorVertexBuf.bind();
-
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = program->attributeLocation("a_position");
     program->enableAttributeArray(vertexLocation);
     program->setAttributeBuffer("a_position", GL_FLOAT, 0, 3, sizeof(VertexData));
-
-    // Draw cube geometry using indices from VBO 1
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+    program->bind();
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, floorVertexBuf);
+    glVertexAttribPointer(0,        // attribute 0.
+                                    // No particular reason for 0, but must match
+                                    // the layout in the shader.
+                          3,        // size
+                          GL_FLOAT, // type
+                          GL_FALSE, // normalized?
+                          0,        // stride
+                          (void*)0  // array buffer offset
+    );
+    glDrawArrays(GL_TRIANGLES, 0, 6); // Starting from vertex 0; 6 vertices -> 2 triangles
+    glDisableVertexAttribArray(0);
 }

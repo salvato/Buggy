@@ -58,7 +58,6 @@ GLWidget::GLWidget(CGrCamera* myCamera, QWidget *parent)
     , geometries(nullptr)
     , camera(myCamera)
     , cubeTexture(nullptr)
-    , roomTexture(nullptr)
     , zNear(0.1)
     , zFar(1300.0)
 {
@@ -173,33 +172,18 @@ GLWidget::initTextures() {
     const QImage posz = QImage(":/Pietra.jpg").convertToFormat(QImage::Format_RGBA8888);
     const QImage negz = QImage(":/Pietra.jpg").convertToFormat(QImage::Format_RGBA8888);
 
-    roomTexture = new QOpenGLTexture(QOpenGLTexture::TargetCubeMap);
-    roomTexture->setSize(posx.width(), posx.height(), posx.depth());
-    roomTexture->setFormat(QOpenGLTexture::RGBA8_UNorm);
-    roomTexture->allocateStorage();
-
-    roomTexture->setData(0, 0, QOpenGLTexture::CubeMapPositiveX,
-                         QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-                         posx.constBits(), Q_NULLPTR);
-    roomTexture->setData(0, 0, QOpenGLTexture::CubeMapPositiveY,
-                         QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-                         posy.constBits(), Q_NULLPTR);
-    roomTexture->setData(0, 0, QOpenGLTexture::CubeMapPositiveZ,
-                         QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-                         posz.constBits(), Q_NULLPTR);
-    roomTexture->setData(0, 0, QOpenGLTexture::CubeMapNegativeX,
-                         QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-                         negx.constBits(), Q_NULLPTR);
-    roomTexture->setData(0, 0, QOpenGLTexture::CubeMapNegativeY,
-                         QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-                         negy.constBits(), Q_NULLPTR);
-    roomTexture->setData(0, 0, QOpenGLTexture::CubeMapNegativeZ,
-                         QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
-                         negz.constBits(), Q_NULLPTR);
-
-    roomTexture->setMinificationFilter(QOpenGLTexture::Nearest);
-    roomTexture->setMagnificationFilter(QOpenGLTexture::Linear);
-    roomTexture->setWrapMode(QOpenGLTexture::Repeat);
+    glGenTextures(1, &roomTexture);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, roomTexture);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) posx.bits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) posy.bits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) posz.bits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) negx.bits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) negy.bits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) negz.bits());
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
 
@@ -220,6 +204,7 @@ GLWidget::paintGL() {
     viewMatrix.lookAt(camera->Eye(), camera->Center(), camera->Up());
     // Floor Model matrix
     model.setToIdentity();
+    model.scale(3.0, 3.0, 3.0);
     model.translate(0.0, 0.0, 0.0);
     model.rotate(rotation);
 
@@ -227,25 +212,23 @@ GLWidget::paintGL() {
     floorProgram.bind();
     floorProgram.setUniformValue("mvp_matrix", projection*viewMatrix*model);
 
-    //glEnable(GL_CULL_FACE); // Enable back face culling
+    glDisable(GL_CULL_FACE); // Disable back face culling
     floorTexture->bind();
     geometries->drawFloor(&floorProgram);
 
-/*
     // Room model Matrix
     model.setToIdentity();
     model.scale(5.0, 5.0, 5.0);
-    model.translate(0.0, 1.0, 0.0);
+    model.translate(0.0, 0.0, 0.0);
     model.rotate(rotation);
     glDisable(GL_CULL_FACE);  // Disable back face culling
 
     roomProgram.bind();
     roomProgram.setUniformValue("mvp_matrix", projection*viewMatrix*model);
 
-    roomTexture->bind();
+    glBindTexture(GL_TEXTURE_CUBE_MAP, roomTexture);
     geometries->drawRoom(&roomProgram);
-*/
-/*
+
     // Buggy Model matrix
     model.setToIdentity();
     model.translate(0.0, 0.0, 0.0);
@@ -258,7 +241,7 @@ GLWidget::paintGL() {
     glEnable(GL_CULL_FACE); // Enable back face culling
     cubeTexture->bind();
     geometries->drawCube(&cubeProgram);
-*/
+
 }
 
 
