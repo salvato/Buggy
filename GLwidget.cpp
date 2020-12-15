@@ -190,8 +190,8 @@ GLWidget::initTextures() {
 void
 GLWidget::resizeGL(int w, int h) {
     aspect = qreal(w) / qreal(h ? h : 1);
-    projection.setToIdentity();
-    projection.perspective(camera->FieldOfView(), aspect, zNear, zFar);
+    projectionMatrix.setToIdentity();
+    projectionMatrix.perspective(camera->FieldOfView(), aspect, zNear, zFar);
 }
 
 
@@ -202,41 +202,42 @@ GLWidget::paintGL() {
     // Camera matrix
     viewMatrix.setToIdentity();
     viewMatrix.lookAt(camera->Eye(), camera->Center(), camera->Up());
+
     // Floor Model matrix
-    model.setToIdentity();
-    model.scale(3.0, 3.0, 3.0);
-    model.translate(0.0, 0.0, 0.0);
-    model.rotate(rotation);
+    modelMatrix.setToIdentity();
+    modelMatrix.scale(3.0, 3.0, 3.0);
+    modelMatrix.translate(0.0, 0.0, 0.0);
+    modelMatrix.rotate(rotation);
 
     // Bind shader pipeline for use
     floorProgram.bind();
-    floorProgram.setUniformValue("mvp_matrix", projection*viewMatrix*model);
+    floorProgram.setUniformValue("mvp_matrix", projectionMatrix*viewMatrix*modelMatrix);
 
     glDisable(GL_CULL_FACE); // Disable back face culling
     floorTexture->bind();
     geometries->drawFloor(&floorProgram);
 
     // Room model Matrix
-    model.setToIdentity();
-    model.scale(5.0, 5.0, 5.0);
-    model.translate(0.0, 0.0, 0.0);
-    model.rotate(rotation);
+    modelMatrix.setToIdentity();
+    modelMatrix.scale(5.0, 5.0, 5.0);
+    modelMatrix.translate(0.0, 0.0, 0.0);
+    modelMatrix.rotate(rotation);
     glDisable(GL_CULL_FACE);  // Disable back face culling
 
     roomProgram.bind();
-    roomProgram.setUniformValue("mvp_matrix", projection*viewMatrix*model);
+    roomProgram.setUniformValue("mvp_matrix", projectionMatrix*viewMatrix*modelMatrix);
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, roomTexture);
     geometries->drawRoom(&roomProgram);
 
     // Buggy Model matrix
-    model.setToIdentity();
-    model.translate(0.0, 0.0, 0.0);
-    model.rotate(rotation);
+    modelMatrix.setToIdentity();
+    modelMatrix.translate(0.0, 0.0, 0.0);
+    modelMatrix.rotate(rotation);
 
     // Bind shader pipeline for use
     cubeProgram.bind();
-    cubeProgram.setUniformValue("mvp_matrix", projection*viewMatrix*model);
+    cubeProgram.setUniformValue("mvp_matrix", projectionMatrix*viewMatrix*modelMatrix);
 
     glEnable(GL_CULL_FACE); // Enable back face culling
     cubeTexture->bind();

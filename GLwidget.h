@@ -104,9 +104,9 @@ private:
     QOpenGLShaderProgram roomProgram;
     QOpenGLShaderProgram floorProgram;
 
-    QMatrix4x4           projection;
+    QMatrix4x4           projectionMatrix;
     QMatrix4x4           viewMatrix;
-    QMatrix4x4           model;
+    QMatrix4x4           modelMatrix;
 
     qreal                aspect;
     const qreal          zNear;
