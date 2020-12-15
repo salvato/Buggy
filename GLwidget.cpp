@@ -100,7 +100,7 @@ GLWidget::setRotation(QQuaternion newRotation) {
 void
 GLWidget::initializeGL() {
     initializeOpenGLFunctions();
-    glClearColor(0, 0, 0, 1);
+    glClearColor(0.5, 0.5, 1, 1);
     initShaders();
     initTextures();
     glEnable(GL_DEPTH_TEST); // Enable depth buffer
@@ -110,32 +110,41 @@ GLWidget::initializeGL() {
 
 void
 GLWidget::initShaders() {
-    if(!program.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/cube.vert")) {
+    if(!cubeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/cube.vert")) {
         perror("Missing Cube Vertex Shader");
         close();
     }
-    if(!program.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/cube.frag")) {
+    if(!cubeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/cube.frag")) {
         perror("Missing Cube Fragment Shader");
         close();
     }
-    if(!program.link()) {
+    if(!cubeProgram.link()) {
         perror("Cube Shader linking Error");
         close();
     }
-    if(!program.bind()) {// Bind shader pipeline for use
-        perror("Cube Shader binding Error");
+
+    if(!floorProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/floor.vert")) {
+        perror("Missing Floor Vertex Shader");
+        close();
+    }
+    if(!floorProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/floor.frag")) {
+        perror("Missing Floor Fragment Shader");
+        close();
+    }
+    if(!floorProgram.link()) {
+        perror("Floor Shader linking Error");
         close();
     }
 
-    if(!mProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/room.vert")) {
+    if(!roomProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/room.vert")) {
         perror("Missing Room Vertex Shader");
         close();
     }
-    if(!mProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/room.frag")) {
+    if(!roomProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/room.frag")) {
         perror("Missing Room Fragment Shader");
         close();
     }
-    if(!mProgram.link()) {
+    if(!roomProgram.link()) {
         perror("Room Shader linking Error");
         close();
     }
@@ -149,6 +158,12 @@ GLWidget::initTextures() {
     cubeTexture->setMinificationFilter(QOpenGLTexture::Nearest);
     cubeTexture->setMagnificationFilter(QOpenGLTexture::Linear);
     cubeTexture->setWrapMode(QOpenGLTexture::Repeat);
+
+    const QImage floorImage = QImage(":/Pavimento.jpg").mirrored();
+    floorTexture = new QOpenGLTexture(floorImage);
+    floorTexture->setMinificationFilter(QOpenGLTexture::Nearest);
+    floorTexture->setMagnificationFilter(QOpenGLTexture::Linear);
+    floorTexture->setWrapMode(QOpenGLTexture::Repeat);
 
     // Cubemap Textures MUST have the same size !!!
     const QImage posx = QImage(":/Pietra.jpg").convertToFormat(QImage::Format_RGBA8888);
@@ -203,6 +218,20 @@ GLWidget::paintGL() {
     // Camera matrix
     viewMatrix.setToIdentity();
     viewMatrix.lookAt(camera->Eye(), camera->Center(), camera->Up());
+    // Floor Model matrix
+    model.setToIdentity();
+    model.translate(0.0, 0.0, 0.0);
+    model.rotate(rotation);
+
+    // Bind shader pipeline for use
+    floorProgram.bind();
+    floorProgram.setUniformValue("mvp_matrix", projection*viewMatrix*model);
+
+    //glEnable(GL_CULL_FACE); // Enable back face culling
+    floorTexture->bind();
+    geometries->drawFloor(&floorProgram);
+
+/*
     // Room model Matrix
     model.setToIdentity();
     model.scale(5.0, 5.0, 5.0);
@@ -210,24 +239,26 @@ GLWidget::paintGL() {
     model.rotate(rotation);
     glDisable(GL_CULL_FACE);  // Disable back face culling
 
-    mProgram.bind();
-    mProgram.setUniformValue("mvp_matrix", projection*viewMatrix*model);
+    roomProgram.bind();
+    roomProgram.setUniformValue("mvp_matrix", projection*viewMatrix*model);
 
     roomTexture->bind();
-    geometries->drawRoom(&mProgram);
-
+    geometries->drawRoom(&roomProgram);
+*/
+/*
     // Buggy Model matrix
     model.setToIdentity();
-    model.translate(0.0, 1.0, 0.0);
+    model.translate(0.0, 0.0, 0.0);
     model.rotate(rotation);
 
     // Bind shader pipeline for use
-    program.bind();
-    program.setUniformValue("mvp_matrix", projection*viewMatrix*model);
+    cubeProgram.bind();
+    cubeProgram.setUniformValue("mvp_matrix", projection*viewMatrix*model);
 
-    glEnable(GL_CULL_FACE);  // Enable back face culling
+    glEnable(GL_CULL_FACE); // Enable back face culling
     cubeTexture->bind();
-    geometries->drawCube(&program);
+    geometries->drawCube(&cubeProgram);
+*/
 }
 
 
@@ -237,7 +268,8 @@ GLWidget::mousePressEvent(QMouseEvent *event) {
         camera->MouseDown(event->x(), event->y());
         camera->MouseMode(CGrCamera::ROLLMOVE);
         event->accept();
-    } else if (event->buttons() & Qt::LeftButton) {
+    }
+    else if (event->buttons() & Qt::LeftButton) {
         camera->MouseDown(event->x(), event->y());
         event->accept();
     }
@@ -249,7 +281,8 @@ GLWidget::mouseReleaseEvent(QMouseEvent *event) {
     if (event->button() & Qt::RightButton) {
         camera->MouseMode(CGrCamera::PITCHYAW);
         event->accept();
-    } else if (event->button() & Qt::LeftButton) {
+    }
+    else if (event->button() & Qt::LeftButton) {
         camera->MouseMode(CGrCamera::PITCHYAW);
         event->accept();
     }
@@ -262,7 +295,8 @@ GLWidget::mouseMoveEvent(QMouseEvent *event) {
     if (event->buttons() & Qt::LeftButton) {
         camera->MouseMove(event->x(), event->y());
         event->accept();
-    } else if (event->buttons() & Qt::RightButton) {
+    }
+    else if (event->buttons() & Qt::RightButton) {
         camera->MouseMove(event->x(), event->y());
         event->accept();
     }

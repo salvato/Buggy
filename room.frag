@@ -90,4 +90,3 @@ main(void) {
 //main(void) {
 //    gl_FragColor = evaluateColor(v_Normal, v_TexCoord);
 //}
-

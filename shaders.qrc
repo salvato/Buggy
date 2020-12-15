@@ -4,5 +4,7 @@
         <file>cube.frag</file>
         <file>room.vert</file>
         <file>room.frag</file>
+        <file>floor.frag</file>
+        <file>floor.vert</file>
     </qresource>
 </RCC>

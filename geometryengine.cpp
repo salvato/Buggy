@@ -63,19 +63,39 @@ VertexData {
 GeometryEngine::GeometryEngine()
     : cubeVertexBuf(QOpenGLBuffer::VertexBuffer)
     , cubeIndexBuf(QOpenGLBuffer::IndexBuffer)
+    , floorVertexBuf(QOpenGLBuffer::VertexBuffer)
 {
     initializeOpenGLFunctions();
-    // Generate 2 VBOs
+    // Generate needed VBOs
     cubeVertexBuf.create();
     cubeIndexBuf.create();
-    // Initializes cube geometry and transfers it to VBOs
+    floorVertexBuf.create();
+
+    // Initializes geometries and transfers them to VBOs
     initCubeGeometry();
+    initFloorGeometry();
 }
 
 
 GeometryEngine::~GeometryEngine() {
     cubeVertexBuf.destroy();
     cubeIndexBuf.destroy();
+}
+
+
+void
+GeometryEngine::initFloorGeometry() {
+    QVector3D vertices[] = {
+        QVector3D(-1.0f, -1.0f, -1.0f),
+        QVector3D( 1.0f, -1.0f, -1.0f),
+        QVector3D( 1.0f, -1.0f,  1.0f),
+
+        QVector3D( 1.0f, -1.0f,  1.0f),
+        QVector3D(-1.0f, -1.0f, -1.0f),
+        QVector3D(-1.0f, -1.0f, -1.0f)
+    };
+    floorVertexBuf.bind();
+    floorVertexBuf.allocate(vertices, 6*sizeof(QVector3D));
 }
 
 
@@ -188,4 +208,19 @@ GeometryEngine::drawRoom(QOpenGLShaderProgram *program) {
 
     // Draw cube geometry using indices from VBO 1
     glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_SHORT, 0);
+}
+
+
+void
+GeometryEngine::drawFloor(QOpenGLShaderProgram *program) {
+    // Tell OpenGL which VBOs to use
+    floorVertexBuf.bind();
+
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+    int vertexLocation = program->attributeLocation("a_position");
+    program->enableAttributeArray(vertexLocation);
+    program->setAttributeBuffer("a_position", GL_FLOAT, 0, 3, sizeof(VertexData));
+
+    // Draw cube geometry using indices from VBO 1
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
 }

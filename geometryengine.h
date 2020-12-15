@@ -63,12 +63,15 @@ public:
 
     void drawCube(QOpenGLShaderProgram *program);
     void drawRoom(QOpenGLShaderProgram *program);
+    void drawFloor(QOpenGLShaderProgram *program);
 
 private:
     void initCubeGeometry();
+    void initFloorGeometry();
 
     QOpenGLBuffer cubeVertexBuf;
     QOpenGLBuffer cubeIndexBuf;
+    QOpenGLBuffer floorVertexBuf;
 };
 
 #endif // GEOMETRYENGINE_H

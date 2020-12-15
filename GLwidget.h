@@ -48,8 +48,7 @@
 **
 ****************************************************************************/
 
-#ifndef GLWIDGET_H
-#define GLWIDGET_H
+#pragma once
 
 #include "geometryengine.h"
 #include "GrCamera.h"
@@ -93,23 +92,24 @@ protected:
     void initTextures();
 
 private:
-    QOpenGLShaderProgram program;
-    QOpenGLShaderProgram mProgram;
     GeometryEngine*      geometries;
     CGrCamera*           camera;
 
-    QOpenGLTexture* cubeTexture;
-    QOpenGLTexture* roomTexture;
-    QOpenGLBuffer   roomVertexBuf;
-    QOpenGLBuffer   roomIndexBuf;
+    QOpenGLTexture*      cubeTexture;
+    QOpenGLTexture*      roomTexture;
+    QOpenGLTexture*      floorTexture;
 
-    QMatrix4x4  projection;
-    QMatrix4x4  viewMatrix;
-    QMatrix4x4  model;
-    QQuaternion rotation;
-    qreal       aspect;
-    const qreal zNear;
-    const qreal zFar;
+    QOpenGLShaderProgram cubeProgram;
+    QOpenGLShaderProgram roomProgram;
+    QOpenGLShaderProgram floorProgram;
+
+    QMatrix4x4           projection;
+    QMatrix4x4           viewMatrix;
+    QMatrix4x4           model;
+
+    qreal                aspect;
+    const qreal          zNear;
+    const qreal          zFar;
+
+    QQuaternion          rotation;
 };
-
-#endif // GLWIDGET_H
