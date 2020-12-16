@@ -66,7 +66,10 @@
 QT_FORWARD_DECLARE_CLASS(GeometryEngine)
 
 
-class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
+class
+GLWidget
+    : public QOpenGLWidget
+    , protected QOpenGLFunctions
 {
     Q_OBJECT
 
@@ -96,8 +99,7 @@ private:
     CGrCamera*           camera;
 
     QOpenGLTexture*      cubeTexture;
-//    QOpenGLTexture*      roomTexture;
-    GLuint roomTexture;
+    GLuint               roomTexture;
     QOpenGLTexture*      floorTexture;
 
     QOpenGLShaderProgram cubeProgram;
