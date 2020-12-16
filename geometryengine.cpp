@@ -50,6 +50,7 @@
 
 #include "geometryengine.h"
 
+#include <QFile>
 #include <QVector2D>
 #include <QVector3D>
 
@@ -61,7 +62,8 @@ VertexData {
 
 
 GeometryEngine::GeometryEngine()
-    : cubeVertexBuf(QOpenGLBuffer::VertexBuffer)
+    : sObjPath(QString())
+    , cubeVertexBuf(QOpenGLBuffer::VertexBuffer)
     , cubeIndexBuf(QOpenGLBuffer::IndexBuffer)
 {
     initializeOpenGLFunctions();
@@ -71,6 +73,11 @@ GeometryEngine::GeometryEngine()
 
     glGenBuffers(1, &floorVertexBuf);
     // Initializes geometries and transfers them to VBOs
+    if(!loadObj(sObjPath, vertices, uvs, normals)) {
+      qDebug() << "Impossible to decode obj file" << sObjPath;
+      exit(-1);
+    }
+    initBuggyGeometry();
     initCubeGeometry();
     initFloorGeometry();
 }
@@ -80,6 +87,137 @@ GeometryEngine::~GeometryEngine() {
     cubeVertexBuf.destroy();
     cubeIndexBuf.destroy();
 }
+
+
+bool
+GeometryEngine::loadObj(QString path,
+                        QVector<QVector3D> &out_vertices,
+                        QVector<QVector2D> &out_uvs,
+                        QVector<QVector3D> &out_normals)
+{
+    QFile file(path);
+    if(!file.open(QIODevice::ReadOnly)) {
+        qDebug() << "Impossible to open the file !" << path;
+        return false;
+    }
+    QVector<unsigned int> vertexIndices, uvIndices, normalIndices;
+    QVector<QVector3D> temp_vertices;
+    QVector<QVector2D> temp_uvs;
+    QVector<QVector3D> temp_normals;
+    float x, y, z;
+
+    QByteArray line;
+    QString string;
+    QStringList stringVals, stringTriples;
+
+    while(!file.atEnd()) {
+        line = file.readLine();
+        // parse the line
+        if(line.startsWith("vt")) {// is the texture coordinate of one vertex
+            string = QString(line.mid(3));
+            stringVals = string.split(" ");
+            if(stringVals.size() != 2) {
+                qDebug() << "File can't be read by our simple parser: Try exporting with other options";
+                return false;
+            }
+            x = stringVals.at(0).toFloat();
+            y = stringVals.at(1).toFloat();
+            temp_uvs.append(QVector2D(x, y));
+        }
+        else if(line.startsWith("vn")) {// is the normal of one vertex
+            string = QString(line.mid(3));
+            stringVals = string.split(" ");
+            if(stringVals.size() != 3) {
+                qDebug() << "File can't be read by our simple parser: Try exporting with other options";
+                return false;
+            }
+            x = stringVals.at(0).toFloat();
+            y = stringVals.at(1).toFloat();
+            z = stringVals.at(2).toFloat();
+            temp_normals.append(QVector3D(x, y, z));
+        }
+        else if(line.startsWith("v")) {// Is a vertex
+            string = QString(line.mid(2));
+            stringVals = string.split(" ");
+            if(stringVals.size() != 3) {
+                qDebug() << "File can't be read by our simple parser: Try exporting with other options";
+                return false;
+            }
+            x = stringVals.at(0).toFloat();
+            y = stringVals.at(1).toFloat();
+            z = stringVals.at(2).toFloat();
+            temp_vertices.append(QVector3D(x, y, z));
+        }
+        else if(line.startsWith("f")) {// is a face
+            string = QString(line.mid(2));
+            stringTriples = string.split(" ");
+            if(stringTriples.size() != 3) {
+                qDebug() << "File can't be read by our simple parser: Try exporting with other options";
+                return false;
+            }
+            for(int i=0; i<3; i++) {
+                stringVals = stringTriples.at(i).split("/");
+                if(stringVals.size() != 3) {
+                    qDebug() << "File can't be read by our simple parser: Try exporting with other options";
+                    return false;
+                }
+                vertexIndices.append(stringVals.at(0).toFloat());
+                if(stringVals.at(1) != "")
+                    uvIndices.append(stringVals.at(1).toFloat());
+                if(stringVals.at(2) != "")
+                    normalIndices.append(stringVals.at(2).toFloat());
+            }
+        }
+        // else
+        // Probably a comment skip the rest of the line
+    }
+    file.close();
+    // For each vertex of each triangle
+    for(int i=0; i<vertexIndices.size(); i++) {
+        // Get the indices of its attributes
+        unsigned int vertexIndex = vertexIndices[i];
+        unsigned int normalIndex = normalIndices[i];
+        // Get the attributes thanks to the index
+        QVector3D vertex = temp_vertices[ vertexIndex-1 ];
+        QVector3D normal = temp_normals[ normalIndex-1 ];
+        // Put the attributes in buffers
+        out_vertices.append(vertex);
+        out_normals .append(normal);
+    }
+    if(!temp_uvs.isEmpty()) {
+        // For each vertex of each triangle
+        for(int i=0; i<vertexIndices.size(); i++) {
+            // Get the indices of its attributes
+            unsigned int uvIndex = uvIndices[i];
+            // Get the attributes thanks to the index
+            QVector2D uv = temp_uvs[ uvIndex-1 ];
+            // Put the attributes in buffers
+            out_uvs.append(uv);
+        }
+    }
+    return true;
+}
+
+
+void
+GeometryEngine::initBuggyGeometry() {
+    if(vertices.size() > 0) { // Transfer vertex data to VBO
+        vertexbuffer.create();
+        vertexbuffer.bind();
+        vertexbuffer.allocate(vertices.data(), vertices.size()*sizeof(QVector3D));
+    }
+    if(normals.size() > 0) { // Transfer normal data to VBO
+        normalbuffer.create();
+        normalbuffer.bind();
+        normalbuffer.allocate(normals.data(), normals.size()*sizeof(QVector3D));
+    }
+    if(uvs.size() > 0) { // Transfer uv data to VBO
+        uvbuffer.create();
+        uvbuffer.bind();
+        uvbuffer.allocate(uvs.data(), uvs.size()*sizeof(QVector2D));
+    }
+}
+
 
 
 void
