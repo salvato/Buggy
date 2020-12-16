@@ -109,7 +109,7 @@ GLWidget::setRotation(QQuaternion newRotation) {
 void
 GLWidget::initializeGL() {
     initializeOpenGLFunctions();
-    glClearColor(0.05, 0.05, 1, 1);
+    glClearColor(0.1, 0.1, 0.4, 1);
     initShaders();
     initTextures();
     glEnable(GL_DEPTH_TEST); // Enable depth buffer

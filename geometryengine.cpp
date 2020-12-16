@@ -73,11 +73,9 @@ GeometryEngine::GeometryEngine()
 
     glGenBuffers(1, &floorVertexBuf);
     // Initializes geometries and transfers them to VBOs
-    if(!loadObj(sObjPath, vertices, uvs, normals)) {
-      qDebug() << "Impossible to decode obj file" << sObjPath;
-      exit(-1);
+    if(loadObj(sObjPath, vertices, uvs, normals)) {
+        initBuggyGeometry();
     }
-    initBuggyGeometry();
     initCubeGeometry();
     initFloorGeometry();
 }
