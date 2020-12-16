@@ -52,6 +52,7 @@
 
 #include "geometryengine.h"
 #include "GrCamera.h"
+#include "trackball.h"
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
@@ -74,7 +75,7 @@ GLWidget
     Q_OBJECT
 
 public:
-    explicit GLWidget(CGrCamera *myCamera, QWidget *parent = nullptr);
+    explicit GLWidget(QWidget *parent = nullptr);
     ~GLWidget() override;
     void setRotation(float q0, float q1, float q2, float q3);
     void setRotation(QQuaternion newRotation);
@@ -95,8 +96,12 @@ protected:
     void initTextures();
 
 private:
+    QPointF pixelPosToViewPos(const QPointF& p);
+
+private:
     GeometryEngine*      geometries;
-    CGrCamera*           camera;
+    CGrCamera            camera;
+    TrackBall            m_trackBalls[3];
 
     QOpenGLTexture*      cubeTexture;
     GLuint               roomTexture;
@@ -115,4 +120,5 @@ private:
     const qreal          zFar;
 
     QQuaternion          rotation;
+    int                  distExp;
 };

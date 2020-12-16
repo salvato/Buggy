@@ -100,17 +100,6 @@ MainWindow::saveSettings() {
 }
 
 
-void
-MainWindow::initCamera() {
-    camera.Set(0.0, 10.0,  0.0,  // Eye
-               0.0,  0.0,  0.0,  // Center
-               0.0,  0.0, -1.0); // Up Vector
-    camera.FieldOfView(90.0);
-    camera.MouseMode(CGrCamera::PITCHYAW);
-    camera.Gravity(true);
-}
-
-
 bool
 MainWindow::serialConnect() {
     serialPort.setPortName(serialPortName);
@@ -193,8 +182,7 @@ MainWindow::initPlots() {
 
 void
 MainWindow::initLayout() {
-    initCamera();
-    pGLWidget = new GLWidget(&camera, this);
+    pGLWidget = new GLWidget(this);
 
     initPlots();
     QVBoxLayout* pPlotLayout = new QVBoxLayout();

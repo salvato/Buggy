@@ -6,7 +6,6 @@
 #include <QSerialPort>
 #include <QStatusBar>
 #include <QTimer>
-#include "GrCamera.h"
 
 
 QT_FORWARD_DECLARE_CLASS(GLWidget)
@@ -32,7 +31,6 @@ protected:
     void saveSettings();
     void createButtons();
     void initLayout();
-    void initCamera();
     void initPlots();
     void initControls();
     bool serialConnect();
@@ -68,7 +66,6 @@ private slots:
 
 private:
     GLWidget*        pGLWidget;
-    CGrCamera        camera;
     Plot2D*          pLeftPlot;
     Plot2D*          pRightPlot;
     QPushButton*     pButtonConnect;

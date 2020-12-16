@@ -53,14 +53,24 @@
 #include <math.h>
 
 
-GLWidget::GLWidget(CGrCamera* myCamera, QWidget *parent)
+GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent)
     , geometries(nullptr)
-    , camera(myCamera)
     , cubeTexture(nullptr)
     , zNear(0.1)
     , zFar(1300.0)
-{
+{ 
+    m_trackBalls[0] = TrackBall(0.05f,  QVector3D(0, 1, 0), TrackBall::Sphere);
+    m_trackBalls[1] = TrackBall(0.005f, QVector3D(0, 0, 1), TrackBall::Sphere);
+    m_trackBalls[2] = TrackBall(0.0f,   QVector3D(0, 1, 0), TrackBall::Plane);
+    distExp = 600;
+
+    camera.Set(30.0, 30.0,  30.0, // Eye (Position of the Camera)
+                0.0,  0.0,   0.0,  // Center
+                0.0,  1.0,   0.0); // Up Vector
+    camera.FieldOfView(60.0);
+    camera.MouseMode(CGrCamera::PITCHYAW);
+    camera.Gravity(true);
 }
 
 
@@ -74,7 +84,7 @@ GLWidget::~GLWidget() {
 
 QSize
 GLWidget::minimumSizeHint() const {
-    return QSize(50, 50);
+    return QSize(300, 300);
 }
 
 
@@ -99,7 +109,7 @@ GLWidget::setRotation(QQuaternion newRotation) {
 void
 GLWidget::initializeGL() {
     initializeOpenGLFunctions();
-    glClearColor(0.5, 0.5, 1, 1);
+    glClearColor(0.05, 0.05, 1, 1);
     initShaders();
     initTextures();
     glEnable(GL_DEPTH_TEST); // Enable depth buffer
@@ -109,44 +119,17 @@ GLWidget::initializeGL() {
 
 void
 GLWidget::initShaders() {
-    if(!cubeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/cube.vert")) {
-        perror("Missing Cube Vertex Shader");
-        close();
-    }
-    if(!cubeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/cube.frag")) {
-        perror("Missing Cube Fragment Shader");
-        close();
-    }
-    if(!cubeProgram.link()) {
-        perror("Cube Shader linking Error");
-        close();
-    }
+    cubeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/cube.vert");
+    cubeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/cube.frag");
+    cubeProgram.link();
 
-    if(!floorProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/floor.vert")) {
-        perror("Missing Floor Vertex Shader");
-        close();
-    }
-    if(!floorProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/floor.frag")) {
-        perror("Missing Floor Fragment Shader");
-        close();
-    }
-    if(!floorProgram.link()) {
-        perror("Floor Shader linking Error");
-        close();
-    }
+    floorProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/floor.vert");
+    floorProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/floor.frag");
+    floorProgram.link();
 
-    if(!roomProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/room.vert")) {
-        perror("Missing Room Vertex Shader");
-        close();
-    }
-    if(!roomProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/room.frag")) {
-        perror("Missing Room Fragment Shader");
-        close();
-    }
-    if(!roomProgram.link()) {
-        perror("Room Shader linking Error");
-        close();
-    }
+    roomProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/room.vert");
+    roomProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/room.frag");
+    roomProgram.link();
 }
 
 
@@ -191,7 +174,7 @@ void
 GLWidget::resizeGL(int w, int h) {
     aspect = qreal(w) / qreal(h ? h : 1);
     projectionMatrix.setToIdentity();
-    projectionMatrix.perspective(camera->FieldOfView(), aspect, zNear, zFar);
+    projectionMatrix.perspective(camera.FieldOfView(), aspect, zNear, zFar);
 }
 
 
@@ -201,7 +184,9 @@ GLWidget::paintGL() {
 
     // Camera matrix
     viewMatrix.setToIdentity();
-    viewMatrix.lookAt(camera->Eye(), camera->Center(), camera->Up());
+    viewMatrix.lookAt(QVector3D(camera.EyeX(),    camera.EyeY(),   camera.EyeZ()),
+                      QVector3D(camera.CenterX(), camera.CenterY(),camera.CenterZ()),
+                      QVector3D(camera.UpX(),     camera.UpY(),    camera.UpZ()));
 
     // Floor Model matrix
     modelMatrix.setToIdentity();
@@ -246,44 +231,118 @@ GLWidget::paintGL() {
 }
 
 
+QPointF
+GLWidget::pixelPosToViewPos(const QPointF& p) {
+    return QPointF(2.0*float(p.x())/width()-1.0,
+                   1.0-2.0*float(p.y())/height());
+}
+
+
 void
 GLWidget::mousePressEvent(QMouseEvent *event) {
-    if (event->buttons() & Qt::RightButton) {
-        camera->MouseDown(event->x(), event->y());
-        camera->MouseMode(CGrCamera::ROLLMOVE);
+    if(event->buttons() & Qt::RightButton) {
+        camera.MouseDown(event->x(), event->y());
+        camera.MouseMode(CGrCamera::ROLLMOVE);
         event->accept();
     }
-    else if (event->buttons() & Qt::LeftButton) {
-        camera->MouseDown(event->x(), event->y());
+    else if(event->buttons() & Qt::LeftButton) {
+        camera.MouseDown(event->x(), event->y());
         event->accept();
     }
+/*
+    if(event->buttons() & Qt::LeftButton) {
+        m_trackBalls[0].move(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
+        event->accept();
+    }
+    else {
+        m_trackBalls[0].release(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
+    }
+
+    if(event->buttons() & Qt::RightButton) {
+        m_trackBalls[1].move(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
+        event->accept();
+    }
+    else {
+        m_trackBalls[1].release(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
+    }
+
+    if(event->buttons() & Qt::MiddleButton) {
+        m_trackBalls[2].move(pixelPosToViewPos(event->pos()), QQuaternion());
+        event->accept();
+    }
+    else {
+        m_trackBalls[2].release(pixelPosToViewPos(event->pos()), QQuaternion());
+    }
+*/
+    update();
 }
 
 
 void
 GLWidget::mouseReleaseEvent(QMouseEvent *event) {
-    if (event->button() & Qt::RightButton) {
-        camera->MouseMode(CGrCamera::PITCHYAW);
+    if(event->button() & Qt::RightButton) {
+        camera.MouseMode(CGrCamera::PITCHYAW);
         event->accept();
     }
-    else if (event->button() & Qt::LeftButton) {
-        camera->MouseMode(CGrCamera::PITCHYAW);
+    else if(event->button() & Qt::LeftButton) {
+        camera.MouseMode(CGrCamera::PITCHYAW);
         event->accept();
     }
+/*
+    if(event->button() == Qt::LeftButton) {
+        m_trackBalls[0].release(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
+        event->accept();
+    }
+
+    if(event->button() == Qt::RightButton) {
+        m_trackBalls[1].release(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
+        event->accept();
+    }
+
+    if(event->button() == Qt::MiddleButton) {
+        m_trackBalls[2].release(pixelPosToViewPos(event->pos()), QQuaternion());
+        event->accept();
+    }
+*/
     update();
 }
 
 
 void
 GLWidget::mouseMoveEvent(QMouseEvent *event) {
-    if (event->buttons() & Qt::LeftButton) {
-        camera->MouseMove(event->x(), event->y());
+    if(event->buttons() & Qt::LeftButton) {
+        camera.MouseMove(event->x(), event->y());
         event->accept();
     }
-    else if (event->buttons() & Qt::RightButton) {
-        camera->MouseMove(event->x(), event->y());
+    else if(event->buttons() & Qt::RightButton) {
+        camera.MouseMove(event->x(), event->y());
         event->accept();
     }
+/*
+    if(event->buttons() & Qt::LeftButton) {
+        m_trackBalls[0].move(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
+        event->accept();
+    }
+    else {
+        m_trackBalls[0].release(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
+    }
+
+    if(event->buttons() & Qt::RightButton) {
+        m_trackBalls[1].move(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
+        event->accept();
+    }
+    else {
+        m_trackBalls[1].release(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
+    }
+
+    if(event->buttons() & Qt::MiddleButton) {
+        m_trackBalls[2].move(pixelPosToViewPos(event->pos()), QQuaternion());
+        event->accept();
+    }
+    else {
+        m_trackBalls[2].release(pixelPosToViewPos(event->pos()), QQuaternion());
+    }
+*/
     update();
 }
 
@@ -291,12 +350,20 @@ GLWidget::mouseMoveEvent(QMouseEvent *event) {
 void
 GLWidget::wheelEvent(QWheelEvent* event) {
     QPoint numDegrees = event->angleDelta();
-    if (!numDegrees.isNull()) {
-        camera->MouseDown(0, 0);
-        camera->MouseMode(CGrCamera::ROLLMOVE);
-        camera->MouseMove(0, -numDegrees.y());
-        camera->MouseMode(CGrCamera::PITCHYAW);
+    if(!numDegrees.isNull()) {
+        camera.MouseDown(0, 0);
+        camera.MouseMode(CGrCamera::ROLLMOVE);
+        camera.MouseMove(0, -numDegrees.y());
+        camera.MouseMode(CGrCamera::PITCHYAW);
         event->accept();
-        update();
     }
+/*
+    distExp += event->angleDelta().x();
+    if (distExp < -8 * 120)
+        distExp = -8 * 120;
+    if (distExp > 10 * 120)
+        distExp = 10 * 120;
+    event->accept();
+*/
+    update();
 }

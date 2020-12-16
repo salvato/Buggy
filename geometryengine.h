@@ -55,23 +55,41 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 
+
 class GeometryEngine : protected QOpenGLFunctions
 {
 public:
     GeometryEngine();
     virtual ~GeometryEngine();
 
+public:
     void drawCube(QOpenGLShaderProgram *program);
     void drawRoom(QOpenGLShaderProgram *program);
     void drawFloor(QOpenGLShaderProgram *program);
 
 private:
+    bool loadObj(QString path,
+                 QVector<QVector3D> &out_vertices,
+                 QVector<QVector2D> &out_uvs,
+                 QVector<QVector3D> &out_normals);
+    void initBuggyGeometry();
     void initCubeGeometry();
     void initFloorGeometry();
+
+private:
+    QString       sObjPath;
 
     QOpenGLBuffer cubeVertexBuf;
     QOpenGLBuffer cubeIndexBuf;
     GLuint        floorVertexBuf;
+
+    QOpenGLBuffer vertexbuffer;
+    QOpenGLBuffer uvbuffer;
+    QOpenGLBuffer normalbuffer;
+
+    QVector<QVector3D> vertices;
+    QVector<QVector2D> uvs;
+    QVector<QVector3D> normals; // Not used at the present.
 };
 
 #endif // GEOMETRYENGINE_H
