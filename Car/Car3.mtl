@@ -1,0 +1,56 @@
+# 3ds Max Wavefront OBJ Exporter v0.94b - (c)2007 guruware
+# File Created: 21.03.2019 15:14:55
+
+newmtl black_st
+	Ns 70.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 1.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.0000 0.0000 0.0000
+	Kd 0.3098 0.3098 0.3098
+	Ks 0.6300 0.6300 0.6300
+	Ke 0.0000 0.0000 0.0000
+	map_Ka D:\New folder 2\4_greys.jpg
+	map_Kd D:\New folder 2\4_greys.jpg
+
+newmtl mat_steklo
+	Ns 30.0000
+	Ni 1.5000
+	d 0.9500
+	Tr 0.9500
+	Tf 0.9500 0.9500 0.9500 
+	illum 2
+	Ka 0.0000 0.0000 0.0000
+	Kd 0.8353 0.8000 0.7686
+	Ks 1.0000 1.0000 1.0000
+	Ke 0.2088 0.2000 0.1922
+
+newmtl green
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 1.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.0000 0.0000 0.0000
+	Kd 0.5216 0.7216 0.5294
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka D:\New folder 2\4_greens.jpg
+	map_Kd D:\New folder 2\4_greens.jpg
+
+newmtl st_wood
+	Ns 70.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 1.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.0000 0.0000 0.0000
+	Kd 0.9922 0.9804 0.8941
+	Ks 0.6300 0.6300 0.6300
+	Ke 0.0000 0.0000 0.0000
+	map_Ka D:\New folder 2\for houses\Wo_16sml.jpg
+	map_Kd D:\New folder 2\for houses\Wo_16sml.jpg
