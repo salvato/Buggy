@@ -49,7 +49,6 @@ SOURCES += geometryengine.cpp
 SOURCES += GLwidget.cpp
 SOURCES += plot2d.cpp
 SOURCES += plotpropertiesdlg.cpp
-SOURCES +=
 SOURCES += mainwindow.cpp
 
 
@@ -110,6 +109,8 @@ DISTFILES += fshader.glsl \
     Car/Car 3.gsm \
     Car/Car 3.mtl \
     Car/Car 3.obj \
+    Car/Car3.mtl \
+    Car/Car3.obj \
     Car/Wo_16sml.jpg \
     Car/archibase.net.txt
 DISTFILES += vshader.glsl

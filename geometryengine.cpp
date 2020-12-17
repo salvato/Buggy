@@ -62,7 +62,7 @@ VertexData {
 
 
 GeometryEngine::GeometryEngine()
-    : sObjPath(QString())
+    : sObjPath(QString("/home/gabriele/qtprojects/Buggy/Car/Car3.obj"))
     , cubeVertexBuf(QOpenGLBuffer::VertexBuffer)
     , cubeIndexBuf(QOpenGLBuffer::IndexBuffer)
 {
@@ -96,8 +96,12 @@ GeometryEngine::loadObj(QString path,
                         QVector<QVector3D> &out_normals)
 {
     QFile file(path);
+    if(!file.exists()) {
+        qDebug() << "File" << file.fileName() << "Not Found";
+        return false;
+    }
     if(!file.open(QIODevice::ReadOnly)) {
-        qDebug() << "Impossible to open the file !" << path;
+        qDebug() << "Unable to open file:" << path;
         return false;
     }
     QVector<unsigned int> vertexIndices, uvIndices, normalIndices;
@@ -106,59 +110,55 @@ GeometryEngine::loadObj(QString path,
     QVector<QVector3D> temp_normals;
     float x, y, z;
 
-    QByteArray line;
+    QString line;
     QString string;
     QStringList stringVals, stringTriples;
 
     while(!file.atEnd()) {
-        line = file.readLine();
+        line = QString(file.readLine()).remove('\r').remove('\n');
         // parse the line
         if(line.startsWith("vt")) {// is the texture coordinate of one vertex
-            string = QString(line.mid(3));
-            stringVals = string.split(" ");
-            if(stringVals.size() != 2) {
-                qDebug() << "File can't be read by our simple parser: Try exporting with other options";
+            stringVals = line.split(" ", Qt::SkipEmptyParts);
+            if(stringVals.size() < 3) {
+                qDebug() << "vt: File can't be read by our simple parser: Try exporting with other options";
                 return false;
             }
-            x = stringVals.at(0).toFloat();
-            y = stringVals.at(1).toFloat();
+            x = stringVals.at(1).toFloat();
+            y = stringVals.at(2).toFloat();
             temp_uvs.append(QVector2D(x, y));
         }
         else if(line.startsWith("vn")) {// is the normal of one vertex
-            string = QString(line.mid(3));
-            stringVals = string.split(" ");
-            if(stringVals.size() != 3) {
-                qDebug() << "File can't be read by our simple parser: Try exporting with other options";
+            stringVals = QString(line).split(" ", Qt::SkipEmptyParts);
+            if(stringVals.size() != 4) {
+                qDebug() << "vn: File can't be read by our simple parser: Try exporting with other options";
                 return false;
             }
-            x = stringVals.at(0).toFloat();
-            y = stringVals.at(1).toFloat();
-            z = stringVals.at(2).toFloat();
+            x = stringVals.at(1).toFloat();
+            y = stringVals.at(2).toFloat();
+            z = stringVals.at(3).toFloat();
             temp_normals.append(QVector3D(x, y, z));
         }
         else if(line.startsWith("v")) {// Is a vertex
-            string = QString(line.mid(2));
-            stringVals = string.split(" ");
-            if(stringVals.size() != 3) {
-                qDebug() << "File can't be read by our simple parser: Try exporting with other options";
+            stringVals = QString(line).split(" ", Qt::SkipEmptyParts);
+            if(stringVals.size() != 4) {
+                qDebug() << "v: File can't be read by our simple parser: Try exporting with other options";
                 return false;
             }
-            x = stringVals.at(0).toFloat();
-            y = stringVals.at(1).toFloat();
-            z = stringVals.at(2).toFloat();
+            x = stringVals.at(1).toFloat();
+            y = stringVals.at(2).toFloat();
+            z = stringVals.at(3).toFloat();
             temp_vertices.append(QVector3D(x, y, z));
         }
         else if(line.startsWith("f")) {// is a face
-            string = QString(line.mid(2));
-            stringTriples = string.split(" ");
-            if(stringTriples.size() != 3) {
-                qDebug() << "File can't be read by our simple parser: Try exporting with other options";
+            stringTriples = QString(line).split(" ", Qt::SkipEmptyParts);
+            if(stringTriples.size() < 4) {
+                qDebug() << "f File can't be read by our simple parser: Try exporting with other options";
                 return false;
             }
-            for(int i=0; i<3; i++) {
+            for(int i=1; i<4; i++) {
                 stringVals = stringTriples.at(i).split("/");
                 if(stringVals.size() != 3) {
-                    qDebug() << "File can't be read by our simple parser: Try exporting with other options";
+                    qDebug() << "f2: File can't be read by our simple parser: Try exporting with other options";
                     return false;
                 }
                 vertexIndices.append(stringVals.at(0).toFloat());

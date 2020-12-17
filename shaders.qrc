@@ -6,14 +6,5 @@
         <file>room.frag</file>
         <file>floor.frag</file>
         <file>floor.vert</file>
-        <file>Car/Car_3.obj</file>
-        <file>Car/4_1_2_d.jpg</file>
-        <file>Car/4_blues.jpg</file>
-        <file>Car/4_greens.jpg</file>
-        <file>Car/4_greys.jpg</file>
-        <file>Car/4_redsml.jpg</file>
-        <file>Car/4_whites.jpg</file>
-        <file>Car/Car3.mtl</file>
-        <file>Car/Wo_16sml.jpg</file>
     </qresource>
 </RCC>
