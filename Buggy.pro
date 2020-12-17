@@ -49,7 +49,6 @@ SOURCES += geometryengine.cpp
 SOURCES += GLwidget.cpp
 SOURCES += plot2d.cpp
 SOURCES += plotpropertiesdlg.cpp
-SOURCES +=
 SOURCES += mainwindow.cpp
 
 
@@ -99,7 +98,21 @@ DISTFILES += fshader.glsl \
     BuggyDocs/Lagging Effect Associated with a Hold.pdf \
     BuggyDocs/Lagging Effect Associated with a Hold.pdf \
     BuggyDocs/SystemAnalysis.pdf \
-    BuggyDocs/SystemModeling.pdf
+    BuggyDocs/SystemModeling.pdf \
+    Car/4_1_2_d.jpg \
+    Car/4_blues.jpg \
+    Car/4_greens.jpg \
+    Car/4_greys.jpg \
+    Car/4_redsml.jpg \
+    Car/4_whites.jpg \
+    Car/Car 3.3ds \
+    Car/Car 3.gsm \
+    Car/Car 3.mtl \
+    Car/Car 3.obj \
+    Car/Car3.mtl \
+    Car/Car3.obj \
+    Car/Wo_16sml.jpg \
+    Car/archibase.net.txt
 DISTFILES += vshader.glsl
 DISTFILES += cube.png
 DISTFILES += plot.png
