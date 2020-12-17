@@ -107,6 +107,7 @@ private:
     GLuint               roomTexture;
     QOpenGLTexture*      floorTexture;
 
+    QOpenGLShaderProgram buggyProgram;
     QOpenGLShaderProgram cubeProgram;
     QOpenGLShaderProgram roomProgram;
     QOpenGLShaderProgram floorProgram;

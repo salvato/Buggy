@@ -12,8 +12,8 @@
 #include "GrCamera.h"
 
 const double GR_PI = 3.1415926535897932384626433832795;
-const double GR_PI2 = 2. * GR_PI;
-const double GR_RTOD = 180. / GR_PI;      // Converts radians to degrees
+//const double GR_PI2 = 2. * GR_PI;
+//const double GR_RTOD = 180. / GR_PI;      // Converts radians to degrees
 const double GR_DTOR = GR_PI / 180.;      // Converts degrees to radians
 
 
@@ -35,7 +35,9 @@ _Length(const double *a) {
 inline void 
 _Normalize(double *a) {
   double len = _Length(a);
-  a[0] /= len;        a[1] /= len;        a[2] /= len;
+  a[0] /= len;
+  a[1] /= len;
+  a[2] /= len;
 }
 
 
@@ -58,7 +60,9 @@ _Identity(double t[4][4]) {
 inline void 
 _Translate(double t[4][4], double x, double y, double z) {
   _Identity(t);
-  t[0][3] = x;        t[1][3] = y;        t[2][3] = z;
+  t[0][3] = x;
+  t[1][3] = y;
+  t[2][3] = z;
 }
 
 
@@ -68,10 +72,10 @@ _RotateX(double m[4][4], double r) {
   double cr = cos(rr);
   double sr = sin(rr);
 
-  m[0][0] = 1;  m[0][1] = 0;  m[0][2] = 0;  m[0][3] = 0;
-  m[1][0] = 0;  m[1][1] = cr;  m[1][2] = -sr;  m[1][3] = 0;
+  m[0][0] = 1;  m[0][1] =  0;  m[0][2] =  0;  m[0][3] = 0;
+  m[1][0] = 0;  m[1][1] = cr;  m[1][2] =-sr;  m[1][3] = 0;
   m[2][0] = 0;  m[2][1] = sr;  m[2][2] = cr;  m[2][3] = 0;
-  m[3][0] = 0;  m[3][1] = 0;  m[3][2] = 0;  m[3][3] = 1;
+  m[3][0] = 0;  m[3][1] =  0;  m[3][2] =  0;  m[3][3] = 1;
 }
 
 
@@ -82,9 +86,9 @@ _RotateY(double m[4][4], double r) {
   double sr = sin(rr);
 
   m[0][0] = cr;  m[0][1] = 0;  m[0][2] = sr;  m[0][3] = 0;
-  m[1][0] = 0;  m[1][1] = 1;  m[1][2] = 0;  m[1][3] = 0;
-  m[2][0] = -sr;  m[2][1] = 0;  m[2][2] = cr;  m[2][3] = 0;
-  m[3][0] = 0;  m[3][1] = 0;  m[3][2] = 0;  m[3][3] = 1;
+  m[1][0] =  0;  m[1][1] = 1;  m[1][2] =  0;  m[1][3] = 0;
+  m[2][0] =-sr;  m[2][1] = 0;  m[2][2] = cr;  m[2][3] = 0;
+  m[3][0] =  0;  m[3][1] = 0;  m[3][2] =  0;  m[3][3] = 1;
 }
 
 
@@ -94,10 +98,10 @@ _RotateZ(double m[4][4], double r) {
   double cr = cos(rr);
   double sr = sin(rr);
 
-  m[0][0] = cr;  m[0][1] = -sr;  m[0][2] = 0;  m[0][3] = 0;
+  m[0][0] = cr;  m[0][1] =-sr;  m[0][2] = 0;  m[0][3] = 0;
   m[1][0] = sr;  m[1][1] = cr;  m[1][2] = 0;  m[1][3] = 0;
-  m[2][0] = 0;  m[2][1] = 0;  m[2][2] = 1;  m[2][3] = 0;
-  m[3][0] = 0;  m[3][1] = 0;  m[3][2] = 0;  m[3][3] = 1;
+  m[2][0] =  0;  m[2][1] =  0;  m[2][2] = 1;  m[2][3] = 0;
+  m[3][0] =  0;  m[3][1] =  0;  m[3][2] = 0;  m[3][3] = 1;
 }
 
 
@@ -105,7 +109,7 @@ inline void
 _Multiply(double a[4][4], double b[4][4], double res[4][4]) {
   for(int r=0;  r<4;  r++)
     for(int c=0;  c<4;  c++) {
-      res[r][c] = a[r][0] * b[0][c] + a[r][1] * b[1][c] + a[r][2] * b[2][c] + a[r][3] * b[3][c];
+      res[r][c] = a[r][0]*b[0][c] + a[r][1]*b[1][c] + a[r][2]*b[2][c] + a[r][3]*b[3][c];
     }
 }
 
@@ -120,10 +124,12 @@ _Multiply(double a[4][4], double b[4][4], double c[4][4], double res[4][4]) {
 
 inline void 
 _MultiplyPoint(double m[4][4], double p[3]) {
-  double x=p[0];      double y=p[1];      double z=p[2];
-  p[0] = m[0][0] * x + m[0][1] * y + m[0][2] * z + m[0][3];
-  p[1] = m[1][0] * x + m[1][1] * y + m[1][2] * z + m[1][3];
-  p[2] = m[2][0] * x + m[2][1] * y + m[2][2] * z + m[2][3];
+  double x=p[0];
+  double y=p[1];
+  double z=p[2];
+  p[0] = m[0][0]*x + m[0][1]*y + m[0][2]*z + m[0][3];
+  p[1] = m[1][0]*x + m[1][1]*y + m[1][2]*z + m[1][3];
+  p[2] = m[2][0]*x + m[2][1]*y + m[2][2]*z + m[2][3];
 }
 
 

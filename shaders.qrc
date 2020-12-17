@@ -6,5 +6,7 @@
         <file>room.frag</file>
         <file>floor.frag</file>
         <file>floor.vert</file>
+        <file>buggy.frag</file>
+        <file>buggy.vert</file>
     </qresource>
 </RCC>

@@ -119,17 +119,26 @@ GLWidget::initializeGL() {
 
 void
 GLWidget::initShaders() {
-    cubeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/cube.vert");
-    cubeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/cube.frag");
-    cubeProgram.link();
+    bool bResult;
+    bResult  = buggyProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/buggy.vert");
+    bResult &= buggyProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/buggy.frag");
+    bResult &= buggyProgram.link();
 
-    floorProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/floor.vert");
-    floorProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/floor.frag");
-    floorProgram.link();
+    bResult &= cubeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/cube.vert");
+    bResult &= cubeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/cube.frag");
+    bResult &= cubeProgram.link();
 
-    roomProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/room.vert");
-    roomProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/room.frag");
-    roomProgram.link();
+    bResult &= floorProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/floor.vert");
+    bResult &= floorProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/floor.frag");
+    bResult &= floorProgram.link();
+
+    bResult &= roomProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/room.vert");
+    bResult &= roomProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/room.frag");
+    bResult &= roomProgram.link();
+    if(!bResult) {
+        perror("Unble to initShaders()...exiting");
+        exit(EXIT_FAILURE);
+    }
 }
 
 
@@ -204,7 +213,7 @@ GLWidget::paintGL() {
 
     // Room model Matrix
     modelMatrix.setToIdentity();
-    modelMatrix.scale(5.0, 5.0, 5.0);
+    modelMatrix.scale(500.0, 500.0, 500.0);
     modelMatrix.translate(0.0, 0.0, 0.0);
     modelMatrix.rotate(rotation);
     glDisable(GL_CULL_FACE);  // Disable back face culling

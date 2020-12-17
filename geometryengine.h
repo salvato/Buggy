@@ -63,6 +63,7 @@ public:
     virtual ~GeometryEngine();
 
 public:
+    void drawBuggy(QOpenGLShaderProgram *program);
     void drawCube(QOpenGLShaderProgram *program);
     void drawRoom(QOpenGLShaderProgram *program);
     void drawFloor(QOpenGLShaderProgram *program);

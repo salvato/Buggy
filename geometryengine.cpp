@@ -62,7 +62,7 @@ VertexData {
 
 
 GeometryEngine::GeometryEngine()
-    : sObjPath(QString("/home/gabriele/qtprojects/Buggy/Car/Car3.obj"))
+    : sObjPath(QString("../Buggy/Car/Car3.obj"))
     , cubeVertexBuf(QOpenGLBuffer::VertexBuffer)
     , cubeIndexBuf(QOpenGLBuffer::IndexBuffer)
 {
@@ -74,6 +74,7 @@ GeometryEngine::GeometryEngine()
     glGenBuffers(1, &floorVertexBuf);
     // Initializes geometries and transfers them to VBOs
     if(loadObj(sObjPath, vertices, uvs, normals)) {
+        qDebug() << "Car3.obj Correctly loaded";
         initBuggyGeometry();
     }
     initCubeGeometry();
@@ -203,19 +204,18 @@ GeometryEngine::initBuggyGeometry() {
         vertexbuffer.create();
         vertexbuffer.bind();
         vertexbuffer.allocate(vertices.data(), vertices.size()*sizeof(QVector3D));
-    }
-    if(normals.size() > 0) { // Transfer normal data to VBO
-        normalbuffer.create();
-        normalbuffer.bind();
-        normalbuffer.allocate(normals.data(), normals.size()*sizeof(QVector3D));
-    }
-    if(uvs.size() > 0) { // Transfer uv data to VBO
-        uvbuffer.create();
-        uvbuffer.bind();
-        uvbuffer.allocate(uvs.data(), uvs.size()*sizeof(QVector2D));
+        if(normals.size() > 0) { // Transfer normal data to VBO
+            normalbuffer.create();
+            normalbuffer.bind();
+            normalbuffer.allocate(normals.data(), normals.size()*sizeof(QVector3D));
+        }
+        if(uvs.size() > 0) { // Transfer uv data to VBO
+            uvbuffer.create();
+            uvbuffer.bind();
+            uvbuffer.allocate(uvs.data(), uvs.size()*sizeof(QVector2D));
+        }
     }
 }
-
 
 
 void
@@ -300,6 +300,30 @@ GeometryEngine::initCubeGeometry() {
     // Transfer index data to VBO 1
     cubeIndexBuf.bind();
     cubeIndexBuf.allocate(indices, 34*sizeof(GLushort));
+}
+
+
+void
+GeometryEngine::drawBuggy(QOpenGLShaderProgram *program) {
+  vertexbuffer.bind();
+  int vertexLocation = program->attributeLocation("qt_Vertex");
+  program->enableAttributeArray(vertexLocation);
+  program->setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
+
+  if(uvs.size() > 0) {
+    uvbuffer.bind();
+    int texcoordLocation = program->attributeLocation("qt_MultiTexCoord0");
+    program->enableAttributeArray(texcoordLocation);
+    program->setAttributeBuffer(texcoordLocation, GL_FLOAT, 0, 2, sizeof(QVector2D));
+  }
+
+  if(normals.size() > 0) {
+      normalbuffer.bind();
+      int normcoordLocation = program->attributeLocation("vertexNormal_modelspace");
+      program->enableAttributeArray(normcoordLocation);
+      program->setAttributeBuffer(normcoordLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
+  }
+  glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 }
 
 
