@@ -111,8 +111,7 @@ DISTFILES += fshader.glsl \
     Car/Car 3.obj \
     Car/Car3.mtl \
     Car/Car3.obj \
-    Car/Wo_16sml.jpg \
-    Car/archibase.net.txt
+    Car/Wo_16sml.jpg
 DISTFILES += vshader.glsl
 DISTFILES += cube.png
 DISTFILES += plot.png

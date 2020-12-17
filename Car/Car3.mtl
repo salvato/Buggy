@@ -12,8 +12,8 @@ newmtl black_st
 	Kd 0.3098 0.3098 0.3098
 	Ks 0.6300 0.6300 0.6300
 	Ke 0.0000 0.0000 0.0000
-	map_Ka D:\New folder 2\4_greys.jpg
-	map_Kd D:\New folder 2\4_greys.jpg
+        map_Ka 4_greys.jpg
+        map_Kd 4_greys.jpg
 
 newmtl mat_steklo
 	Ns 30.0000
@@ -38,8 +38,8 @@ newmtl green
 	Kd 0.5216 0.7216 0.5294
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka D:\New folder 2\4_greens.jpg
-	map_Kd D:\New folder 2\4_greens.jpg
+        map_Ka 4_greens.jpg
+        map_Kd 4_greens.jpg
 
 newmtl st_wood
 	Ns 70.0000
@@ -52,5 +52,5 @@ newmtl st_wood
 	Kd 0.9922 0.9804 0.8941
 	Ks 0.6300 0.6300 0.6300
 	Ke 0.0000 0.0000 0.0000
-	map_Ka D:\New folder 2\for houses\Wo_16sml.jpg
-	map_Kd D:\New folder 2\for houses\Wo_16sml.jpg
+        map_Ka Wo_16sml.jpg
+        map_Kd Wo_16sml.jpg
