@@ -167,8 +167,8 @@ GeometryEngine::loadObj(QString path,
                     normalIndices.append(stringVals.at(2).toFloat());
             }
         }
-        // else
-        // Probably a comment skip the rest of the line
+         else // Probably a comment skip the rest of the line
+            qDebug() << line;
     }
     file.close();
     // For each vertex of each triangle
