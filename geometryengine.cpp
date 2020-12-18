@@ -210,12 +210,12 @@ GeometryEngine::initBuggyGeometry() {
         glBindBuffer(GL_ARRAY_BUFFER, buggyVertexBuf);
         glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(QVector3D), vertices.data(), GL_STATIC_DRAW);
         if(normals.size() > 0) { // Transfer normal data to VBO
-            glBindBuffer(GL_NORMAL_ARRAY_BUFFER_BINDING, buggyNormalBuf);
-            glBufferData(GL_NORMAL_ARRAY_BUFFER_BINDING,  normals.size()*sizeof(QVector3D), normals.data(), GL_STATIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, buggyNormalBuf);
+            glBufferData(GL_ARRAY_BUFFER,  normals.size()*sizeof(QVector3D), normals.data(), GL_STATIC_DRAW);
         }
         if(uvs.size() > 0) { // Transfer uv data to VBO
-            glBindBuffer(GL_TEXTURE_COORD_ARRAY_BUFFER_BINDING, buggyUvBuf);
-            glBufferData(GL_TEXTURE_COORD_ARRAY_BUFFER_BINDING, uvs.size()*sizeof(QVector2D), uvs.data(), GL_STATIC_DRAW);
+            glBindBuffer(GL_TEXTURE_BUFFER, buggyUvBuf);
+            glBufferData(GL_TEXTURE_BUFFER, uvs.size()*sizeof(QVector2D), uvs.data(), GL_STATIC_DRAW);
         }
     }
 }
@@ -299,14 +299,14 @@ GeometryEngine::drawBuggy(QOpenGLShaderProgram *program) {
     program->setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
 
     if(uvs.size() > 0) {
-        glBindBuffer(GL_TEXTURE_COORD_ARRAY_BUFFER_BINDING, buggyUvBuf);
+        glBindBuffer(GL_TEXTURE_BUFFER, buggyUvBuf);
         int texcoordLocation = program->attributeLocation("qt_MultiTexCoord0");
         program->enableAttributeArray(texcoordLocation);
         program->setAttributeBuffer(texcoordLocation, GL_FLOAT, 0, 2, sizeof(QVector2D));
     }
 
     if(normals.size() > 0) {
-        glBindBuffer(GL_NORMAL_ARRAY_BUFFER_BINDING, buggyNormalBuf);
+        glBindBuffer(GL_ARRAY_BUFFER, buggyNormalBuf);
         int normcoordLocation = program->attributeLocation("vertexNormal_modelspace");
         program->enableAttributeArray(normcoordLocation);
         program->setAttributeBuffer(normcoordLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
