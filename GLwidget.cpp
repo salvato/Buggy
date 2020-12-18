@@ -209,7 +209,7 @@ GLWidget::paintGL() {
 
     glDisable(GL_CULL_FACE); // Disable back face culling
     floorTexture->bind();
-    //geometries->drawFloor(&floorProgram);
+    geometries->drawFloor(&floorProgram);
 
     geometries->drawBuggy(&buggyProgram);
 

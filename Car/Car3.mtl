@@ -1,56 +1,45 @@
-# 3ds Max Wavefront OBJ Exporter v0.94b - (c)2007 guruware
-# File Created: 21.03.2019 15:14:55
+# Blender MTL File: 'None'
+# Material Count: 4
 
 newmtl black_st
-	Ns 70.0000
-	Ni 1.5000
-	d 1.0000
-	Tr 1.0000
-	Tf 1.0000 1.0000 1.0000 
-	illum 2
-	Ka 0.0000 0.0000 0.0000
-	Kd 0.3098 0.3098 0.3098
-	Ks 0.6300 0.6300 0.6300
-	Ke 0.0000 0.0000 0.0000
-        map_Ka 4_greys.jpg
-        map_Kd 4_greys.jpg
-
-newmtl mat_steklo
-	Ns 30.0000
-	Ni 1.5000
-	d 0.9500
-	Tr 0.9500
-	Tf 0.9500 0.9500 0.9500 
-	illum 2
-	Ka 0.0000 0.0000 0.0000
-	Kd 0.8353 0.8000 0.7686
-	Ks 1.0000 1.0000 1.0000
-	Ke 0.2088 0.2000 0.1922
+Ns 70.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.309800 0.309800 0.309800
+Ks 0.630000 0.630000 0.630000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /home/gabriele/Scrivania/Buggy/Car (1)/4_greys.jpg
 
 newmtl green
-	Ns 10.0000
-	Ni 1.5000
-	d 1.0000
-	Tr 1.0000
-	Tf 1.0000 1.0000 1.0000 
-	illum 2
-	Ka 0.0000 0.0000 0.0000
-	Kd 0.5216 0.7216 0.5294
-	Ks 0.0000 0.0000 0.0000
-	Ke 0.0000 0.0000 0.0000
-        map_Ka 4_greens.jpg
-        map_Kd 4_greens.jpg
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.521600 0.721600 0.529400
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /home/gabriele/Scrivania/Buggy/Car (1)/4_greens.jpg
+
+newmtl mat_steklo
+Ns 30.000009
+Ka 1.000000 1.000000 1.000000
+Kd 0.835300 0.800000 0.768600
+Ks 1.000000 1.000000 1.000000
+Ke 0.208800 0.200000 0.192200
+Ni 1.500000
+d 0.950000
+illum 9
 
 newmtl st_wood
-	Ns 70.0000
-	Ni 1.5000
-	d 1.0000
-	Tr 1.0000
-	Tf 1.0000 1.0000 1.0000 
-	illum 2
-	Ka 0.0000 0.0000 0.0000
-	Kd 0.9922 0.9804 0.8941
-	Ks 0.6300 0.6300 0.6300
-	Ke 0.0000 0.0000 0.0000
-        map_Ka Wo_16sml.jpg
-        map_Kd Wo_16sml.jpg
+Ns 70.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.992200 0.980400 0.894100
+Ks 0.630000 0.630000 0.630000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /home/gabriele/Scrivania/Buggy/Car (1)/Wo_16sml.jpg
