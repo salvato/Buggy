@@ -209,7 +209,9 @@ GLWidget::paintGL() {
 
     glDisable(GL_CULL_FACE); // Disable back face culling
     floorTexture->bind();
-    geometries->drawFloor(&floorProgram);
+    //geometries->drawFloor(&floorProgram);
+
+    geometries->drawBuggy(&buggyProgram);
 
     // Room model Matrix
     modelMatrix.setToIdentity();
@@ -222,7 +224,7 @@ GLWidget::paintGL() {
     roomProgram.setUniformValue("mvp_matrix", projectionMatrix*viewMatrix*modelMatrix);
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, roomTexture);
-    geometries->drawRoom(&roomProgram);
+    //geometries->drawRoom(&roomProgram);
 
     // Buggy Model matrix
     modelMatrix.setToIdentity();
@@ -235,7 +237,7 @@ GLWidget::paintGL() {
 
     glEnable(GL_CULL_FACE); // Enable back face culling
     cubeTexture->bind();
-    geometries->drawCube(&cubeProgram);
+    //geometries->drawCube(&cubeProgram);
 
 }
 
