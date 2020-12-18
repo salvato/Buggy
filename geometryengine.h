@@ -84,8 +84,8 @@ private:
     GLuint        cubeIndexBuf;
     GLuint        floorVertexBuf;
     GLuint        buggyVertexBuf;
+    GLuint        buggyUvBuf;
 
-    QOpenGLBuffer uvbuffer;
     QOpenGLBuffer normalbuffer;
 
     QVector<QVector3D> vertices;
