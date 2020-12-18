@@ -80,13 +80,12 @@ private:
 private:
     QString       sObjPath;
 
-    GLuint        cubeVertexBuf;
-    GLuint        cubeIndexBuf;
-    GLuint        floorVertexBuf;
-    GLuint        buggyVertexBuf;
-    GLuint        buggyUvBuf;
-
-    QOpenGLBuffer normalbuffer;
+    GLuint cubeVertexBuf;
+    GLuint cubeIndexBuf;
+    GLuint floorVertexBuf;
+    GLuint buggyVertexBuf;
+    GLuint buggyUvBuf;
+    GLuint buggyNormalBuf;
 
     QVector<QVector3D> vertices;
     QVector<QVector2D> uvs;

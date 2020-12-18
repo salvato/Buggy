@@ -73,6 +73,7 @@ GeometryEngine::GeometryEngine()
     glGenBuffers(1, &floorVertexBuf);
     glGenBuffers(1, &buggyVertexBuf);
     glGenBuffers(1, &buggyUvBuf);
+    glGenBuffers(1, &buggyNormalBuf);
 
     // Initializes geometries and transfers them to VBOs
     if(loadObj(sObjPath, vertices, uvs, normals)) {
@@ -90,6 +91,7 @@ GeometryEngine::~GeometryEngine() {
     glDeleteBuffers(1, &floorVertexBuf);
     glDeleteBuffers(1, &buggyVertexBuf);
     glDeleteBuffers(1, &buggyUvBuf);
+    glDeleteBuffers(1, &buggyNormalBuf);
 }
 
 
@@ -208,9 +210,8 @@ GeometryEngine::initBuggyGeometry() {
         glBindBuffer(GL_ARRAY_BUFFER, buggyVertexBuf);
         glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(QVector3D), vertices.data(), GL_STATIC_DRAW);
         if(normals.size() > 0) { // Transfer normal data to VBO
-            normalbuffer.create();
-            normalbuffer.bind();
-            normalbuffer.allocate(normals.data(), normals.size()*sizeof(QVector3D));
+            glBindBuffer(GL_NORMAL_ARRAY_BUFFER_BINDING, buggyNormalBuf);
+            glBufferData(GL_NORMAL_ARRAY_BUFFER_BINDING,  normals.size()*sizeof(QVector3D), normals.data(), GL_STATIC_DRAW);
         }
         if(uvs.size() > 0) { // Transfer uv data to VBO
             glBindBuffer(GL_TEXTURE_COORD_ARRAY_BUFFER_BINDING, buggyUvBuf);
@@ -305,7 +306,7 @@ GeometryEngine::drawBuggy(QOpenGLShaderProgram *program) {
     }
 
     if(normals.size() > 0) {
-        normalbuffer.bind();
+        glBindBuffer(GL_NORMAL_ARRAY_BUFFER_BINDING, buggyNormalBuf);
         int normcoordLocation = program->attributeLocation("vertexNormal_modelspace");
         program->enableAttributeArray(normcoordLocation);
         program->setAttributeBuffer(normcoordLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
