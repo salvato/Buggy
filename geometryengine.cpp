@@ -115,6 +115,9 @@ GeometryEngine::loadObj(QString path,
     QVector<QVector2D> temp_uvs;
     QVector<QVector3D> temp_normals;
     float x, y, z;
+    float xMin=__FLT_MAX__, xMax=-__FLT_MAX__;
+    float yMin=__FLT_MAX__, yMax=-__FLT_MAX__;
+    float zMin=__FLT_MAX__, zMax=-__FLT_MAX__;
 
     QString line;
     QStringList stringVals, stringTriples;
@@ -153,6 +156,12 @@ GeometryEngine::loadObj(QString path,
             y = stringVals.at(2).toFloat();
             z = stringVals.at(3).toFloat();
             temp_vertices.append(QVector3D(x, y, z));
+            if(x<xMin) xMin = x;
+            if(y<yMin) yMin = y;
+            if(z<zMin) zMin = z;
+            if(x>xMax) xMax = x;
+            if(y>yMax) yMax = y;
+            if(z>zMax) zMax = z;
         }
         else if(line.startsWith("f")) {// is a face
             stringTriples = QString(line).split(" ", Qt::SkipEmptyParts);
@@ -177,14 +186,22 @@ GeometryEngine::loadObj(QString path,
             qDebug() << line;
     }
     file.close();
+    float dx = xMax-xMin;
+    float dy = yMax-yMin;
+    float dz = zMax-zMin;
+    for(int i=0; i<temp_vertices.size(); i++) {
+        temp_vertices[i].setX((temp_vertices[i].x()-xMin)/dx);
+        temp_vertices[i].setY((temp_vertices[i].y()-yMin)/dy);
+        temp_vertices[i].setZ((temp_vertices[i].z()-zMin)/dz);
+    }
     // For each vertex of each triangle
     for(int i=0; i<vertexIndices.size(); i++) {
         // Get the indices of its attributes
         unsigned int vertexIndex = vertexIndices[i];
         unsigned int normalIndex = normalIndices[i];
         // Get the attributes thanks to the index
-        QVector3D vertex = temp_vertices[ vertexIndex-1 ];
-        QVector3D normal = temp_normals[ normalIndex-1 ];
+        QVector3D vertex = temp_vertices[vertexIndex-1];
+        QVector3D normal = temp_normals[normalIndex-1];
         // Put the attributes in buffers
         out_vertices.append(vertex);
         out_normals .append(normal);

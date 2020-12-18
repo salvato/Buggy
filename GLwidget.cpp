@@ -209,9 +209,7 @@ GLWidget::paintGL() {
 
     glDisable(GL_CULL_FACE); // Disable back face culling
     floorTexture->bind();
-    geometries->drawFloor(&floorProgram);
-
-    geometries->drawBuggy(&buggyProgram);
+    //geometries->drawFloor(&floorProgram);
 
     // Room model Matrix
     modelMatrix.setToIdentity();
@@ -239,6 +237,7 @@ GLWidget::paintGL() {
     cubeTexture->bind();
     //geometries->drawCube(&cubeProgram);
 
+    geometries->drawBuggy(&buggyProgram);
 }
 
 
