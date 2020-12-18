@@ -68,7 +68,7 @@ GeometryEngine::GeometryEngine()
 {
     initializeOpenGLFunctions();
     // Generate needed VBOs
-    cubeVertexBuf.create();
+    glGenBuffers(1, &cubeVertexBuf); // cubeVertexBuf.create();
     cubeIndexBuf.create();
 
     glGenBuffers(1, &floorVertexBuf);
@@ -83,7 +83,7 @@ GeometryEngine::GeometryEngine()
 
 
 GeometryEngine::~GeometryEngine() {
-    cubeVertexBuf.destroy();
+    glDeleteBuffers(1, &cubeVertexBuf); // cubeVertexBuf.destroy();
     cubeIndexBuf.destroy();
 }
 
@@ -293,9 +293,8 @@ GeometryEngine::initCubeGeometry() {
         20, 20, 21, 22, 23      // Face 5 - triangle strip (v20, v21, v22, v23)
     };
 
-    // Transfer vertex data to VBO 0
-    cubeVertexBuf.bind();
-    cubeVertexBuf.allocate(vertices, 24*sizeof(VertexData));
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVertexBuf); // cubeVertexBuf.bind();
+    glBufferData(GL_ARRAY_BUFFER, 24*sizeof(VertexData), vertices, GL_STATIC_DRAW); // cubeVertexBuf.allocate(vertices, 24*sizeof(VertexData));
 
     // Transfer index data to VBO 1
     cubeIndexBuf.bind();
@@ -330,7 +329,8 @@ GeometryEngine::drawBuggy(QOpenGLShaderProgram *program) {
 void
 GeometryEngine::drawCube(QOpenGLShaderProgram *program) {
     // Tell OpenGL which VBOs to use
-    cubeVertexBuf.bind();
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVertexBuf); // cubeVertexBuf.bind();
+    //cubeVertexBuf.bind();
     cubeIndexBuf.bind();
 
     // Offset for position
@@ -357,7 +357,7 @@ GeometryEngine::drawCube(QOpenGLShaderProgram *program) {
 void
 GeometryEngine::drawRoom(QOpenGLShaderProgram *program) {
     // Tell OpenGL which VBOs to use
-    cubeVertexBuf.bind();
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVertexBuf); // cubeVertexBuf.bind();
     cubeIndexBuf.bind();
 
     // Tell OpenGL programmable pipeline how to locate vertex position data

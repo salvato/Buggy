@@ -80,7 +80,7 @@ private:
 private:
     QString       sObjPath;
 
-    QOpenGLBuffer cubeVertexBuf;
+    GLuint        cubeVertexBuf;
     QOpenGLBuffer cubeIndexBuf;
     GLuint        floorVertexBuf;
 
