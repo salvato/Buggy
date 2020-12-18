@@ -81,10 +81,10 @@ private:
     QString       sObjPath;
 
     GLuint        cubeVertexBuf;
-    QOpenGLBuffer cubeIndexBuf;
+    GLuint        cubeIndexBuf;
     GLuint        floorVertexBuf;
+    GLuint        buggyVertexBuf;
 
-    QOpenGLBuffer vertexbuffer;
     QOpenGLBuffer uvbuffer;
     QOpenGLBuffer normalbuffer;
 

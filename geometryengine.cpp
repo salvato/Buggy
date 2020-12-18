@@ -63,15 +63,16 @@ VertexData {
 
 GeometryEngine::GeometryEngine()
     : sObjPath(QString("../Buggy/Car/Car3.obj"))
-    , cubeVertexBuf(QOpenGLBuffer::VertexBuffer)
-    , cubeIndexBuf(QOpenGLBuffer::IndexBuffer)
 {
+    // Initializes OpenGL function resolution for the current context
     initializeOpenGLFunctions();
-    // Generate needed VBOs
-    glGenBuffers(1, &cubeVertexBuf); // cubeVertexBuf.create();
-    cubeIndexBuf.create();
 
+    // Generate needed VBOs
+    glGenBuffers(1, &cubeVertexBuf);
+    glGenBuffers(1, &cubeIndexBuf);
     glGenBuffers(1, &floorVertexBuf);
+    glGenBuffers(1, &buggyVertexBuf);
+
     // Initializes geometries and transfers them to VBOs
     if(loadObj(sObjPath, vertices, uvs, normals)) {
         qDebug() << "Car3.obj Correctly loaded";
@@ -83,8 +84,10 @@ GeometryEngine::GeometryEngine()
 
 
 GeometryEngine::~GeometryEngine() {
-    glDeleteBuffers(1, &cubeVertexBuf); // cubeVertexBuf.destroy();
-    cubeIndexBuf.destroy();
+    glDeleteBuffers(1, &cubeVertexBuf);
+    glDeleteBuffers(1, &cubeIndexBuf);
+    glDeleteBuffers(1, &floorVertexBuf);
+    glDeleteBuffers(1, &buggyVertexBuf);
 }
 
 
@@ -110,7 +113,6 @@ GeometryEngine::loadObj(QString path,
     float x, y, z;
 
     QString line;
-    QString string;
     QStringList stringVals, stringTriples;
 
     while(!file.atEnd()) {
@@ -201,9 +203,8 @@ GeometryEngine::loadObj(QString path,
 void
 GeometryEngine::initBuggyGeometry() {
     if(vertices.size() > 0) { // Transfer vertex data to VBO
-        vertexbuffer.create();
-        vertexbuffer.bind();
-        vertexbuffer.allocate(vertices.data(), vertices.size()*sizeof(QVector3D));
+        glBindBuffer(GL_ARRAY_BUFFER, buggyVertexBuf);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(QVector3D), vertices.data(), GL_STATIC_DRAW);
         if(normals.size() > 0) { // Transfer normal data to VBO
             normalbuffer.create();
             normalbuffer.bind();
@@ -236,9 +237,6 @@ GeometryEngine::initFloorGeometry() {
 
 void
 GeometryEngine::initCubeGeometry() {
-    // For cube we would need only 8 vertices but we have to
-    // duplicate vertex for each face because texture coordinate
-    // is different.
     VertexData vertices[] = {
         // Vertex data for face 0
         {QVector3D(-1.0f, -1.0f,  1.0f), QVector2D(0.0f,  0.0f)}, // v0
@@ -276,14 +274,6 @@ GeometryEngine::initCubeGeometry() {
         {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(0.33f, 1.0f)}, // v22
         {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(0.66f, 1.0f)}  // v23
     };
-
-    // Indices for drawing cube faces using triangle strips.
-    // Triangle strips can be connected by duplicating indices
-    // between the strips. If connecting strips have opposite
-    // vertex order then last index of the first strip and first
-    // index of the second strip needs to be duplicated. If
-    // connecting strips have same vertex order then only last
-    // index of the first strip needs to be duplicated.
     GLushort indices[] = {
          0,  1,  2,  3,  3,     // Face 0 - triangle strip ( v0,  v1,  v2,  v3)
          4,  4,  5,  6,  7,  7, // Face 1 - triangle strip ( v4,  v5,  v6,  v7)
@@ -292,46 +282,42 @@ GeometryEngine::initCubeGeometry() {
         16, 16, 17, 18, 19, 19, // Face 4 - triangle strip (v16, v17, v18, v19)
         20, 20, 21, 22, 23      // Face 5 - triangle strip (v20, v21, v22, v23)
     };
-
-    glBindBuffer(GL_ARRAY_BUFFER, cubeVertexBuf); // cubeVertexBuf.bind();
-    glBufferData(GL_ARRAY_BUFFER, 24*sizeof(VertexData), vertices, GL_STATIC_DRAW); // cubeVertexBuf.allocate(vertices, 24*sizeof(VertexData));
-
-    // Transfer index data to VBO 1
-    cubeIndexBuf.bind();
-    cubeIndexBuf.allocate(indices, 34*sizeof(GLushort));
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVertexBuf);
+    glBufferData(GL_ARRAY_BUFFER, 24*sizeof(VertexData), vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIndexBuf);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 34*sizeof(GLushort), indices, GL_STATIC_DRAW);
 }
 
 
 void
 GeometryEngine::drawBuggy(QOpenGLShaderProgram *program) {
-  vertexbuffer.bind();
-  int vertexLocation = program->attributeLocation("qt_Vertex");
-  program->enableAttributeArray(vertexLocation);
-  program->setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
+    glBindBuffer(GL_ARRAY_BUFFER, buggyVertexBuf);
+    int vertexLocation = program->attributeLocation("qt_Vertex");
+    program->enableAttributeArray(vertexLocation);
+    program->setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
 
-  if(uvs.size() > 0) {
-    uvbuffer.bind();
-    int texcoordLocation = program->attributeLocation("qt_MultiTexCoord0");
-    program->enableAttributeArray(texcoordLocation);
-    program->setAttributeBuffer(texcoordLocation, GL_FLOAT, 0, 2, sizeof(QVector2D));
-  }
+    if(uvs.size() > 0) {
+        uvbuffer.bind();
+        int texcoordLocation = program->attributeLocation("qt_MultiTexCoord0");
+        program->enableAttributeArray(texcoordLocation);
+        program->setAttributeBuffer(texcoordLocation, GL_FLOAT, 0, 2, sizeof(QVector2D));
+    }
 
-  if(normals.size() > 0) {
-      normalbuffer.bind();
-      int normcoordLocation = program->attributeLocation("vertexNormal_modelspace");
-      program->enableAttributeArray(normcoordLocation);
-      program->setAttributeBuffer(normcoordLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
-  }
-  glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+    if(normals.size() > 0) {
+        normalbuffer.bind();
+        int normcoordLocation = program->attributeLocation("vertexNormal_modelspace");
+        program->enableAttributeArray(normcoordLocation);
+        program->setAttributeBuffer(normcoordLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
+    }
+    glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 }
 
 
 void
 GeometryEngine::drawCube(QOpenGLShaderProgram *program) {
     // Tell OpenGL which VBOs to use
-    glBindBuffer(GL_ARRAY_BUFFER, cubeVertexBuf); // cubeVertexBuf.bind();
-    //cubeVertexBuf.bind();
-    cubeIndexBuf.bind();
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVertexBuf);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIndexBuf);
 
     // Offset for position
     quintptr offset = 0;
@@ -357,8 +343,8 @@ GeometryEngine::drawCube(QOpenGLShaderProgram *program) {
 void
 GeometryEngine::drawRoom(QOpenGLShaderProgram *program) {
     // Tell OpenGL which VBOs to use
-    glBindBuffer(GL_ARRAY_BUFFER, cubeVertexBuf); // cubeVertexBuf.bind();
-    cubeIndexBuf.bind();
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVertexBuf);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIndexBuf);
 
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = program->attributeLocation("a_position");
@@ -379,14 +365,12 @@ GeometryEngine::drawFloor(QOpenGLShaderProgram *program) {
     program->bind();
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, floorVertexBuf);
-    glVertexAttribPointer(0,        // attribute 0.
-                                    // No particular reason for 0, but must match
-                                    // the layout in the shader.
+    glVertexAttribPointer(0,        // attribute: Must match the layout in the shader.
                           3,        // size
                           GL_FLOAT, // type
                           GL_FALSE, // normalized?
                           0,        // stride
-                          (void*)0  // array buffer offset
+                          nullptr   // array buffer offset
     );
     glDrawArrays(GL_TRIANGLES, 0, 6); // Starting from vertex 0; 6 vertices -> 2 triangles
     glDisableVertexAttribArray(0);
