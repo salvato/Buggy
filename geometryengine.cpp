@@ -186,13 +186,14 @@ GeometryEngine::loadObj(QString path,
             qDebug() << line;
     }
     file.close();
+    //qDebug() << xMax << xMin << yMax << yMin << zMax << zMin;
     float dx = xMax-xMin;
     float dy = yMax-yMin;
     float dz = zMax-zMin;
     for(int i=0; i<temp_vertices.size(); i++) {
-        temp_vertices[i].setX((temp_vertices[i].x()-xMin)/dx);
+        temp_vertices[i].setX(((temp_vertices[i].x()-xMin)/dx)-0.5);
         temp_vertices[i].setY((temp_vertices[i].y()-yMin)/dy);
-        temp_vertices[i].setZ((temp_vertices[i].z()-zMin)/dz);
+        temp_vertices[i].setZ(((temp_vertices[i].z()-zMin)/dz)-0.5);
     }
     // For each vertex of each triangle
     for(int i=0; i<vertexIndices.size(); i++) {
@@ -202,7 +203,6 @@ GeometryEngine::loadObj(QString path,
         // Get the attributes thanks to the index
         QVector3D vertex = temp_vertices[vertexIndex-1];
         QVector3D normal = temp_normals[normalIndex-1];
-        // Put the attributes in buffers
         out_vertices.append(vertex);
         out_normals .append(normal);
     }
