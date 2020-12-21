@@ -75,6 +75,8 @@ GeometryEngine::GeometryEngine()
     glGenBuffers(1, &buggyUvBuf);
     glGenBuffers(1, &buggyNormalBuf);
 
+    pCar = new Model(sObjPath);
+
     // Initializes geometries and transfers them to VBOs   
     if(loadObj(sObjPath, vertices, uvs, normals)) {
         qDebug() << "Car3.obj Correctly loaded";

@@ -48,12 +48,13 @@
 **
 ****************************************************************************/
 
-#ifndef GEOMETRYENGINE_H
-#define GEOMETRYENGINE_H
+#pragma once
 
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
+
+#include <model.h>
 
 
 class GeometryEngine : protected QOpenGLFunctions
@@ -78,6 +79,7 @@ private:
     void initFloorGeometry();
 
 private:
+    Model*        pCar;
     QString       sObjPath;
 
     GLuint cubeVertexBuf;
@@ -91,5 +93,3 @@ private:
     QVector<QVector2D> uvs;
     QVector<QVector3D> normals; // Not used at the present.
 };
-
-#endif // GEOMETRYENGINE_H
