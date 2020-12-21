@@ -35,12 +35,12 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 
 CONFIG += c++11
 
-SOURCES += main.cpp \
-    GrCamera.cpp \
-    mesh.cpp \
-    model.cpp \
-    skyboxwidget.cpp \
-    trackball.cpp
+SOURCES += main.cpp
+SOURCES += GrCamera.cpp
+SOURCES += mesh.cpp
+SOURCES += model.cpp
+SOURCES += skyboxwidget.cpp
+SOURCES += trackball.cpp
 SOURCES += controlsdialog.cpp
 SOURCES += axesdialog.cpp
 SOURCES += AxisFrame.cpp
@@ -54,12 +54,12 @@ SOURCES += plotpropertiesdlg.cpp
 SOURCES += mainwindow.cpp
 
 
-HEADERS += mainwindow.h \
-    GrCamera.h \
-    mesh.h \
-    model.h \
-    skyboxwidget.h \
-    trackball.h
+HEADERS += mainwindow.h
+HEADERS += GrCamera.h
+HEADERS += mesh.h
+HEADERS += model.h
+HEADERS += skyboxwidget.h
+HEADERS += trackball.h
 HEADERS += controlsdialog.h
 HEADERS += geometryengine.h
 HEADERS += GLwidget.h
@@ -75,47 +75,47 @@ HEADERS += plotpropertiesdlg.h
 FORMS += controlsdialog.ui
 
 
-RESOURCES += shaders.qrc \
-    textures.qrc
-RESOURCES +=
+RESOURCES += shaders.qrc
+RESOURCES += textures.qrc
 
 
 LIBS += -lrt
 LIBS += -lpthread
+LIBS += -lassimp
 
 
-DISTFILES += fshader.glsl \
-    BuggyDocs/0_DcMotorModel.pdf \
-    BuggyDocs/1_DCMotorSpeedSystemAnalysis.pdf \
-    BuggyDocs/DcMotor_Digital_Control.pdf \
-    BuggyDocs/DcMotor_Digital_PID_Control.pdf \
-    BuggyDocs/DcMotor_PI_Control.pdf \
-    BuggyDocs/DcMotor_PID_Control.pdf \
-    BuggyDocs/DcMotor_ROOT_Locus.pdf \
-    BuggyDocs/DcMotorControl.pdf \
-    BuggyDocs/DcMotorFrequencyDomain.pdf \
-    BuggyDocs/DcMotorModel.pdf \
-    BuggyDocs/DcMotorSimscapeModeling.pdf \
-    BuggyDocs/DcMotorSimulinkControllerDesign.pdf \
-    BuggyDocs/DcMotorSimulinkModeling.pdf \
-    BuggyDocs/DcMotorStateSpace.pdf \
-    BuggyDocs/Lagging Effect Associated with a Hold.pdf \
-    BuggyDocs/Lagging Effect Associated with a Hold.pdf \
-    BuggyDocs/SystemAnalysis.pdf \
-    BuggyDocs/SystemModeling.pdf \
-    Car/4_1_2_d.jpg \
-    Car/4_blues.jpg \
-    Car/4_greens.jpg \
-    Car/4_greys.jpg \
-    Car/4_redsml.jpg \
-    Car/4_whites.jpg \
-    Car/Car 3.3ds \
-    Car/Car 3.gsm \
-    Car/Car 3.mtl \
-    Car/Car 3.obj \
-    Car/Car3.mtl \
-    Car/Car3.obj \
-    Car/Wo_16sml.jpg
+DISTFILES += fshader.glsl
+DISTFILES += BuggyDocs/0_DcMotorModel.pdf
+DISTFILES += BuggyDocs/1_DCMotorSpeedSystemAnalysis.pdf
+DISTFILES += BuggyDocs/DcMotor_Digital_Control.pdf
+DISTFILES += BuggyDocs/DcMotor_Digital_PID_Control.pdf
+DISTFILES += BuggyDocs/DcMotor_PI_Control.pdf
+DISTFILES += BuggyDocs/DcMotor_PID_Control.pdf
+DISTFILES += BuggyDocs/DcMotor_ROOT_Locus.pdf
+DISTFILES += BuggyDocs/DcMotorControl.pdf
+DISTFILES += BuggyDocs/DcMotorFrequencyDomain.pdf
+DISTFILES += BuggyDocs/DcMotorModel.pdf
+DISTFILES += BuggyDocs/DcMotorSimscapeModeling.pdf
+DISTFILES += BuggyDocs/DcMotorSimulinkControllerDesign.pdf
+DISTFILES += BuggyDocs/DcMotorSimulinkModeling.pdf
+DISTFILES += BuggyDocs/DcMotorStateSpace.pdf
+DISTFILES += BuggyDocs/Lagging Effect Associated with a Hold.pdf
+DISTFILES += BuggyDocs/Lagging Effect Associated with a Hold.pdf
+DISTFILES += BuggyDocs/SystemAnalysis.pdf
+DISTFILES += BuggyDocs/SystemModeling.pdf
+DISTFILES += Car/4_1_2_d.jpg
+DISTFILES += Car/4_blues.jpg
+DISTFILES += Car/4_greens.jpg
+DISTFILES += Car/4_greys.jpg
+DISTFILES += Car/4_redsml.jpg
+DISTFILES += Car/4_whites.jpg
+DISTFILES += Car/Car 3.3ds
+DISTFILES += Car/Car 3.gsm
+DISTFILES += Car/Car 3.mtl
+DISTFILES += Car/Car 3.obj
+DISTFILES += Car/Car3.mtl
+DISTFILES += Car/Car3.obj
+DISTFILES += Car/Wo_16sml.jpg
 DISTFILES += vshader.glsl
 DISTFILES += cube.png
 DISTFILES += plot.png
