@@ -37,6 +37,8 @@ CONFIG += c++11
 
 SOURCES += main.cpp \
     GrCamera.cpp \
+    mesh.cpp \
+    model.cpp \
     skyboxwidget.cpp \
     trackball.cpp
 SOURCES += controlsdialog.cpp
