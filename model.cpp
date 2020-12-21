@@ -212,7 +212,7 @@ Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, QString typeNam
         for(int j=0; j<textures_loaded.size(); j++) {
             if(QString(str.C_Str()) == textures_loaded[j].path) {
                 textures.push_back(textures_loaded[j]);
-                skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
+                skip = true; // skip textures with the same filepath already loaded
                 break;
             }
         }
@@ -222,8 +222,7 @@ Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, QString typeNam
             texture.type = typeName;
             texture.path = str.C_Str();
             textures.append(texture);
-            textures_loaded.push_back(texture); // store it as texture loaded for entire model, to
-            // ensure we won't unnecesery load duplicate textures.
+            textures_loaded.push_back(texture);
         }
     }
     return textures;
