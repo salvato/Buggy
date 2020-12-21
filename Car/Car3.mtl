@@ -10,7 +10,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-map_Kd /home/gabriele/Scrivania/Buggy/Car (1)/4_greys.jpg
+map_Kd 4_greys.jpg
 
 newmtl green.001
 Ns 10.000002
@@ -21,7 +21,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 1
-map_Kd /home/gabriele/Scrivania/Buggy/Car (1)/4_greens.jpg
+map_Kd 4_greens.jpg
 
 newmtl mat_steklo.001
 Ns 30.000009
@@ -42,4 +42,4 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-map_Kd /home/gabriele/Scrivania/Buggy/Car (1)/Wo_16sml.jpg
+map_Kd Wo_16sml.jpg

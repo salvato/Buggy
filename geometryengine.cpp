@@ -77,11 +77,11 @@ GeometryEngine::GeometryEngine()
 
     pCar = new Model(sObjPath);
 
-    // Initializes geometries and transfers them to VBOs   
-    if(loadObj(sObjPath, vertices, uvs, normals)) {
-        qDebug() << "Car3.obj Correctly loaded";
-        initBuggyGeometry();
-    }
+//    // Initializes geometries and transfers them to VBOs
+//    if(loadObj(sObjPath, vertices, uvs, normals)) {
+//        qDebug() << "Car3.obj Correctly loaded";
+//        initBuggyGeometry();
+//    }
     initCubeGeometry();
     initFloorGeometry();
 }
@@ -312,6 +312,7 @@ GeometryEngine::initCubeGeometry() {
 
 void
 GeometryEngine::drawBuggy(QOpenGLShaderProgram *program) {
+/*
     glBindBuffer(GL_ARRAY_BUFFER, buggyVertexBuf);
     int vertexLocation = program->attributeLocation("qt_Vertex");
     program->enableAttributeArray(vertexLocation);
@@ -331,6 +332,8 @@ GeometryEngine::drawBuggy(QOpenGLShaderProgram *program) {
         program->setAttributeBuffer(normcoordLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
     }
     glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+*/
+    pCar->Draw(program);
 }
 
 

@@ -165,7 +165,6 @@ Model::processMesh(aiMesh *mesh, const aiScene *scene) {
                                                         aiTextureType_DIFFUSE,
                                                         "texture_diffuse");
     textures.append(diffuseMaps);
-    //        textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
     // 2. specular maps
     QVector<Texture> specularMaps = loadMaterialTextures(material,
@@ -173,23 +172,17 @@ Model::processMesh(aiMesh *mesh, const aiScene *scene) {
                                                          "texture_specular");
 
     textures.append(specularMaps);
-    //        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
-    // 3. normal maps
     QVector<Texture> normalMaps = loadMaterialTextures(material,
                                                        aiTextureType_HEIGHT,
                                                        "texture_normal");
     textures.append(normalMaps);
-    //        textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
-    // 4. height maps
     QVector<Texture> heightMaps = loadMaterialTextures(material,
                                                        aiTextureType_AMBIENT,
                                                        "texture_height");
     textures.append(heightMaps);
-    //        textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
-    // return a mesh object created from the extracted mesh data
     return Mesh(vertices, indices, textures);
 }
 

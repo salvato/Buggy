@@ -6,6 +6,8 @@ Mesh::Mesh(QVector<Vertex> vertices,
            QVector<Texture> textures)
     : QOpenGLExtraFunctions()
 {
+    initializeOpenGLFunctions();
+
     this->vertices = vertices;
     this->indices = indices;
     this->textures = textures;
@@ -50,6 +52,7 @@ Mesh::Draw(QOpenGLShaderProgram* shader) {
     // always good practice to set everything back to defaults once configured.
     glActiveTexture(GL_TEXTURE0);
 }
+
 
 // initializes all the buffer objects/arrays
 void
