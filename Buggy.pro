@@ -55,6 +55,7 @@ SOURCES += mainwindow.cpp
 HEADERS += mainwindow.h \
     GrCamera.h \
     mesh.h \
+    model.h \
     skyboxwidget.h \
     trackball.h
 HEADERS += controlsdialog.h

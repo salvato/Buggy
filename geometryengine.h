@@ -55,6 +55,12 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 
+#include <mesh.h>
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 
 class GeometryEngine : protected QOpenGLFunctions
 {
@@ -73,13 +79,20 @@ private:
                  QVector<QVector3D> &out_vertices,
                  QVector<QVector2D> &out_uvs,
                  QVector<QVector3D> &out_normals);
+    void loadModel(QString path);
+    void processNode(aiNode *node, const aiScene *scene);
+    Mesh processMesh(aiMesh *mesh, const aiScene *scene);
+    QVector<Texture> loadMaterialTextures(aiMaterial *mat,
+                                          aiTextureType type,
+                                          QString typeName);
     void initBuggyGeometry();
     void initCubeGeometry();
     void initFloorGeometry();
 
 private:
     QString       sObjPath;
-
+    QVector<Mesh> meshes;
+    QString       directory;
     GLuint cubeVertexBuf;
     GLuint cubeIndexBuf;
     GLuint floorVertexBuf;
@@ -90,6 +103,14 @@ private:
     QVector<QVector3D> vertices;
     QVector<QVector2D> uvs;
     QVector<QVector3D> normals; // Not used at the present.
+
+    struct Texture {
+        unsigned int id;
+        QString type;
+        QString path;  // we store the path of the texture to compare with other textures
+    };
+    QVector<Texture> textures_loaded;
+
 };
 
 #endif // GEOMETRYENGINE_H

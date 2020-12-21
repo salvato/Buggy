@@ -21,6 +21,11 @@ struct Texture {
     unsigned int id;
     QString type;
     QString path;
+    Texture(unsigned int _id, QString _type, QString _path) {
+        id = _id;
+        type = _type;
+        path = _path;
+    }
 };
 
 
