@@ -8,5 +8,7 @@
         <file>floor.vert</file>
         <file>buggy.frag</file>
         <file>buggy.vert</file>
+        <file>model.frag</file>
+        <file>model.vert</file>
     </qresource>
 </RCC>

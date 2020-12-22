@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     , pRightPlot(nullptr)
     , pPIDControlsDialog(nullptr)
     , serialPortName(QString("/dev/ttyACM0"))
-    , baudRate(QSerialPort::Baud38400)
+    , baudRate(QSerialPort::Baud9600)
     , receivedData(QString())
     , quat0(QQuaternion(1, 0, 0, 0).conjugated())
     , t0(-1.0)
@@ -228,6 +228,8 @@ MainWindow::connectSignals() {
             this, SLOT(onTryToConnect()));
     connect(&changeSpeedTimer, SIGNAL(timeout()),
             this, SLOT(onTimeToChangeSpeed()));
+    connect(&steadyTimer, SIGNAL(timeout()),
+            this, SLOT(onSteadyTimeElapsed()));
 
     connect(pButtonConnect, SIGNAL(clicked()),
             this, SLOT(onConnectPushed()));
@@ -374,7 +376,9 @@ MainWindow::onKeepAlive() {
 void
 MainWindow::onTimeToChangeSpeed() {
     if((LSpeed > 255) || (LSpeed < -255)) {
+        changeSpeedTimer.stop();
         iSign = -iSign;
+        steadyTimer.start(1);
     }
     LSpeed += iSign;
     RSpeed += iSign;
@@ -382,6 +386,13 @@ MainWindow::onTimeToChangeSpeed() {
             .arg(LSpeed)
             .arg(RSpeed);
     serialPort.write(sMessage.toLatin1().constData());
+}
+
+
+void
+MainWindow::onSteadyTimeElapsed() {
+    steadyTimer.stop();
+    changeSpeedTimer.start(20);
 }
 
 

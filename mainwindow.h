@@ -63,6 +63,7 @@ private slots:
     void onHidePIDControls();
     void onKeepAlive();
     void onTimeToChangeSpeed();
+    void onSteadyTimeElapsed();
 
 private:
     GLWidget*        pGLWidget;
@@ -83,6 +84,7 @@ private:
     QTimer      connectionTimer;
     QTimer      keepAliveTimer;
     QTimer      changeSpeedTimer;
+    QTimer      steadyTimer;
 
     float  q0, q1, q2, q3;
     double leftSpeed;

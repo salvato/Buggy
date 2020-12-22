@@ -111,6 +111,7 @@ private:
     QOpenGLShaderProgram cubeProgram;
     QOpenGLShaderProgram roomProgram;
     QOpenGLShaderProgram floorProgram;
+    QOpenGLShaderProgram modelProgram;
 
     QMatrix4x4           projectionMatrix;
     QMatrix4x4           viewMatrix;

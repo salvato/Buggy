@@ -65,9 +65,9 @@ GLWidget::GLWidget(QWidget *parent)
     m_trackBalls[2] = TrackBall(0.0f,   QVector3D(0, 1, 0), TrackBall::Plane);
     distExp = 600;
 
-    camera.Set(30.0, 30.0,  30.0, // Eye (Position of the Camera)
-                0.0,  0.0,   0.0,  // Center
-                0.0,  1.0,   0.0); // Up Vector
+    camera.Set(0.0, 30.0,  30.0, // Eye (Position of the Camera)
+               0.0,  0.0,   0.0,  // Center
+               0.0,  1.0,   0.0); // Up Vector
     camera.FieldOfView(60.0);
     camera.MouseMode(CGrCamera::PITCHYAW);
     camera.Gravity(true);
@@ -135,6 +135,11 @@ GLWidget::initShaders() {
     bResult &= roomProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/room.vert");
     bResult &= roomProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/room.frag");
     bResult &= roomProgram.link();
+/*
+    bResult &= modelProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/model.vert");
+    bResult &= modelProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/model.frag");
+    bResult &= modelProgram.link();
+*/
     if(!bResult) {
         perror("Unble to initShaders()...exiting");
         exit(EXIT_FAILURE);
@@ -199,9 +204,9 @@ GLWidget::paintGL() {
 
     // Floor Model matrix
     modelMatrix.setToIdentity();
-    modelMatrix.scale(3.0, 3.0, 3.0);
-    modelMatrix.translate(0.0, 0.0, 0.0);
     modelMatrix.rotate(rotation);
+    modelMatrix.translate(1.0, 0.0, 0.0);
+    modelMatrix.scale(10.0, 1.0, 10.0);
 
     // Bind shader pipeline for use
     floorProgram.bind();
@@ -209,7 +214,7 @@ GLWidget::paintGL() {
 
     glDisable(GL_CULL_FACE); // Disable back face culling
     floorTexture->bind();
-    //geometries->drawFloor(&floorProgram);
+    geometries->drawFloor(&floorProgram);
 
     // Room model Matrix
     modelMatrix.setToIdentity();
@@ -222,11 +227,11 @@ GLWidget::paintGL() {
     roomProgram.setUniformValue("mvp_matrix", projectionMatrix*viewMatrix*modelMatrix);
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, roomTexture);
-    //geometries->drawRoom(&roomProgram);
+//    geometries->drawRoom(&roomProgram);
 
     // Buggy Model matrix
     modelMatrix.setToIdentity();
-    modelMatrix.translate(0.0, 0.0, 0.0);
+    modelMatrix.translate(0.0, 1.0, 0.0);
     modelMatrix.rotate(rotation);
 
     // Bind shader pipeline for use
@@ -235,9 +240,9 @@ GLWidget::paintGL() {
 
     glEnable(GL_CULL_FACE); // Enable back face culling
     cubeTexture->bind();
-    //geometries->drawCube(&cubeProgram);
+    geometries->drawCube(&cubeProgram);
 
-    geometries->drawBuggy(&buggyProgram);
+//    geometries->drawBuggy(&buggyProgram);
 }
 
 
@@ -365,6 +370,10 @@ GLWidget::wheelEvent(QWheelEvent* event) {
         camera.MouseMode(CGrCamera::ROLLMOVE);
         camera.MouseMove(0, -numDegrees.y());
         camera.MouseMode(CGrCamera::PITCHYAW);
+//        QVector3D oldCenter = QVector3D(camera.Center()[0], camera.Center()[1], camera.Center()[2]);
+//        //oldCenter.setX(oldCenter.x()+numDegrees.ry()/10.0);
+//        oldCenter.setZ(oldCenter.z()+numDegrees.ry()/10.0);
+//        camera.SetCenter(oldCenter);
         event->accept();
     }
 /*

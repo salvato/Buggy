@@ -243,13 +243,13 @@ GeometryEngine::initBuggyGeometry() {
 void
 GeometryEngine::initFloorGeometry() {
     QVector3D vertices[] = {
-        QVector3D(-1.0f,  0.0f, -1.0f),
-        QVector3D( 1.0f,  0.0f,  1.0f),
-        QVector3D( 1.0f,  0.0f, -1.0f),
+        QVector3D(-8.0f,  0.0f, -8.0f),
+        QVector3D( 8.0f,  0.0f,  8.0f),
+        QVector3D( 8.0f,  0.0f, -8.0f),
 
-        QVector3D( 1.0f,  0.0f,  1.0f),
-        QVector3D(-1.0f,  0.0f, -1.0f),
-        QVector3D(-1.0f,  0.0f,  1.0f)
+        QVector3D( 8.0f,  0.0f,  8.0f),
+        QVector3D(-8.0f,  0.0f, -8.0f),
+        QVector3D(-8.0f,  0.0f,  8.0f)
     };
     glBindBuffer(GL_ARRAY_BUFFER, floorVertexBuf);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
