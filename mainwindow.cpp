@@ -263,8 +263,9 @@ MainWindow::connectSignals() {
 
 void
 MainWindow::processData(QString sData) {
-    bUpdateMotors = false;
-    bUpdateObstacleDistance = false;
+    bool bUpdateWidget = false;
+    bool bUpdateMotors = false;
+    bool bUpdateObstacleDistance = false;
     QStringList tokens = sData.split(',');
     while(!tokens.isEmpty()) {
         QString sHeader = tokens.first();
@@ -281,7 +282,7 @@ MainWindow::processData(QString sData) {
             tokens.removeFirst();
             quat1 = QQuaternion(q0, q1, q2, q3)*quat0;
             pGLWidget->setRotation(quat1);
-            pGLWidget->update();
+            bUpdateWidget = true;
         }
         else if(sHeader == "M" && nTokens > 4) {
             tokens.removeFirst();
@@ -299,7 +300,6 @@ MainWindow::processData(QString sData) {
             tokens.removeFirst();
             obstacleDistance = tokens.first().toDouble();
             tokens.removeFirst();
-            pEditObstacleDistance->setText(QString("%1").arg(obstacleDistance));
             bUpdateObstacleDistance = true;
         }
         else if(sHeader == "T" && nTokens > 1) {
@@ -310,10 +310,8 @@ MainWindow::processData(QString sData) {
             if(bUpdateMotors) {
                 pLeftPlot->NewPoint(2, (dTime-t0)/1000.0, leftSpeed);
                 pLeftPlot->NewPoint(1, (dTime-t0)/1000.0, LSpeed/100.0);
-                pLeftPlot->UpdatePlot();
                 pRightPlot->NewPoint(2, (dTime-t0)/1000.0, rightSpeed);
                 pRightPlot->NewPoint(1, (dTime-t0)/1000.0, RSpeed/100.0);
-                pRightPlot->UpdatePlot();
             }
         }
         else if(sHeader == "P") { // Buggy Asked the PID Parameters
@@ -327,6 +325,18 @@ MainWindow::processData(QString sData) {
         else { // Unknown token
             tokens.removeFirst();
         }
+    } // while(!tokens.isEmpty())
+
+    if(bUpdateMotors) {
+        pLeftPlot->UpdatePlot();
+        pRightPlot->UpdatePlot();
+        pGLWidget->update();
+    }
+    else if(bUpdateWidget) {
+        pGLWidget->update();
+    }
+    if(bUpdateObstacleDistance) {
+        pEditObstacleDistance->setText(QString("%1").arg(obstacleDistance));
     }
 }
 
@@ -412,8 +422,8 @@ MainWindow::onStartStopPushed() {
         nRightPlotPoints = 0;
         changeSpeedTimer.start(20);
         QString sMessage = QString("Ls%1\nRs%2\n")
-                .arg(LSpeed)
-                .arg(RSpeed);
+                           .arg(LSpeed)
+                           .arg(RSpeed);
         serialPort.write(sMessage.toLatin1().constData());
         pButtonStartStop->setText("Stop");
     }
@@ -515,5 +525,3 @@ MainWindow::onRSpeedChanged(int value) {
     QString sMessage = QString("Rs%1\n").arg(int(value));
     serialPort.write(sMessage.toLatin1().constData());
 }
-
-

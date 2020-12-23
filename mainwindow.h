@@ -106,8 +106,6 @@ private:
     double RSpeed;
 
     double obstacleDistance;
-    bool   bUpdateObstacleDistance;
-    bool   bUpdateMotors;
 
     bool   bConnected;
     int    iSign;
