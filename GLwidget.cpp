@@ -59,13 +59,14 @@ GLWidget::GLWidget(QWidget *parent)
     , cubeTexture(nullptr)
     , zNear(0.1)
     , zFar(1300.0)
+    , carPosition(QVector3D(0.0, 0.0, 0.0))
 { 
     m_trackBalls[0] = TrackBall(0.05f,  QVector3D(0, 1, 0), TrackBall::Sphere);
     m_trackBalls[1] = TrackBall(0.005f, QVector3D(0, 0, 1), TrackBall::Sphere);
     m_trackBalls[2] = TrackBall(0.0f,   QVector3D(0, 1, 0), TrackBall::Plane);
     distExp = 600;
 
-    camera.Set(0.0, 30.0,  30.0, // Eye (Position of the Camera)
+    camera.Set(0.0, 30.0,  30.0,  // Eye (Position of the Camera)
                0.0,  0.0,   0.0,  // Center
                0.0,  1.0,   0.0); // Up Vector
     camera.FieldOfView(60.0);
@@ -91,6 +92,18 @@ GLWidget::minimumSizeHint() const {
 QSize
 GLWidget::sizeHint() const {
     return QSize(800, 800);
+}
+
+
+void
+GLWidget::setCarPosition(double x, double y, double z) {
+    carPosition = QVector3D(x, y, z);
+}
+
+
+void
+GLWidget::setCarPosition(QVector3D position) {
+    carPosition = position;
 }
 
 
@@ -204,7 +217,6 @@ GLWidget::paintGL() {
 
     // Floor Model matrix
     modelMatrix.setToIdentity();
-    modelMatrix.rotate(rotation);
     modelMatrix.translate(1.0, 0.0, 0.0);
     modelMatrix.scale(10.0, 1.0, 10.0);
 
@@ -220,7 +232,6 @@ GLWidget::paintGL() {
     modelMatrix.setToIdentity();
     modelMatrix.scale(500.0, 500.0, 500.0);
     modelMatrix.translate(0.0, 0.0, 0.0);
-    modelMatrix.rotate(rotation);
     glDisable(GL_CULL_FACE);  // Disable back face culling
 
     roomProgram.bind();
@@ -231,8 +242,9 @@ GLWidget::paintGL() {
 
     // Buggy Model matrix
     modelMatrix.setToIdentity();
-    modelMatrix.translate(0.0, 1.0, 0.0);
+    modelMatrix.translate(carPosition+QVector3D(0.0, 1.0, 0.0));
     modelMatrix.rotate(rotation);
+    modelMatrix.rotate(90.0, QVector3D(0.0, 1.0, 0.0));
 
     // Bind shader pipeline for use
     cubeProgram.bind();

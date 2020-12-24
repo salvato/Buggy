@@ -79,6 +79,8 @@ public:
     ~GLWidget() override;
     void setRotation(float q0, float q1, float q2, float q3);
     void setRotation(QQuaternion newRotation);
+    void setCarPosition(double x, double y, double z);
+    void setCarPosition(QVector3D position);
 
 protected:
     void initializeGL() override;
@@ -122,5 +124,6 @@ private:
     const qreal          zFar;
 
     QQuaternion          rotation;
+    QVector3D            carPosition;
     int                  distExp;
 };

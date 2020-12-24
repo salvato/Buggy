@@ -280,8 +280,21 @@ MainWindow::processData(QString sData) {
             tokens.removeFirst();
             q3 = tokens.first().toDouble()/1000.0;
             tokens.removeFirst();
+
+            double newX = tokens.first().toDouble()/1000.0;
+            tokens.removeFirst();
+            double newY = tokens.first().toDouble()/1000.0;
+            tokens.removeFirst();
+            double newZ = tokens.first().toDouble()/1000.0;
+            tokens.removeFirst();
+
             quat1 = QQuaternion(q0, q1, q2, q3)*quat0;
             pGLWidget->setRotation(quat1);
+            pGLWidget->setCarPosition(QVector3D(newX, newY, newZ));
+            pEditObstacleDistance->setText(QString("%1 %2 %3")
+                                           .arg(newX, 8)
+                                           .arg(newY, 8)
+                                           .arg(newZ, 8));
             bUpdateWidget = true;
         }
         else if(sHeader == "M" && nTokens > 4) {
@@ -336,7 +349,7 @@ MainWindow::processData(QString sData) {
         pGLWidget->update();
     }
     if(bUpdateObstacleDistance) {
-        pEditObstacleDistance->setText(QString("%1").arg(obstacleDistance));
+        //pEditObstacleDistance->setText(QString("%1").arg(obstacleDistance));
     }
 }
 
@@ -362,6 +375,8 @@ MainWindow::onConnectPushed() {
     else {
         disableUI();
         keepAliveTimer.stop();
+        changeSpeedTimer.stop();
+        steadyTimer.stop();
         pButtonConnect->setText("Connect");
         pStatusBar->showMessage(QString("Buggy Disconnected !"));
         connectionTimer.start(500);
@@ -376,6 +391,7 @@ MainWindow::onKeepAlive() {
     }
     else {
         keepAliveTimer.stop();
+        changeSpeedTimer.stop();
         disableUI();
         pStatusBar->showMessage(QString("Buggy Disconnected !"));
         connectionTimer.start(500);
@@ -393,8 +409,8 @@ MainWindow::onTimeToChangeSpeed() {
     LSpeed += iSign;
     RSpeed += iSign;
     QString sMessage = QString("Ls%1\nRs%2\n")
-            .arg(LSpeed)
-            .arg(RSpeed);
+                       .arg(LSpeed)
+                       .arg(RSpeed);
     serialPort.write(sMessage.toLatin1().constData());
 }
 
@@ -408,7 +424,7 @@ MainWindow::onSteadyTimeElapsed() {
 
 void
 MainWindow::onStartStopPushed() {
-    if(pButtonStartStop->text()== QString("Start")) {
+    if(pButtonStartStop->text() == QString("Start")) {
         quat0 = QQuaternion(q0, q1, q2, q3).conjugated();
         t0 = dTime;
         pLeftPlot->ClearDataSet(1);
@@ -421,7 +437,7 @@ MainWindow::onStartStopPushed() {
         pRightPlot->ClearDataSet(3);
         nRightPlotPoints = 0;
         changeSpeedTimer.start(20);
-        QString sMessage = QString("Ls%1\nRs%2\n")
+        QString sMessage = QString("G\nLs%1\nRs%2\n")
                            .arg(LSpeed)
                            .arg(RSpeed);
         serialPort.write(sMessage.toLatin1().constData());
