@@ -82,6 +82,9 @@ public:
     void setCarPosition(double x, double y, double z);
     void setCarPosition(QVector3D position);
 
+public:
+    CGrCamera camera;
+
 protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
@@ -102,7 +105,6 @@ private:
 
 private:
     GeometryEngine*      geometries;
-    CGrCamera            camera;
     TrackBall            m_trackBalls[3];
 
     QOpenGLTexture*      cubeTexture;

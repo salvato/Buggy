@@ -12,8 +12,10 @@
 #include <QSlider>
 #include <QMessageBox>
 
+
 double testAngle = 0.0;
-QVector3D testPos = QVector3D(0.0, 0.0, -30.0);
+QVector3D testPos = QVector3D(0.0, 0.0, 0.0);
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
@@ -24,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     , serialPortName(QString("/dev/ttyACM0"))
     , baudRate(QSerialPort::Baud9600)
     , receivedData(QString())
-    , quat0(QQuaternion(1, 0, 0, 0).conjugated())
+    , quat0(QQuaternion(1.0, 0.0, 0.0, 0.0).conjugated())
     , t0(-1.0)
     , LSpeed(0.0)
     , RSpeed(0.0)
@@ -38,20 +40,24 @@ MainWindow::MainWindow(QWidget *parent)
     disableUI();
     pStatusBar->showMessage(QString("Wait: Connecting to Buggy..."));
     connectionTimer.start(500);
-//    connect(&testTimer, SIGNAL(timeout()),
-//            this, SLOT(onTestTimerElapsed()));
-//    testTimer.start(30);
+    connect(&testTimer, SIGNAL(timeout()),
+            this, SLOT(onTestTimerElapsed()));
+    //testTimer.start(30);
 }
 
 void
 MainWindow::onTestTimerElapsed() {
-    testAngle += 2.0;
-    if(testAngle > 360.0) testAngle -= 360.0;
-    QQuaternion quat = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 1.0, 0.0), testAngle);
-    pGLWidget->setCarRotation(quat);
-    testPos.setZ(testPos.z()+0.1);
-    pGLWidget->setCarPosition(testPos);
-    pGLWidget->update();
+//    testPos.setX(-0.025);
+//    testPos.setY(-0.025);
+//    testPos.setZ(-0.025);
+//    testAngle += 2.0;
+//    if(testAngle > 360.0) testAngle -= 360.0;
+//    QQuaternion quat = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 1.0, 0.0), testAngle);
+
+//    pGLWidget->setCarRotation(quat);
+//    pGLWidget->setCarPosition(testPos);
+//    pGLWidget->camera.Dolly(testPos);
+//    pGLWidget->update();
 }
 
 

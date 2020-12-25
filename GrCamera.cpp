@@ -18,10 +18,10 @@
 CGrCamera::CGrCamera()
 {
     m_mousemode = PITCHYAW;
-    m_gravity = false;
-    Set(QVector3D(0.0, 0.0, 30.0), // Eye vector
-        QVector3D(0.0, 0.0, 0.0),  // Center
-        QVector3D(0.0, 1.0, 0.0)); // Up vector
+    m_gravity   = false;
+    Set(QVector3D(0.0, 0.0, 30.0),  // Eye vector
+        QVector3D(0.0, 0.0,  0.0),  // Center
+        QVector3D(0.0, 1.0,  0.0)); // Up vector
     FieldOfView(70.0);
 }
 
@@ -106,9 +106,9 @@ CGrCamera::ComputeFrame() {
         m_up = QVector3D(0.0, 1.0, 0.0);
     m_cameraz = m_eye - m_center;
     m_cameraz.normalize();
-    m_camerax = m_camerax.crossProduct(m_cameraz, m_up);
+    m_camerax = QVector3D::crossProduct(m_cameraz, m_up);
     m_camerax.normalize();
-    m_cameray = m_cameray.crossProduct(m_cameraz, m_camerax);
+    m_cameray = QVector3D::crossProduct(m_cameraz, m_camerax);
 }
 
 
@@ -122,7 +122,6 @@ CGrCamera::Pan(const double d) {
     transform.translate(m_eye);         // Back to the original position
     m_center = transform * m_center;    // Apply the transformation
     m_up     = transform * m_up;        // ...Idem...
-
     ComputeFrame();
 }
 
@@ -135,7 +134,6 @@ CGrCamera::Tilt(const double d) {
     transform.translate(m_eye);         // Back to the original position
     m_center = transform * m_center;    // Apply the transformation
     m_up     = transform * m_up;        // ...Idem...
-
     ComputeFrame();
 }
 
@@ -148,7 +146,6 @@ CGrCamera::Roll(const double d) {
     transform.translate(m_eye);         // Back to the original position
     m_center = transform * m_center;    // Apply the transformation
     m_up     = transform * m_up;        // ...Idem...
-
     ComputeFrame();
 }
 
@@ -165,7 +162,6 @@ CGrCamera::Yaw(const double d) {
     transform.translate(m_center);      // Back to the original position
     m_eye = transform * m_eye;          // Apply the transformation
     m_up  = transform * m_up;           // ...Idem...
-
     ComputeFrame();
 }
 
@@ -318,7 +314,7 @@ CGrCamera::RotCameraX(QMatrix4x4 &m, const double a) {
     QMatrix4x4 tocam;
     RotCamera(tocam);
 
-    m = uncam * rot * tocam;
+    m = uncam*rot*tocam;
 }
 
 
@@ -331,7 +327,7 @@ CGrCamera::RotCameraY(QMatrix4x4 &m, const double a) {
     QMatrix4x4 tocam;
     RotCamera(tocam);
 
-    m = uncam * rot * tocam;
+    m = uncam*rot*tocam;
 }
 
 
@@ -344,6 +340,6 @@ CGrCamera::RotCameraZ(QMatrix4x4 &m, const double a) {
     QMatrix4x4 tocam;
     RotCamera(tocam);
 
-    m = uncam * rot * tocam;
+    m = uncam*rot*tocam;
 }
 

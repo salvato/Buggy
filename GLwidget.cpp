@@ -66,7 +66,7 @@ GLWidget::GLWidget(QWidget *parent)
     m_trackBalls[2] = TrackBall(0.0f,   QVector3D(0, 1, 0), TrackBall::Plane);
     distExp = 600;
 
-    QVector3D eyePos    = QVector3D(0.0,  0.0,  30.0);
+    QVector3D eyePos    = QVector3D(0.0,  0.0, -30.0);
     QVector3D centerPos = QVector3D(0.0,  0.0,   0.0);
     QVector3D upVector  = QVector3D(0.0,  1.0,   0.0);
 
