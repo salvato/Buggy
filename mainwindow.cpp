@@ -290,7 +290,7 @@ MainWindow::processData(QString sData) {
 
             quat1 = QQuaternion(q0, q1, q2, q3)*quat0;
             pGLWidget->setRotation(quat1);
-            pGLWidget->setCarPosition(QVector3D(newX, newY, newZ));
+            //pGLWidget->setCarPosition(QVector3D(newX, newY, newZ));
             pEditObstacleDistance->setText(QString("%1 %2 %3")
                                            .arg(newX, 8)
                                            .arg(newY, 8)
