@@ -10,21 +10,18 @@ class CGrCamera
 public:
     CGrCamera();
     virtual ~CGrCamera();
+    void  Set(const QVector3D p_eye, const QVector3D p_center, const QVector3D p_up);
 
-    double CameraDistance();
+    double Distance();
     void Gravity(const bool p_gravity);
-    void DollyCenter(const double x, const double y, const double z);
-    void DollyCamera(const double x, const double y, const double z);
-    void Dolly(const double x, const double y, const double z);
+    void DollyCenter(const QVector3D p);
+    void DollyCamera(const QVector3D p);
+    void Dolly(const QVector3D p);
     void Pitch(const double d);
     void Yaw(const double d);
     void Roll(const double d);
     void Tilt(const double d);
     void Pan(const double d);
-    void Set3dv(const double *p_eye, const double *p_center, const double *p_up);
-    void Set(const double p_eyex, const double p_eyey, const double p_eyez,
-             const double p_cenx, const double p_ceny, const double p_cenz,
-             const double p_upx,  const double p_upy,  const double p_upz);
 
     QVector3D Eye();
     QVector3D Up();
@@ -46,14 +43,19 @@ public:
     bool Gravity() const;
 
 private:
-    void DollyHelper(double m[4][4], const double x, const double y, const double z);
+    void DollyHelper(QMatrix4x4 &m, QVector3D t);
     void ComputeFrame();
 
-    void RotCamera(double m[4][4]);
-    void UnRotCamera(double m[4][4]);
-    void RotCameraX(double m[4][4], const double a);
-    void RotCameraY(double m[4][4], const double a);
-    void RotCameraZ(double m[4][4], const double a);
+//    void RotCamera(double m[4][4]);
+    void RotCamera(QMatrix4x4 &m);
+    void UnRotCamera(QMatrix4x4 &m);
+//    void UnRotCamera(double m[4][4]);
+    void RotCameraX(QMatrix4x4 &m, const double a);
+    void RotCameraY(QMatrix4x4 &m, const double a);
+    void RotCameraZ(QMatrix4x4 &m, const double a);
+//    void RotCameraX(double m[4][4], const double a);
+//    void RotCameraY(double m[4][4], const double a);
+//    void RotCameraZ(double m[4][4], const double a);
 
 private:
     QVector3D m_up;

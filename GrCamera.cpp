@@ -10,97 +10,6 @@
 #include <cmath>
 #include "GrCamera.h"
 
-const double GR_PI   = 3.1415926535897932384626433832795;
-//const double GR_PI2  = 2.0 * GR_PI;
-//const double GR_RTOD = 180.0 / GR_PI;      // Converts radians to degrees
-const double GR_DTOR = GR_PI / 180.;      // Converts degrees to radians
-
-
-// Some linear algebra helper routines
-
-inline void 
-_Identity(double t[4][4]) {
-    for(int i=0;  i<4;  i++)
-        for(int j=0;  j<4;  j++)
-            t[i][j] = i == j ? 1.0 : 0.0;
-}
-
-
-inline void 
-_Translate(double t[4][4], const double x, const double y, const double z) {
-    _Identity(t);
-    t[0][3] = x;
-    t[1][3] = y;
-    t[2][3] = z;
-}
-
-
-inline void 
-_RotateX(double m[4][4], const double r) {
-    double rr = r * GR_DTOR;
-    double cr = cos(rr);
-    double sr = sin(rr);
-
-    m[0][0] = 1;  m[0][1] = 0;   m[0][2] = 0;   m[0][3] = 0;
-    m[1][0] = 0;  m[1][1] = cr;  m[1][2] =-sr;  m[1][3] = 0;
-    m[2][0] = 0;  m[2][1] = sr;  m[2][2] = cr;  m[2][3] = 0;
-    m[3][0] = 0;  m[3][1] = 0;   m[3][2] = 0;   m[3][3] = 1;
-}
-
-
-inline void 
-_RotateY(double m[4][4], const double r) {
-    double rr = r * GR_DTOR;
-    double cr = cos(rr);
-    double sr = sin(rr);
-
-    m[0][0] = cr;  m[0][1] = 0;  m[0][2] = sr;  m[0][3] = 0;
-    m[1][0] = 0;   m[1][1] = 1;  m[1][2] = 0;   m[1][3] = 0;
-    m[2][0] =-sr;  m[2][1] = 0;  m[2][2] = cr;  m[2][3] = 0;
-    m[3][0] = 0;   m[3][1] = 0;  m[3][2] = 0;   m[3][3] = 1;
-}
-
-
-inline void 
-_RotateZ(double m[4][4], const double r) {
-    double rr = r * GR_DTOR;
-    double cr = cos(rr);
-    double sr = sin(rr);
-
-    m[0][0] = cr;  m[0][1] =-sr;  m[0][2] = 0;  m[0][3] = 0;
-    m[1][0] = sr;  m[1][1] = cr;  m[1][2] = 0;  m[1][3] = 0;
-    m[2][0] = 0;   m[2][1] = 0;   m[2][2] = 1;  m[2][3] = 0;
-    m[3][0] = 0;   m[3][1] = 0;   m[3][2] = 0;  m[3][3] = 1;
-}
-
-
-inline void 
-_Multiply(const double a[4][4], const double b[4][4], double res[4][4]) {
-    for(int r=0;  r<4;  r++)
-        for(int c=0;  c<4;  c++) {
-            res[r][c] = a[r][0]*b[0][c] + a[r][1]*b[1][c] + a[r][2]*b[2][c] + a[r][3]*b[3][c];
-        }
-}
-
-
-inline void 
-_Multiply(const double a[4][4], const double b[4][4], const double c[4][4], double res[4][4]) {
-    double i[4][4];
-    _Multiply(a, b, i);
-    _Multiply(i, c, res);
-}
-
-
-inline void 
-_MultiplyPoint(const double m[4][4], double p[3]) {
-    double x = p[0];
-    double y = p[1];
-    double z = p[2];
-    p[0] = m[0][0]*x + m[0][1]*y + m[0][2]*z + m[0][3];
-    p[1] = m[1][0]*x + m[1][1]*y + m[1][2]*z + m[1][3];
-    p[2] = m[2][0]*x + m[2][1]*y + m[2][2]*z + m[2][3];
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -110,9 +19,9 @@ CGrCamera::CGrCamera()
 {
     m_mousemode = PITCHYAW;
     m_gravity = false;
-    Set(0.0, 0.0, 30.0, // Eye vector
-        0.0, 0.0, 0.0,  // Center
-        0.0, 1.0, 0.0); // Up vector
+    Set(QVector3D(0.0, 0.0, 30.0), // Eye vector
+        QVector3D(0.0, 0.0, 0.0),  // Center
+        QVector3D(0.0, 1.0, 0.0)); // Up vector
     FieldOfView(70.0);
 }
 
@@ -176,23 +85,14 @@ CGrCamera::Eye() {
 }
 
 
-void 
-CGrCamera::Set(const double p_eyex, const double p_eyey, const double p_eyez,
-               const double p_centerx, const double p_centery, const double p_centerz,
-               const double p_upx, const double p_upy, const double p_upz)
+void
+CGrCamera::Set(const QVector3D p_eye,
+               const QVector3D p_center,
+               const QVector3D p_up)
 {
-    m_eye    = QVector3D(p_eyex, p_eyey, p_eyez);
-    m_center = QVector3D(p_centerx, p_centery, p_centerz);
-    m_up     = QVector3D(p_upx, p_upy, p_upz);
-    ComputeFrame();
-}
-
-
-void 
-CGrCamera::Set3dv(const double *p_eye, const double *p_center, const double *p_up) {
-    m_eye    = QVector3D(p_eye[0], p_eye[1], p_eye[2]);
-    m_center = QVector3D(p_center[0], p_center[1], p_center[2]);
-    m_up     = QVector3D(p_up[0], p_up[1], p_up[2]);
+    m_eye    = p_eye;
+    m_center = p_center;
+    m_up     = p_up;
     ComputeFrame();
 }
 
@@ -285,58 +185,42 @@ CGrCamera::Pitch(const double d) {
 // Name :         CGrCamera::Dolly()
 // Description :  A camera dolly operation moves the camera in space.
 //                This function moves the camera and center together.
-void 
-CGrCamera::Dolly(const double x, const double y, const double z) {
-    double t[4][4];
-    DollyHelper(t, x, y, z);
-
-    double center[3] = {m_center.x(), m_center.y(), m_center.z()};
-    _MultiplyPoint(t, center);
-    m_center = QVector3D(center[0], center[1], center[2]);
-
-    double eye[3] = {m_eye.x(), m_eye.y(), m_eye.z()};
-    _MultiplyPoint(t, eye);
-    m_eye = QVector3D(eye[0], eye[1], eye[2]);
-
-    // Frame does not change...
+void
+CGrCamera::Dolly(const QVector3D p) {
+   QMatrix4x4 t;
+   DollyHelper(t, p);
+   m_center = t * m_center;
+   m_eye    = t * m_eye;
 }
 
 
-void 
-CGrCamera::DollyCamera(const double x, const double y, const double z) {
-    double t[4][4];
-    DollyHelper(t, x, y, z);
-
-    double eye[3] = {m_eye.x(), m_eye.y(), m_eye.z()};
-    _MultiplyPoint(t, eye);
-    m_eye = QVector3D(eye[0], eye[1], eye[2]);
-
+void
+CGrCamera::DollyCamera(const QVector3D p) {
+    QMatrix4x4 t;
+    DollyHelper(t, p);
+    m_eye = t * m_eye;
     ComputeFrame();
 }
 
 
-void 
-CGrCamera::DollyCenter(const double x, const double y, const double z) {
-    double t[4][4];
-    DollyHelper(t, x, y, z);
-
-    double center[3] = {m_center.x(), m_center.y(), m_center.z()};
-    _MultiplyPoint(t, center);
-    m_center = QVector3D(center[0], center[1], center[2]);
+void
+CGrCamera::DollyCenter(const QVector3D p) {
+    QMatrix4x4 t;
+    DollyHelper(t, p);
+    m_center = t * m_center;
     ComputeFrame();
 }
 
 
-void 
-CGrCamera::DollyHelper(double m[4][4], double x, double y, double z) {
-    double uncam[4][4];
+void
+CGrCamera::DollyHelper(QMatrix4x4 &m, QVector3D t) {
+    QMatrix4x4 uncam;
     UnRotCamera(uncam);
-    double tran[4][4];
-    _Translate(tran, x, y, z);
-    double tocam[4][4];
+    QMatrix4x4 tran;
+    tran.translate(t);
+    QMatrix4x4 tocam;
     RotCamera(tocam);
-
-    _Multiply(uncam, tran, tocam, m);
+    m = uncam*tran*tocam;
 }
 
 
@@ -344,22 +228,22 @@ void
 CGrCamera::MouseMove(int x, int y) {
     switch(m_mousemode) {
         case PANTILT:
-            Pan((x-m_mousex) * -0.1);
+            Pan((x-m_mousex)  * -0.1);
             Tilt((y-m_mousey) * -0.1);
             break;
 
         case ROLLMOVE:
             Roll((x-m_mousex) * 0.1);
-            DollyCamera(0.0, 0.0, 0.01*(y-m_mousey));
+            DollyCamera(QVector3D(0.0, 0.0, 0.01*(y-m_mousey)));
             break;
 
         case DOLLYXY:
-            DollyCamera(0.01*(x-m_mousex), 0.01*(y-m_mousey), 0);
+            DollyCamera(QVector3D(0.01*(x-m_mousex), 0.01*(y-m_mousey), 0));
             break;
 
         case PITCHYAW:
-            Yaw((x-m_mousex) * 0.8);  // GS Changed Movement Sign
-            Pitch((y-m_mousey) * 0.8);// GS Changed Movement Sign
+            Yaw((x-m_mousex)   * 0.8); // GS Changed Movement Sign
+            Pitch((y-m_mousey) * 0.8); // GS Changed Movement Sign
             break;
     }
     m_mousex = x;
@@ -385,82 +269,81 @@ CGrCamera::Gravity(const bool p_gravity) {
 // Name :         CGrCamera::CameraDistance()
 // Description :  Returns the distance from the camera to the center
 double 
-CGrCamera::CameraDistance() {
+CGrCamera::Distance() {
     return (m_eye-m_center).length();
 }
 
 
-inline void 
-CGrCamera::RotCamera(double m[4][4]) {
-    _Identity(m);
+inline void
+CGrCamera::RotCamera(QMatrix4x4 &m) {
+    m.setToIdentity();
     // m_camera is the camera frame.
+    m(0, 0) = m_camerax.x();
+    m(0, 1) = m_camerax.y();
+    m(0, 2) = m_camerax.z();
 
-    m[0][0] = m_camerax.x();
-    m[0][1] = m_camerax.y();
-    m[0][2] = m_camerax.z();
+    m(1, 0) = m_cameray.x();
+    m(1, 1) = m_cameray.y();
+    m(1, 2) = m_cameray.z();
 
-    m[1][0] = m_cameray.x();
-    m[1][1] = m_cameray.y();
-    m[1][2] = m_cameray.z();
-
-    m[2][0] = m_cameraz.x();
-    m[2][1] = m_cameraz.y();
-    m[2][2] = m_cameraz.z();
+    m(2, 0) = m_cameraz.x();
+    m(2, 1) = m_cameraz.y();
+    m(2, 2) = m_cameraz.z();
 }
 
 
-inline void 
-CGrCamera::UnRotCamera(double m[4][4]) {
-    _Identity(m);
-    m[0][0] = m_camerax.x();
-    m[1][0] = m_camerax.y();
-    m[2][0] = m_camerax.z();
+inline void
+CGrCamera::UnRotCamera(QMatrix4x4 &m) {
+    m.setToIdentity();
+    m(0, 0) = m_camerax.x();
+    m(1, 0) = m_camerax.y();
+    m(2, 0) = m_camerax.z();
 
-    m[0][1] = m_cameray.x();
-    m[1][1] = m_cameray.y();
-    m[2][1] = m_cameray.z();
+    m(0, 1) = m_cameray.x();
+    m(1, 1) = m_cameray.y();
+    m(2, 1) = m_cameray.z();
 
-    m[0][2] = m_cameraz.x();
-    m[1][2] = m_cameraz.y();
-    m[2][2] = m_cameraz.z();
+    m(0, 2) = m_cameraz.x();
+    m(1, 2) = m_cameraz.y();
+    m(2, 2) = m_cameraz.z();
 }
 
 
-void 
-CGrCamera::RotCameraX(double m[4][4], const double a) {
-    double uncam[4][4];
+void
+CGrCamera::RotCameraX(QMatrix4x4 &m, const double a) {
+    QMatrix4x4 uncam;
     UnRotCamera(uncam);
-    double rot[4][4];
-    _RotateX(rot, a);
-    double tocam[4][4];
+    QMatrix4x4 rot;
+    rot.rotate(a, QVector3D(1.0, 0.0, 0.0));
+    QMatrix4x4 tocam;
     RotCamera(tocam);
 
-    // m = uncam * rot * tocam
-    _Multiply(uncam, rot, tocam, m);
+    m = uncam * rot * tocam;
 }
 
 
-void 
-CGrCamera::RotCameraY(double m[4][4], const double a) {
-    double uncam[4][4];
+void
+CGrCamera::RotCameraY(QMatrix4x4 &m, const double a) {
+    QMatrix4x4 uncam;
     UnRotCamera(uncam);
-    double rot[4][4];
-    _RotateY(rot, a);
-    double tocam[4][4];
+    QMatrix4x4 rot;
+    rot.rotate(a, QVector3D(0.0, 1.0, 0.0));
+    QMatrix4x4 tocam;
     RotCamera(tocam);
 
-    _Multiply(uncam, rot, tocam, m);
+    m = uncam * rot * tocam;
 }
 
 
-void 
-CGrCamera::RotCameraZ(double m[4][4], const double a) {
-    double uncam[4][4];
+void
+CGrCamera::RotCameraZ(QMatrix4x4 &m, const double a) {
+    QMatrix4x4 uncam;
     UnRotCamera(uncam);
-    double rot[4][4];
-    _RotateZ(rot, a);
-    double tocam[4][4];
+    QMatrix4x4 rot;
+    rot.rotate(a, QVector3D(0.0, 0.0, 1.0));
+    QMatrix4x4 tocam;
     RotCamera(tocam);
 
-    _Multiply(uncam, rot, tocam, m);
+    m = uncam * rot * tocam;
 }
+

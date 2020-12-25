@@ -66,9 +66,9 @@ GLWidget::GLWidget(QWidget *parent)
     m_trackBalls[2] = TrackBall(0.0f,   QVector3D(0, 1, 0), TrackBall::Plane);
     distExp = 600;
 
-    camera.Set(0.0,  -30.0, -30.0,  // Eye (Position of the Camera)
-               0.0,  0.0,   0.0,  // Center
-               0.0,  1.0,   0.0); // Up Vector
+    camera.Set(QVector3D(0.0,  -30.0, -30.0), // Eye (Position of the Camera)
+               QVector3D(0.0,  0.0,   0.0),   // Center
+               QVector3D(0.0,  1.0,   0.0));  // Up Vector
     camera.FieldOfView(60.0);
     camera.MouseMode(CGrCamera::PITCHYAW);
     camera.Gravity(true);
