@@ -77,8 +77,8 @@ GLWidget
 public:
     explicit GLWidget(QWidget *parent = nullptr);
     ~GLWidget() override;
-    void setRotation(float q0, float q1, float q2, float q3);
-    void setRotation(QQuaternion newRotation);
+    void setCarRotation(float q0, float q1, float q2, float q3);
+    void setCarRotation(QQuaternion newRotation);
     void setCarPosition(double x, double y, double z);
     void setCarPosition(QVector3D position);
 
@@ -123,7 +123,7 @@ private:
     const qreal          zNear;
     const qreal          zFar;
 
-    QQuaternion          rotation;
+    QQuaternion          carRotation;
     QVector3D            carPosition;
     int                  distExp;
 };

@@ -12,6 +12,8 @@
 #include <QSlider>
 #include <QMessageBox>
 
+double testAngle = 0.0;
+QVector3D testPos = QVector3D(0.0, 0.0, -30.0);
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
@@ -36,6 +38,20 @@ MainWindow::MainWindow(QWidget *parent)
     disableUI();
     pStatusBar->showMessage(QString("Wait: Connecting to Buggy..."));
     connectionTimer.start(500);
+//    connect(&testTimer, SIGNAL(timeout()),
+//            this, SLOT(onTestTimerElapsed()));
+//    testTimer.start(30);
+}
+
+void
+MainWindow::onTestTimerElapsed() {
+    testAngle += 2.0;
+    if(testAngle > 360.0) testAngle -= 360.0;
+    QQuaternion quat = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 1.0, 0.0), testAngle);
+    pGLWidget->setCarRotation(quat);
+    testPos.setZ(testPos.z()+0.1);
+    pGLWidget->setCarPosition(testPos);
+    pGLWidget->update();
 }
 
 
@@ -289,7 +305,7 @@ MainWindow::processData(QString sData) {
             tokens.removeFirst();
 
             quat1 = QQuaternion(q0, q1, q2, q3)*quat0;
-            pGLWidget->setRotation(quat1);
+            pGLWidget->setCarRotation(quat1);
             //pGLWidget->setCarPosition(QVector3D(newX, newY, newZ));
             pEditObstacleDistance->setText(QString("%1 %2 %3")
                                            .arg(newX, 8)

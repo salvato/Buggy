@@ -64,6 +64,7 @@ private slots:
     void onKeepAlive();
     void onTimeToChangeSpeed();
     void onSteadyTimeElapsed();
+    void onTestTimerElapsed();
 
 private:
     GLWidget*        pGLWidget;
@@ -85,6 +86,7 @@ private:
     QTimer      keepAliveTimer;
     QTimer      changeSpeedTimer;
     QTimer      steadyTimer;
+    QTimer      testTimer;
 
     float  q0, q1, q2, q3;
     double leftSpeed;

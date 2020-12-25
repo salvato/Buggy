@@ -56,13 +56,13 @@ CGrCamera::FieldOfView(const double f) {
 
 
 double
-CGrCamera::FieldOfView() const {
+CGrCamera::GetFieldOfView() const {
     return m_fieldofview;
 }
 
 
 bool
-CGrCamera::Gravity() const {
+CGrCamera::GetGravity() const {
     return m_gravity;
 }
 

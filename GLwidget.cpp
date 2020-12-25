@@ -66,12 +66,14 @@ GLWidget::GLWidget(QWidget *parent)
     m_trackBalls[2] = TrackBall(0.0f,   QVector3D(0, 1, 0), TrackBall::Plane);
     distExp = 600;
 
-    camera.Set(QVector3D(0.0,  -30.0, -30.0), // Eye (Position of the Camera)
-               QVector3D(0.0,  0.0,   0.0),   // Center
-               QVector3D(0.0,  1.0,   0.0));  // Up Vector
+    QVector3D eyePos    = QVector3D(0.0,  0.0,  30.0);
+    QVector3D centerPos = QVector3D(0.0,  0.0,   0.0);
+    QVector3D upVector  = QVector3D(0.0,  1.0,   0.0);
+
+    camera.Set(eyePos, centerPos, upVector);
     camera.FieldOfView(60.0);
     camera.MouseMode(CGrCamera::PITCHYAW);
-    camera.Gravity(true);
+    camera.Gravity(false);
 }
 
 
@@ -108,21 +110,21 @@ GLWidget::setCarPosition(QVector3D position) {
 
 
 void
-GLWidget::setRotation(float q0, float q1, float q2, float q3) {
-    rotation = QQuaternion(q0, q1, q2, q3);
+GLWidget::setCarRotation(float q0, float q1, float q2, float q3) {
+    carRotation = QQuaternion(q0, q1, q2, q3);
 }
 
 
 void
-GLWidget::setRotation(QQuaternion newRotation) {
-    rotation = newRotation;
+GLWidget::setCarRotation(QQuaternion newRotation) {
+    carRotation = newRotation;
 }
 
 
 void
 GLWidget::initializeGL() {
     initializeOpenGLFunctions();
-    glClearColor(0.1, 0.1, 0.4, 1);
+    glClearColor(0.1, 0.1, 0.3, 1);
     initShaders();
     initTextures();
     glEnable(GL_DEPTH_TEST); // Enable depth buffer
@@ -190,6 +192,7 @@ GLWidget::initTextures() {
     glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) negx.bits());
     glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) negy.bits());
     glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA, posx.width(), posx.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*) negz.bits());
+
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -201,7 +204,7 @@ void
 GLWidget::resizeGL(int w, int h) {
     aspect = qreal(w) / qreal(h ? h : 1);
     projectionMatrix.setToIdentity();
-    projectionMatrix.perspective(camera.FieldOfView(), aspect, zNear, zFar);
+    projectionMatrix.perspective(camera.GetFieldOfView(), aspect, zNear, zFar);
 }
 
 
@@ -243,7 +246,7 @@ GLWidget::paintGL() {
     // Buggy Model matrix
     modelMatrix.setToIdentity();
     modelMatrix.translate(carPosition+QVector3D(0.0, 1.0, 0.0));
-    modelMatrix.rotate(rotation);
+    modelMatrix.rotate(carRotation);
 
     // Bind shader pipeline for use
     cubeProgram.bind();
