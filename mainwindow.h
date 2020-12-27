@@ -1,5 +1,6 @@
 #pragma once
 
+#include <car.h>
 #include <QWidget>
 #include <QQuaternion>
 #include <QByteArray>
@@ -48,6 +49,8 @@ private slots:
     void onConnectPushed();
     void onStartStopPushed();
     void onPIDControlsPushed();
+    void onResetCameraPushed();
+
     void onNewDataAvailable();
 
     void onLPvalueChanged(int value);
@@ -73,21 +76,27 @@ private:
     QPushButton*     pButtonConnect;
     QPushButton*     pButtonStartStop;
     QPushButton*     pButtonPIDControls;
+    QPushButton*     pButtonResetCamera;
     QLineEdit*       pEditObstacleDistance;
     ControlsDialog*  pPIDControlsDialog;
     QStatusBar*      pStatusBar;
+    Car              car;
 
-    QSerialPort serialPort;
-    QString     serialPortName;
-    int         baudRate;
-    QString     receivedData;
-    QQuaternion quat0, quat1;
-    QTimer      connectionTimer;
-    QTimer      keepAliveTimer;
-    QTimer      changeSpeedTimer;
-    QTimer      steadyTimer;
-    QTimer      testTimer;
+    QVector3D        eyePos;
+    QVector3D        centerPos;
+    QVector3D        upVector;
 
+    QSerialPort      serialPort;
+    QString          serialPortName;
+    QString          receivedData;
+    QQuaternion      quat0, quat1;
+    QTimer           connectionTimer;
+    QTimer           keepAliveTimer;
+    QTimer           changeSpeedTimer;
+    QTimer           steadyTimer;
+    QTimer           testTimer;
+
+    int    baudRate;
     float  q0, q1, q2, q3;
     double leftSpeed;
     double leftPath;
@@ -111,4 +120,5 @@ private:
 
     bool   bConnected;
     int    iSign;
+
 };

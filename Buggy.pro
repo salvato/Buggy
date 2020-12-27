@@ -35,7 +35,8 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 
 CONFIG += c++11
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    car.cpp
 SOURCES += GrCamera.cpp
 SOURCES += mesh.cpp
 SOURCES += model.cpp
@@ -54,7 +55,8 @@ SOURCES += plotpropertiesdlg.cpp
 SOURCES += mainwindow.cpp
 
 
-HEADERS += mainwindow.h
+HEADERS += mainwindow.h \
+    car.h
 HEADERS += GrCamera.h
 HEADERS += mesh.h
 HEADERS += model.h

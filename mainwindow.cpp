@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include <QSlider>
 #include <QMessageBox>
+#include <QThread>
 
 
 double testAngle = 0.0;
@@ -24,7 +25,6 @@ MainWindow::MainWindow(QWidget *parent)
     , pRightPlot(nullptr)
     , pPIDControlsDialog(nullptr)
     , serialPortName(QString("/dev/ttyACM0"))
-    , baudRate(QSerialPort::Baud9600)
     , receivedData(QString())
     , quat0(QQuaternion(1.0, 0.0, 0.0, 0.0).conjugated())
     , t0(-1.0)
@@ -32,17 +32,23 @@ MainWindow::MainWindow(QWidget *parent)
     , RSpeed(0.0)
     , iSign(1)
 {
+    baudRate = QSerialPort::Baud9600;
+    eyePos    = QVector3D(0.0, 30.0,  0.0);
+    centerPos = QVector3D(0.0,  0.0,  0.0);
+    upVector  = QVector3D(0.0,  0.0,  1.0);
+
     setWindowIcon(QIcon(":/plot.png"));
     initLayout();
+    onResetCameraPushed();
     restoreSettings();
     pPIDControlsDialog = new ControlsDialog();
     connectSignals();
     disableUI();
     pStatusBar->showMessage(QString("Wait: Connecting to Buggy..."));
     connectionTimer.start(500);
-    connect(&testTimer, SIGNAL(timeout()),
-            this, SLOT(onTestTimerElapsed()));
-    //testTimer.start(30);
+    car.Reset(rightPath, leftPath);
+    pGLWidget->update();
+    testTimer.start(30);
 }
 
 void
@@ -58,6 +64,13 @@ MainWindow::onTestTimerElapsed() {
 //    pGLWidget->setCarPosition(testPos);
 //    pGLWidget->camera.Dolly(testPos);
 //    pGLWidget->update();
+
+    rightPath += 10;
+//    leftPath += 10;
+    car.Move(rightPath, leftPath);
+    pGLWidget->setCarRotation(car.GetRotation());
+    pGLWidget->setCarPosition(car.GetPosition());
+    pGLWidget->update();
 }
 
 
@@ -147,6 +160,7 @@ MainWindow::createButtons() {
     pButtonConnect     = new QPushButton("Connect",  this);
     pButtonStartStop   = new QPushButton("Start",    this);
     pButtonPIDControls = new QPushButton("PID Ctrl", this);
+    pButtonResetCamera = new QPushButton("Camera Rst", this);
 }
 
 
@@ -220,6 +234,7 @@ MainWindow::initLayout() {
     firstButtonRow->addWidget(pButtonConnect);
     firstButtonRow->addWidget(pButtonStartStop);
     firstButtonRow->addWidget(pButtonPIDControls);
+    firstButtonRow->addWidget(pButtonResetCamera);
     pEditObstacleDistance = new QLineEdit();
     firstButtonRow->addWidget(pEditObstacleDistance);
 
@@ -252,6 +267,8 @@ MainWindow::connectSignals() {
             this, SLOT(onTimeToChangeSpeed()));
     connect(&steadyTimer, SIGNAL(timeout()),
             this, SLOT(onSteadyTimeElapsed()));
+    connect(&testTimer, SIGNAL(timeout()),
+            this, SLOT(onTestTimerElapsed()));
 
     connect(pButtonConnect, SIGNAL(clicked()),
             this, SLOT(onConnectPushed()));
@@ -259,6 +276,8 @@ MainWindow::connectSignals() {
             this, SLOT(onStartStopPushed()));
     connect(pButtonPIDControls, SIGNAL(clicked()),
             this, SLOT(onPIDControlsPushed()));
+    connect(pButtonResetCamera, SIGNAL(clicked()),
+            this, SLOT(onResetCameraPushed()));
 
     connect(pPIDControlsDialog, SIGNAL(LPvalueChanged(int)),
             this, SLOT(onLPvalueChanged(int)));
@@ -303,20 +322,12 @@ MainWindow::processData(QString sData) {
             q3 = tokens.first().toDouble()/1000.0;
             tokens.removeFirst();
 
-            double newX = tokens.first().toDouble()/1000.0;
-            tokens.removeFirst();
-            double newY = tokens.first().toDouble()/1000.0;
-            tokens.removeFirst();
-            double newZ = tokens.first().toDouble()/1000.0;
-            tokens.removeFirst();
-
-            quat1 = QQuaternion(q0, q1, q2, q3)*quat0;
-            pGLWidget->setCarRotation(quat1);
-            //pGLWidget->setCarPosition(QVector3D(newX, newY, newZ));
-            pEditObstacleDistance->setText(QString("%1 %2 %3")
-                                           .arg(newX, 8)
-                                           .arg(newY, 8)
-                                           .arg(newZ, 8));
+//            quat1 = QQuaternion(q0, q1, q2, q3)*quat0;
+            quat1 = QQuaternion();
+//            pEditObstacleDistance->setText(QString("%1 %2 %3")
+//                                           .arg(newX, 8)
+//                                           .arg(newY, 8)
+//                                           .arg(newZ, 8));
             bUpdateWidget = true;
         }
         else if(sHeader == "M" && nTokens > 4) {
@@ -329,6 +340,7 @@ MainWindow::processData(QString sData) {
             tokens.removeFirst();
             rightPath = tokens.first().toDouble();
             tokens.removeFirst();
+            car.Move(rightPath, leftPath);
             bUpdateMotors = true;
         }
         else if(sHeader == "D") {
@@ -343,10 +355,11 @@ MainWindow::processData(QString sData) {
             if(t0 < 0)
                 t0 = dTime;
             if(bUpdateMotors) {
-                pLeftPlot->NewPoint(2, (dTime-t0)/1000.0, leftSpeed);
-                pLeftPlot->NewPoint(1, (dTime-t0)/1000.0, LSpeed/100.0);
-                pRightPlot->NewPoint(2, (dTime-t0)/1000.0, rightSpeed);
-                pRightPlot->NewPoint(1, (dTime-t0)/1000.0, RSpeed/100.0);
+                double t = (dTime-t0)/1000.0;
+                pLeftPlot->NewPoint(2, t, leftSpeed);
+                pLeftPlot->NewPoint(1, t, LSpeed/100.0);
+                pRightPlot->NewPoint(2, t, rightSpeed);
+                pRightPlot->NewPoint(1, t, RSpeed/100.0);
             }
         }
         else if(sHeader == "P") { // Buggy Asked the PID Parameters
@@ -365,13 +378,17 @@ MainWindow::processData(QString sData) {
     if(bUpdateMotors) {
         pLeftPlot->UpdatePlot();
         pRightPlot->UpdatePlot();
+        pGLWidget->setCarRotation(car.GetRotation()*quat1);
+        pGLWidget->setCarPosition(car.GetPosition());
         pGLWidget->update();
     }
     else if(bUpdateWidget) {
+        pGLWidget->setCarRotation(car.GetRotation()*quat1);
+        pGLWidget->setCarPosition(car.GetPosition());
         pGLWidget->update();
     }
     if(bUpdateObstacleDistance) {
-        //pEditObstacleDistance->setText(QString("%1").arg(obstacleDistance));
+        pEditObstacleDistance->setText(QString("%1").arg(obstacleDistance));
     }
 }
 
@@ -423,7 +440,8 @@ MainWindow::onKeepAlive() {
 
 void
 MainWindow::onTimeToChangeSpeed() {
-    if((LSpeed > 255) || (LSpeed < -255)) {
+    if((LSpeed > 255) || (LSpeed < -255) ||
+       (RSpeed > 255) || (RSpeed < -255)) {
         changeSpeedTimer.stop();
         iSign = -iSign;
         steadyTimer.start(1);
@@ -449,6 +467,7 @@ MainWindow::onStartStopPushed() {
     if(pButtonStartStop->text() == QString("Start")) {
         quat0 = QQuaternion(q0, q1, q2, q3).conjugated();
         t0 = dTime;
+        car.Reset(rightPath, leftPath);
         pLeftPlot->ClearDataSet(1);
         pLeftPlot->ClearDataSet(2);
         pLeftPlot->ClearDataSet(3);
@@ -477,6 +496,13 @@ void
 MainWindow::onPIDControlsPushed() {
     pPIDControlsDialog->show();
     pButtonPIDControls->setDisabled(true);
+}
+
+
+void
+MainWindow::onResetCameraPushed() {
+    pGLWidget->camera.Set(eyePos, centerPos, upVector);
+    pGLWidget->update();
 }
 
 

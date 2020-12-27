@@ -66,7 +66,7 @@ GLWidget::GLWidget(QWidget *parent)
     m_trackBalls[2] = TrackBall(0.0f,   QVector3D(0, 1, 0), TrackBall::Plane);
     distExp = 600;
 
-    QVector3D eyePos    = QVector3D(0.0,  0.0, -30.0);
+    QVector3D eyePos    = QVector3D(0.0, 30.0, -30.0);
     QVector3D centerPos = QVector3D(0.0,  0.0,   0.0);
     QVector3D upVector  = QVector3D(0.0,  1.0,   0.0);
 
@@ -217,7 +217,7 @@ GLWidget::paintGL() {
     viewMatrix.lookAt(camera.Eye(),
                       camera.Center(),
                       camera.Up());
-
+/*
     // Floor Model matrix
     modelMatrix.setToIdentity();
     modelMatrix.translate(1.0, 0.0, 0.0);
@@ -229,7 +229,7 @@ GLWidget::paintGL() {
 
     glDisable(GL_CULL_FACE); // Disable back face culling
     floorTexture->bind();
-//    geometries->drawFloor(&floorProgram);
+    geometries->drawFloor(&floorProgram);
 
     // Room model Matrix
     modelMatrix.setToIdentity();
@@ -242,10 +242,10 @@ GLWidget::paintGL() {
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, roomTexture);
 //    geometries->drawRoom(&roomProgram);
-
+*/
     // Buggy Model matrix
     modelMatrix.setToIdentity();
-    modelMatrix.translate(carPosition+QVector3D(0.0, 1.0, 0.0));
+    modelMatrix.translate(carPosition);//+QVector3D(0.0, 1.0, 0.0));
     modelMatrix.rotate(carRotation);
 
     // Bind shader pipeline for use
