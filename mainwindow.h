@@ -50,6 +50,7 @@ private slots:
     void onStartStopPushed();
     void onPIDControlsPushed();
     void onResetCameraPushed();
+    void onResetCarPushed();
 
     void onNewDataAvailable();
 
@@ -77,6 +78,7 @@ private:
     QPushButton*     pButtonStartStop;
     QPushButton*     pButtonPIDControls;
     QPushButton*     pButtonResetCamera;
+    QPushButton*     pButtonResetCar;
     QLineEdit*       pEditObstacleDistance;
     ControlsDialog*  pPIDControlsDialog;
     QStatusBar*      pStatusBar;

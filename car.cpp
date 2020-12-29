@@ -90,6 +90,22 @@ Car::Reset(const int rightPulses, const int leftPulses) {
 
 
 void
+Car::Reset() {
+    Position = StartingPosition;
+    carAngle = startingAngle;
+}
+
+
+void
+Car::Reset(const QVector3D initialPosition, const double degrees) {
+    StartingPosition = initialPosition;
+    Position = StartingPosition;
+    carAngle = qDegreesToRadians(degrees);
+    startingAngle = carAngle;
+}
+
+
+void
 Car::SetPosition(const QVector3D initialPosition) {
     StartingPosition = initialPosition;
     Position = StartingPosition;

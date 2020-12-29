@@ -13,6 +13,8 @@ public:
     double      FromPathToAngle(const double path);
     void        Move(const int rightPulses, const int leftPulses);
     void        Reset(const int rightPulses, const int leftPulses);
+    void        Reset();
+    void        Reset(const QVector3D initialPosition, const double degrees);
     void        SetPosition(const QVector3D initialPosition);
     void        SetAngle(const double degrees);
     QVector3D   GetPosition();

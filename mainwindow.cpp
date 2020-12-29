@@ -160,10 +160,11 @@ MainWindow::serialConnect() {
 
 void
 MainWindow::createButtons() {
-    pButtonConnect     = new QPushButton("Connect",  this);
-    pButtonStartStop   = new QPushButton("Start",    this);
-    pButtonPIDControls = new QPushButton("PID Ctrl", this);
+    pButtonConnect     = new QPushButton("Connect",    this);
+    pButtonStartStop   = new QPushButton("Start",      this);
+    pButtonPIDControls = new QPushButton("PID Ctrl",   this);
     pButtonResetCamera = new QPushButton("Camera Rst", this);
+    pButtonResetCar    = new QPushButton("Car Reset",   this);
 }
 
 
@@ -238,6 +239,7 @@ MainWindow::initLayout() {
     firstButtonRow->addWidget(pButtonStartStop);
     firstButtonRow->addWidget(pButtonPIDControls);
     firstButtonRow->addWidget(pButtonResetCamera);
+    firstButtonRow->addWidget(pButtonResetCar);
     pEditObstacleDistance = new QLineEdit();
     firstButtonRow->addWidget(pEditObstacleDistance);
 
@@ -281,6 +283,8 @@ MainWindow::connectSignals() {
             this, SLOT(onPIDControlsPushed()));
     connect(pButtonResetCamera, SIGNAL(clicked()),
             this, SLOT(onResetCameraPushed()));
+    connect(pButtonResetCar, SIGNAL(clicked()),
+            this, SLOT(onResetCarPushed()));
 
     connect(pPIDControlsDialog, SIGNAL(LPvalueChanged(int)),
             this, SLOT(onLPvalueChanged(int)));
@@ -506,6 +510,12 @@ void
 MainWindow::onResetCameraPushed() {
     pGLWidget->camera.Set(eyePos, centerPos, upVector);
     pGLWidget->update();
+}
+
+
+void
+MainWindow::onResetCarPushed() {
+    car.Reset();
 }
 
 
