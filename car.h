@@ -17,10 +17,11 @@ public:
     QQuaternion GetRotation();
 
 private:
+    QVector3D carPosition;
     QVector3D Position;
     QQuaternion Rotation;
     double wheelDiameter;
-    double wheelDistance;
+    double wheelsDistance;
     double wheelToCenterDistance;
     int    pulsesPerRevolution;
     double carAngle;

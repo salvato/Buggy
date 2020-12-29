@@ -33,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
     , iSign(1)
 {
     baudRate = QSerialPort::Baud9600;
+
     eyePos    = QVector3D(0.0, 30.0,  0.0);
     centerPos = QVector3D(0.0,  0.0,  0.0);
     upVector  = QVector3D(0.0,  0.0,  1.0);
@@ -48,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
     connectionTimer.start(500);
     car.Reset(rightPath, leftPath);
     pGLWidget->update();
-    testTimer.start(30);
+    testTimer.start(100);
 }
 
 void
@@ -65,8 +66,8 @@ MainWindow::onTestTimerElapsed() {
 //    pGLWidget->camera.Dolly(testPos);
 //    pGLWidget->update();
 
-    rightPath += 10;
-//    leftPath += 10;
+//    rightPath -= 10;
+    leftPath += 10;
     car.Move(rightPath, leftPath);
     pGLWidget->setCarRotation(car.GetRotation());
     pGLWidget->setCarPosition(car.GetPosition());
@@ -80,15 +81,15 @@ MainWindow::~MainWindow() {
 
 void
 MainWindow::closeEvent(QCloseEvent *event) {
-    Q_UNUSED(event)
-    QMessageBox msgBox;
-    msgBox.setWindowTitle(QString("...Exiting Buggy..."));
-    msgBox.setIcon(QMessageBox::Question);
-    msgBox.setText(QString("Exiting Program..."));
-    msgBox.setInformativeText(QString("Are you Sure ?"));
-    msgBox.setStandardButtons(QMessageBox::Ok|QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Cancel);
-    if(msgBox.exec() == QDialogButtonBox::Ok) {
+//    Q_UNUSED(event)
+//    QMessageBox msgBox;
+//    msgBox.setWindowTitle(QString("...Exiting Buggy..."));
+//    msgBox.setIcon(QMessageBox::Question);
+//    msgBox.setText(QString("Exiting Program..."));
+//    msgBox.setInformativeText(QString("Are you Sure ?"));
+//    msgBox.setStandardButtons(QMessageBox::Ok|QMessageBox::Cancel);
+//    msgBox.setDefaultButton(QMessageBox::Cancel);
+//    if(msgBox.exec() == QDialogButtonBox::Ok) {
         saveSettings();
         if(pPIDControlsDialog) {
             pPIDControlsDialog->close();
@@ -97,10 +98,10 @@ MainWindow::closeEvent(QCloseEvent *event) {
         if(serialPort.isOpen())
             serialPort.close();
         event->accept();
-    }
-    else {
-        event->ignore();
-    }
+//    }
+//    else {
+//        event->ignore();
+//    }
 }
 
 
