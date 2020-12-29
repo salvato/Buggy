@@ -51,7 +51,7 @@ Car::Move(const int rightPulses, const int leftPulses) {
     transform.rotate(qRadiansToDegrees(rightAngle), QVector3D(0.0, 1.0, 0.0));
     transform.translate(-xL, 0.0, -zL);
     carPosition = transform*carPosition;
-    Position = carPosition;// += transform*QVector3D(0.0, 1.0, 0.0) - QVector3D(0.0, 1.0, 0.0);
+    Position = carPosition;//+= transform*QVector3D(0.0, 1.0, 0.0) - QVector3D(0.0, 1.0, 0.0);
     carAngle += rightAngle;
 
     // Now move only the Left Wheel
@@ -64,7 +64,7 @@ Car::Move(const int rightPulses, const int leftPulses) {
     transform.rotate(qRadiansToDegrees(-leftAngle), QVector3D(0.0, 1.0, 0.0));
     transform.translate(-xR, 0.0, -zR);
     carPosition = transform*carPosition;
-    Position = carPosition;// += transform*QVector3D(0.0, 1.0, 0.0) - QVector3D(0.0, 1.0, 0.0);
+    Position = carPosition;//+= transform*QVector3D(0.0, 0.0, 0.0);
     carAngle -= leftAngle;
     carAngle = fmod(carAngle, 2.0*M_PI);
     Rotation = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 1.0, 0.0), qRadiansToDegrees(carAngle));
@@ -73,6 +73,8 @@ Car::Move(const int rightPulses, const int leftPulses) {
              << "Angle =" << qRadiansToDegrees(carAngle)
              << "xL=" << xL
              << "zL=" << zL
+             << "xR=" << xR
+             << "zR=" << zR
              << "X:" << carPosition.x()
              << "Z:" << carPosition.z();
 }

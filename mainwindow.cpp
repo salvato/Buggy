@@ -66,8 +66,8 @@ MainWindow::onTestTimerElapsed() {
 //    pGLWidget->camera.Dolly(testPos);
 //    pGLWidget->update();
 
-//    rightPath -= 10;
-    leftPath += 10;
+    rightPath += 10;
+    leftPath  += 5;
     car.Move(rightPath, leftPath);
     pGLWidget->setCarRotation(car.GetRotation());
     pGLWidget->setCarPosition(car.GetPosition());
