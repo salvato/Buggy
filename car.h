@@ -13,13 +13,16 @@ public:
     double FromPathToAngle(const double path);
     void Move(const int rightPulses, const int leftPulses);
     void Reset(const int rightPulses, const int leftPulses);
+    void SetPosition(const QVector3D initialPosition);
+    void SetRotation(QQuaternion initialRotation);
     QVector3D GetPosition();
     QQuaternion GetRotation();
 
 private:
-    QVector3D carPosition;
     QVector3D Position;
     QQuaternion Rotation;
+    QVector3D StartingPosition;
+    QQuaternion StartingRotation;
     double wheelDiameter;
     double wheelsDistance;
     double wheelToCenterDistance;

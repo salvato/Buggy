@@ -217,7 +217,7 @@ GLWidget::paintGL() {
     viewMatrix.lookAt(camera.Eye(),
                       camera.Center(),
                       camera.Up());
-/*
+
     // Floor Model matrix
     modelMatrix.setToIdentity();
     modelMatrix.translate(1.0, 0.0, 0.0);
@@ -230,7 +230,7 @@ GLWidget::paintGL() {
     glDisable(GL_CULL_FACE); // Disable back face culling
     floorTexture->bind();
     geometries->drawFloor(&floorProgram);
-
+/*
     // Room model Matrix
     modelMatrix.setToIdentity();
     modelMatrix.scale(500.0, 500.0, 500.0);
@@ -245,7 +245,7 @@ GLWidget::paintGL() {
 */
     // Buggy Model matrix
     modelMatrix.setToIdentity();
-    modelMatrix.translate(carPosition);//+QVector3D(0.0, 1.0, 0.0));
+    modelMatrix.translate(carPosition+QVector3D(0.0, 1.0, 0.0));
     modelMatrix.rotate(carRotation);
 
     // Bind shader pipeline for use

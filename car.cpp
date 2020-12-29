@@ -13,6 +13,8 @@ Car::Car() {
     wheelsDistance        = 2.0;  // in dm
     wheelToCenterDistance = 0.5*wheelsDistance; // in dm
     pulsesPerRevolution   = 12*4*9;
+    StartingPosition      = QVector3D(0.0, 0.0, 0.0);
+    StartingRotation      = QQuaternion(0.0, QVector3D(0.0, 01.0, 0.0));
 
     Reset(0, 0);
 }
@@ -42,41 +44,40 @@ Car::Move(const int rightPulses, const int leftPulses) {
     lastLPulses = leftPulses;
 
     // Let only the Right Wheel to move
-    xL = carPosition.x() - wheelToCenterDistance * cos(carAngle);
-    zL = carPosition.z() + wheelToCenterDistance * sin(carAngle);
+    xL = Position.x() - wheelToCenterDistance * cos(carAngle);
+    zL = Position.z() + wheelToCenterDistance * sin(carAngle);
 
     transform.setToIdentity();
 
     transform.translate(xL, 0.0, zL);
     transform.rotate(qRadiansToDegrees(rightAngle), QVector3D(0.0, 1.0, 0.0));
     transform.translate(-xL, 0.0, -zL);
-    carPosition = transform*carPosition;
-    Position = carPosition;//+= transform*QVector3D(0.0, 1.0, 0.0) - QVector3D(0.0, 1.0, 0.0);
+    Position = transform*Position;
     carAngle += rightAngle;
 
     // Now move only the Left Wheel
-    xR = carPosition.x() + wheelToCenterDistance * cos(carAngle);
-    zR = carPosition.z() - wheelToCenterDistance * sin(carAngle);
+    xR = Position.x() + wheelToCenterDistance * cos(carAngle);
+    zR = Position.z() - wheelToCenterDistance * sin(carAngle);
 
     transform.setToIdentity();
 
     transform.translate(xR, 0.0, zR);
     transform.rotate(qRadiansToDegrees(-leftAngle), QVector3D(0.0, 1.0, 0.0));
     transform.translate(-xR, 0.0, -zR);
-    carPosition = transform*carPosition;
-    Position = carPosition;//+= transform*QVector3D(0.0, 0.0, 0.0);
+    Position = transform*Position;
     carAngle -= leftAngle;
     carAngle = fmod(carAngle, 2.0*M_PI);
     Rotation = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 1.0, 0.0), qRadiansToDegrees(carAngle));
-
+/*
     qDebug()
              << "Angle =" << qRadiansToDegrees(carAngle)
              << "xL=" << xL
              << "zL=" << zL
              << "xR=" << xR
              << "zR=" << zR
-             << "X:" << carPosition.x()
-             << "Z:" << carPosition.z();
+             << "X:" << Position.x()
+             << "Z:" << Position.z();
+*/
 }
 
 
@@ -85,9 +86,26 @@ Car::Reset(const int rightPulses, const int leftPulses) {
     lastRPulses = rightPulses;
     lastLPulses = leftPulses;
 
-    carPosition = QVector3D(0.0, 0.0, 0.0);
-    carAngle = 0.0;
-    Rotation = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 1.0, 0.0), qRadiansToDegrees(carAngle));
+    Position = StartingPosition;
+    QVector3D dummy;
+    float angle;
+    StartingRotation.getAxisAndAngle(&dummy, &angle);
+    carAngle = angle;
+    Rotation = StartingRotation;
+}
+
+
+void
+Car::SetPosition(const QVector3D initialPosition) {
+    StartingPosition = initialPosition;
+    Position = StartingPosition;
+}
+
+
+void
+Car::SetRotation(QQuaternion initialRotation) {
+    StartingRotation  = initialRotation;
+    Rotation = StartingRotation;
 }
 
 
