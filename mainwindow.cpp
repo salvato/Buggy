@@ -83,15 +83,15 @@ MainWindow::~MainWindow() {
 
 void
 MainWindow::closeEvent(QCloseEvent *event) {
-//    Q_UNUSED(event)
-//    QMessageBox msgBox;
-//    msgBox.setWindowTitle(QString("...Exiting Buggy..."));
-//    msgBox.setIcon(QMessageBox::Question);
-//    msgBox.setText(QString("Exiting Program..."));
-//    msgBox.setInformativeText(QString("Are you Sure ?"));
-//    msgBox.setStandardButtons(QMessageBox::Ok|QMessageBox::Cancel);
-//    msgBox.setDefaultButton(QMessageBox::Cancel);
-//    if(msgBox.exec() == QDialogButtonBox::Ok) {
+    Q_UNUSED(event)
+    QMessageBox msgBox;
+    msgBox.setWindowTitle(QString("...Exiting Buggy..."));
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setText(QString("Exiting Program..."));
+    msgBox.setInformativeText(QString("Are you Sure ?"));
+    msgBox.setStandardButtons(QMessageBox::Ok|QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    if(msgBox.exec() == QDialogButtonBox::Ok) {
         saveSettings();
         if(pPIDControlsDialog) {
             pPIDControlsDialog->close();
@@ -100,10 +100,10 @@ MainWindow::closeEvent(QCloseEvent *event) {
         if(serialPort.isOpen())
             serialPort.close();
         event->accept();
-//    }
-//    else {
-//        event->ignore();
-//    }
+    }
+    else {
+        event->ignore();
+    }
 }
 
 
