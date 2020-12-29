@@ -47,9 +47,11 @@ MainWindow::MainWindow(QWidget *parent)
     disableUI();
     pStatusBar->showMessage(QString("Wait: Connecting to Buggy..."));
     connectionTimer.start(500);
-    car.Reset(rightPath, leftPath);
-    pGLWidget->update();
-    testTimer.start(100);
+//    car.SetPosition(QVector3D(3.0, 0.0, -1.5));
+//    car.SetAngle(5.0);
+//    car.Reset(rightPath, leftPath);
+//    pGLWidget->update();
+//    testTimer.start(100);
 }
 
 void
@@ -66,8 +68,8 @@ MainWindow::onTestTimerElapsed() {
 //    pGLWidget->camera.Dolly(testPos);
 //    pGLWidget->update();
 
-    rightPath += 10;
-    leftPath  += 8;
+    rightPath += 100;
+    leftPath  += 80;
     car.Move(rightPath, leftPath);
     pGLWidget->setCarRotation(car.GetRotation());
     pGLWidget->setCarPosition(car.GetPosition());

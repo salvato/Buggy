@@ -215,7 +215,8 @@ GLWidget::paintGL() {
     // Camera matrix
     viewMatrix.setToIdentity();
     viewMatrix.lookAt(camera.Eye(),
-                      camera.Center(),
+                      //camera.Center(),
+                      carPosition,
                       camera.Up());
 
     // Floor Model matrix

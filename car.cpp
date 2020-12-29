@@ -14,8 +14,7 @@ Car::Car() {
     wheelToCenterDistance = 0.5*wheelsDistance; // in dm
     pulsesPerRevolution   = 12*4*9;
     StartingPosition      = QVector3D(0.0, 0.0, 0.0);
-    StartingRotation      = QQuaternion(0.0, QVector3D(0.0, 01.0, 0.0));
-
+    startingAngle         = 0.0;
     Reset(0, 0);
 }
 
@@ -67,7 +66,6 @@ Car::Move(const int rightPulses, const int leftPulses) {
     Position = transform*Position;
     carAngle -= leftAngle;
     carAngle = fmod(carAngle, 2.0*M_PI);
-    Rotation = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 1.0, 0.0), qRadiansToDegrees(carAngle));
 /*
     qDebug()
              << "Angle =" << qRadiansToDegrees(carAngle)
@@ -87,11 +85,7 @@ Car::Reset(const int rightPulses, const int leftPulses) {
     lastLPulses = leftPulses;
 
     Position = StartingPosition;
-    QVector3D dummy;
-    float angle;
-    StartingRotation.getAxisAndAngle(&dummy, &angle);
-    carAngle = angle;
-    Rotation = StartingRotation;
+    carAngle = startingAngle;
 }
 
 
@@ -103,9 +97,9 @@ Car::SetPosition(const QVector3D initialPosition) {
 
 
 void
-Car::SetRotation(QQuaternion initialRotation) {
-    StartingRotation  = initialRotation;
-    Rotation = StartingRotation;
+Car::SetAngle(const double degrees) {
+    carAngle = qDegreesToRadians(degrees);
+    startingAngle = carAngle;
 }
 
 
@@ -116,5 +110,5 @@ QVector3D Car::GetPosition() {
 
 QQuaternion
 Car::GetRotation() {
-    return Rotation;
+    return QQuaternion::fromAxisAndAngle(QVector3D(0.0, 1.0, 0.0), qRadiansToDegrees(carAngle));
 }
