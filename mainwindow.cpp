@@ -20,7 +20,7 @@ QVector3D testPos = QVector3D(0.0, 0.0, 0.0);
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
-    , pGLWidget(nullptr)
+    , pRoomWidget(nullptr)
     , pLeftPlot(nullptr)
     , pRightPlot(nullptr)
     , pPIDControlsDialog(nullptr)
@@ -71,9 +71,9 @@ MainWindow::onTestTimerElapsed() {
     rightPath += 100;
     leftPath  += 80;
     car.Move(rightPath, leftPath);
-    pGLWidget->setCarRotation(car.GetRotation());
-    pGLWidget->setCarPosition(car.GetPosition());
-    pGLWidget->update();
+    pRoomWidget->setCarRotation(car.GetRotation());
+    pRoomWidget->setCarPosition(car.GetPosition());
+    pRoomWidget->update();
 }
 
 
@@ -222,7 +222,7 @@ MainWindow::initPlots() {
 
 void
 MainWindow::initLayout() {
-    pGLWidget = new GLWidget(this);
+    pRoomWidget = new GLWidget(this);
 
     initPlots();
     QVBoxLayout* pPlotLayout = new QVBoxLayout();
@@ -230,7 +230,7 @@ MainWindow::initLayout() {
     pPlotLayout->addWidget(pRightPlot);
 
     QHBoxLayout *firstRow = new QHBoxLayout;
-    firstRow->addWidget(pGLWidget);
+    firstRow->addWidget(pRoomWidget);
     firstRow->addLayout(pPlotLayout);
 
     createButtons();
@@ -385,14 +385,14 @@ MainWindow::processData(QString sData) {
     if(bUpdateMotors) {
         pLeftPlot->UpdatePlot();
         pRightPlot->UpdatePlot();
-        pGLWidget->setCarRotation(car.GetRotation()*quat1);
-        pGLWidget->setCarPosition(car.GetPosition());
-        pGLWidget->update();
+        pRoomWidget->setCarRotation(car.GetRotation()*quat1);
+        pRoomWidget->setCarPosition(car.GetPosition());
+        pRoomWidget->update();
     }
     else if(bUpdateWidget) {
-        pGLWidget->setCarRotation(car.GetRotation()*quat1);
-        pGLWidget->setCarPosition(car.GetPosition());
-        pGLWidget->update();
+        pRoomWidget->setCarRotation(car.GetRotation()*quat1);
+        pRoomWidget->setCarPosition(car.GetPosition());
+        pRoomWidget->update();
     }
     if(bUpdateObstacleDistance) {
         pEditObstacleDistance->setText(QString("%1").arg(obstacleDistance));
@@ -508,8 +508,8 @@ MainWindow::onPIDControlsPushed() {
 
 void
 MainWindow::onResetCameraPushed() {
-    pGLWidget->camera.Set(eyePos, centerPos, upVector);
-    pGLWidget->update();
+    pRoomWidget->camera.Set(eyePos, centerPos, upVector);
+    pRoomWidget->update();
 }
 
 

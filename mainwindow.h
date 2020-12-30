@@ -71,7 +71,7 @@ private slots:
     void onTestTimerElapsed();
 
 private:
-    GLWidget*        pGLWidget;
+    GLWidget*        pRoomWidget;
     Plot2D*          pLeftPlot;
     Plot2D*          pRightPlot;
     QPushButton*     pButtonConnect;
