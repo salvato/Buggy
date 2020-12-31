@@ -61,10 +61,8 @@ RoomWidget::RoomWidget(QWidget *parent)
     : QOpenGLWidget(parent)
     , QOpenGLFunctions()
     , geometries(nullptr)
-    , cubeTexture(nullptr)
     , zNear(0.1)
     , zFar(1300.0)
-    , carPosition(QVector3D(0.0, 0.0, 0.0))
 {
     QVector3D eyePos    = QVector3D(0.0, 30.0, -30.0);
     QVector3D centerPos = QVector3D(0.0,  0.0,   0.0);
@@ -80,7 +78,6 @@ RoomWidget::RoomWidget(QWidget *parent)
 
 RoomWidget::~RoomWidget() {
     makeCurrent();
-    delete cubeTexture;
     delete geometries;
     doneCurrent();
 }
@@ -100,25 +97,30 @@ RoomWidget::sizeHint() const {
 
 void
 RoomWidget::setCarPosition(double x, double y, double z) {
-    carPosition = QVector3D(x, y, z);
+    Q_UNUSED(x)
+    Q_UNUSED(y)
+    Q_UNUSED(z)
 }
 
 
 void
 RoomWidget::setCarPosition(QVector3D position) {
-    carPosition = position;
+    Q_UNUSED(position)
 }
 
 
 void
 RoomWidget::setCarRotation(float q0, float q1, float q2, float q3) {
-    carRotation = QQuaternion(q0, q1, q2, q3);
+    Q_UNUSED(q0)
+    Q_UNUSED(q1)
+    Q_UNUSED(q2)
+    Q_UNUSED(q3)
 }
 
 
 void
 RoomWidget::setCarRotation(QQuaternion newRotation) {
-    carRotation = newRotation;
+    Q_UNUSED(newRotation)
 }
 
 
@@ -136,14 +138,7 @@ RoomWidget::initializeGL() {
 
 void
 RoomWidget::initShaders() {
-    bool bResult;
-    bResult  = buggyProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/buggy.vert");
-    bResult &= buggyProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/buggy.frag");
-    bResult &= buggyProgram.link();
-
-    bResult &= cubeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/cube.vert");
-    bResult &= cubeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/cube.frag");
-    bResult &= cubeProgram.link();
+    bool bResult = true;
 
     bResult &= floorProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/floor.vert");
     bResult &= floorProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/floor.frag");
@@ -166,12 +161,6 @@ RoomWidget::initShaders() {
 
 void
 RoomWidget::initTextures() {
-    const QImage cubeImage = QImage(":/cube.png").mirrored();
-    cubeTexture = new QOpenGLTexture(cubeImage);
-    cubeTexture->setMinificationFilter(QOpenGLTexture::Nearest);
-    cubeTexture->setMagnificationFilter(QOpenGLTexture::Linear);
-    cubeTexture->setWrapMode(QOpenGLTexture::Repeat);
-
     const QImage floorImage = QImage(":/Pavimento.jpg").mirrored();
     floorTexture = new QOpenGLTexture(floorImage);
     floorTexture->setMinificationFilter(QOpenGLTexture::Nearest);
@@ -215,12 +204,11 @@ RoomWidget::resizeGL(int w, int h) {
 void
 RoomWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     // Camera matrix
     viewMatrix.setToIdentity();
     viewMatrix.lookAt(camera.Eye(),
                       //camera.Center(),
-                      carPosition,
+                      pCar->GetPosition(),
                       camera.Up());
     // Floor
     modelMatrix.setToIdentity();
@@ -232,19 +220,8 @@ RoomWidget::paintGL() {
     glDisable(GL_CULL_FACE); // Disable back face culling
     floorTexture->bind();
     geometries->drawFloor(&floorProgram);
-
     // Buggy
-    modelMatrix.setToIdentity();
-    modelMatrix.translate(carPosition+QVector3D(0.0, 1.0, 0.0));
-    modelMatrix.rotate(carRotation);
-    // Bind shader pipeline for use
-    cubeProgram.bind();
-    cubeProgram.setUniformValue("mvp_matrix", projectionMatrix*viewMatrix*modelMatrix);
-    glEnable(GL_CULL_FACE); // Enable back face culling
-    cubeTexture->bind();
-    pCar->draw(&cubeProgram);
-//    geometries->drawCube(&cubeProgram);
-//    geometries->drawBuggy(&buggyProgram);
+    pCar->draw(projectionMatrix, viewMatrix);
 
 /*
     // Room

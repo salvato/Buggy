@@ -109,12 +109,9 @@ private:
 private:
     GeometryEngine*      geometries;
 
-    QOpenGLTexture*      cubeTexture;
     GLuint               roomTexture;
     QOpenGLTexture*      floorTexture;
 
-    QOpenGLShaderProgram buggyProgram;
-    QOpenGLShaderProgram cubeProgram;
     QOpenGLShaderProgram roomProgram;
     QOpenGLShaderProgram floorProgram;
     QOpenGLShaderProgram modelProgram;
@@ -128,7 +125,7 @@ private:
     const qreal          zNear;
     const qreal          zFar;
 
-    QQuaternion          carRotation;
-    QVector3D            carPosition;
-    int                  distExp;
+//    QQuaternion          carRotation;
+//    QVector3D            carPosition;
+//    int                  distExp;
 };

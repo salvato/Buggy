@@ -26,9 +26,13 @@ public:
     void        SetAngle(const double degrees);
     QVector3D   GetPosition();
     QQuaternion GetRotation();
+    void        draw(const QMatrix4x4 projectionMatrix, const QMatrix4x4 viewMatrix);
+
+protected:
     bool        loadObj();
     void        initGeometry();
-    void        draw(QOpenGLShaderProgram *program);
+    void        initTextures();
+    void        initShaders();
 
 private:
     Model*      pModel;
@@ -46,12 +50,17 @@ private:
     int         pulsesPerRevolution;
     double      xL, zL, xR, zR;
 
+    QOpenGLShaderProgram buggyProgram;
+    QOpenGLShaderProgram cubeProgram;
+
     GLuint cubeVertexBuf;
     GLuint cubeIndexBuf;
     GLuint floorVertexBuf;
     GLuint buggyVertexBuf;
     GLuint buggyUvBuf;
     GLuint buggyNormalBuf;
+    GLuint cubeTexture;
+
 
 
     struct

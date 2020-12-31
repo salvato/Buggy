@@ -15,6 +15,7 @@
 #include <QSlider>
 #include <QMessageBox>
 #include <QThread>
+#include <QtMath>
 
 
 double testAngle = 0.0;
@@ -51,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent)
     disableUI();
     pStatusBar->showMessage(QString("Wait: Connecting to Buggy..."));
     connectionTimer.start(500);
+
 //    car.SetPosition(QVector3D(3.0, 0.0, -1.5));
 //    car.SetAngle(5.0);
 //    car.Reset(rightPath, leftPath);
@@ -334,10 +336,6 @@ MainWindow::processData(QString sData) {
 
 //            quat1 = QQuaternion(q0, q1, q2, q3)*quat0;
             quat1 = QQuaternion();
-//            pEditObstacleDistance->setText(QString("%1 %2 %3")
-//                                           .arg(newX, 8)
-//                                           .arg(newY, 8)
-//                                           .arg(newZ, 8));
             bUpdateWidget = true;
         }
         else if(sHeader == "M" && nTokens > 4) {
@@ -388,13 +386,9 @@ MainWindow::processData(QString sData) {
     if(bUpdateMotors) {
         pLeftPlot->UpdatePlot();
         pRightPlot->UpdatePlot();
-//        pRoomWidget->setCarRotation(pCar->GetRotation()*quat1);
-//        pRoomWidget->setCarPosition(pCar->GetPosition());
         pRoomWidget->update();
     }
     else if(bUpdateWidget) {
-//        pRoomWidget->setCarRotation(pCar->GetRotation()*quat1);
-//        pRoomWidget->setCarPosition(pCar->GetPosition());
         pRoomWidget->update();
     }
     if(bUpdateObstacleDistance) {
@@ -475,9 +469,13 @@ MainWindow::onSteadyTimeElapsed() {
 void
 MainWindow::onStartStopPushed() {
     if(pButtonStartStop->text() == QString("Start")) {
-        quat0 = QQuaternion(q0, q1, q2, q3).conjugated();
+        quat0 = QQuaternion(q0, q1, q2, q3);//.conjugated();
         t0 = dTime;
+        float alfa;
+        QVector3D axis;
+        quat0.getAxisAndAngle(&axis, &alfa);
         pRoomWidget->pCar->Reset(rightPath, leftPath);
+        pRoomWidget->pCar->SetAngle(alfa);
         pLeftPlot->ClearDataSet(1);
         pLeftPlot->ClearDataSet(2);
         pLeftPlot->ClearDataSet(3);

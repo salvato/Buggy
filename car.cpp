@@ -19,6 +19,7 @@ Car::Car()
     pModel = new Model(sObjPath);
 
     initGeometry();
+    initShaders();
 
     wheelDiameter         = 0.69; // in dm
     wheelsDistance        = 2.0;  // in dm
@@ -27,6 +28,17 @@ Car::Car()
     StartingPosition      = QVector3D(0.0, 0.0, 0.0);
     startingAngle         = 0.0;
     Reset(0, 0);
+}
+
+
+Car::~Car() {
+    glDeleteBuffers(1, &cubeVertexBuf);
+    glDeleteBuffers(1, &cubeIndexBuf);
+    glDeleteBuffers(1, &floorVertexBuf);
+    glDeleteBuffers(1, &buggyVertexBuf);
+    glDeleteBuffers(1, &buggyUvBuf);
+    glDeleteBuffers(1, &buggyNormalBuf);
+    glDeleteBuffers(1, &cubeTexture);
 }
 
 
@@ -108,16 +120,47 @@ Car::initGeometry() {
     glBufferData(GL_ARRAY_BUFFER, 24*sizeof(VertexData), vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIndexBuf);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, 34*sizeof(GLushort), indices, GL_STATIC_DRAW);
+    initTextures();
 }
 
 
-Car::~Car() {
-    glDeleteBuffers(1, &cubeVertexBuf);
-    glDeleteBuffers(1, &cubeIndexBuf);
-    glDeleteBuffers(1, &floorVertexBuf);
-    glDeleteBuffers(1, &buggyVertexBuf);
-    glDeleteBuffers(1, &buggyUvBuf);
-    glDeleteBuffers(1, &buggyNormalBuf);
+void
+Car::initTextures() {
+    const QImage cubeImage = QImage(":/cube.png").mirrored();
+    glGenTextures(1, &cubeTexture);
+    glBindTexture(GL_TEXTURE_2D, cubeTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D,
+                 0,
+                 GL_RGBA,
+                 cubeImage.width(),
+                 cubeImage.height(),
+                 0,
+                 GL_RGBA,
+                 GL_UNSIGNED_BYTE,
+                 (void*)cubeImage.bits()
+                );
+    glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+
+void
+Car::initShaders() {
+    bool bResult;
+    bResult  = buggyProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/buggy.vert");
+    bResult &= buggyProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/buggy.frag");
+    bResult &= buggyProgram.link();
+
+    bResult &= cubeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/cube.vert");
+    bResult &= cubeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/cube.frag");
+    bResult &= cubeProgram.link();
+    if(!bResult) {
+        perror("Unble to init Car Shaders()...exiting");
+        exit(EXIT_FAILURE);
+    }
 }
 
 
@@ -244,7 +287,17 @@ Car::loadObj() {
 
 
 void
-Car::draw(QOpenGLShaderProgram *program) {
+Car::draw(const QMatrix4x4 projectionMatrix, const QMatrix4x4 viewMatrix) {
+    QMatrix4x4 modelMatrix;
+    modelMatrix.setToIdentity();
+    modelMatrix.translate(Position+QVector3D(0.0, 1.0, 0.0));
+    modelMatrix.rotate(QQuaternion::fromAxisAndAngle(QVector3D(0.0, 1.0, 0.0), qRadiansToDegrees(carAngle)));
+    cubeProgram.bind();
+    cubeProgram.setUniformValue("projection_matrix", projectionMatrix);
+    cubeProgram.setUniformValue("view_matrix", viewMatrix);
+    cubeProgram.setUniformValue("model_matrix", modelMatrix);
+    glEnable(GL_CULL_FACE); // Enable back face culling
+
 /*
     glBindBuffer(GL_ARRAY_BUFFER, buggyVertexBuf);
     int vertexLocation = program->attributeLocation("qt_Vertex");
@@ -268,22 +321,20 @@ Car::draw(QOpenGLShaderProgram *program) {
     pModel->Draw(program);
 */
 
-    // Tell OpenGL which VBOs to use
-    glBindBuffer(GL_ARRAY_BUFFER, cubeVertexBuf);
+    glBindTexture(GL_TEXTURE_2D, cubeTexture);
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVertexBuf); // Tell OpenGL which VBOs to use
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIndexBuf);
-    // Offset for position
-    quintptr offset = 0;
-    // Tell OpenGL programmable pipeline how to locate vertex position data
-    int vertexLocation = program->attributeLocation("a_position");
-    program->enableAttributeArray(vertexLocation);
-    program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
-    // Offset for texture coordinate
-    offset += sizeof(QVector3D);
-    // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
-    int texcoordLocation = program->attributeLocation("a_texcoord");
-    program->enableAttributeArray(texcoordLocation);
-    program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
-    // Draw cube using indices from VBO 1
+
+    quintptr offset = 0; // Offset for position
+    int vertexLocation = cubeProgram.attributeLocation("vertexPosition");
+    cubeProgram.enableAttributeArray(vertexLocation);
+    cubeProgram.setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+
+    offset += sizeof(QVector3D); // Offset for texture coordinate
+    int texcoordLocation = cubeProgram.attributeLocation("textureCoord");
+    cubeProgram.enableAttributeArray(texcoordLocation);
+    cubeProgram.setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
+
     glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_SHORT, 0);
 }
 
@@ -312,7 +363,7 @@ Car::Move(const int rightPulses, const int leftPulses) {
     lastRPulses = rightPulses;
     lastLPulses = leftPulses;
 
-    // Let only the Right Wheel to move
+    // First Let Only the Right Wheel to Move
     xL = Position.x() - wheelToCenterDistance * cos(carAngle);
     zL = Position.z() + wheelToCenterDistance * sin(carAngle);
 
@@ -324,7 +375,7 @@ Car::Move(const int rightPulses, const int leftPulses) {
     Position = transform*Position;
     carAngle += rightAngle;
 
-    // Now move only the Left Wheel
+    // Then Move only the Left Wheel
     xR = Position.x() + wheelToCenterDistance * cos(carAngle);
     zR = Position.z() - wheelToCenterDistance * sin(carAngle);
 
