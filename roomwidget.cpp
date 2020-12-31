@@ -48,24 +48,24 @@
 **
 ****************************************************************************/
 
-#include "GLwidget.h"
+#include <roomwidget.h>
+#include <car.h>
 #include <QMouseEvent>
 #include <math.h>
 
 
-GLWidget::GLWidget(QWidget *parent)
+QT_FORWARD_DECLARE_CLASS(Car)
+
+
+RoomWidget::RoomWidget(QWidget *parent)
     : QOpenGLWidget(parent)
+    , QOpenGLFunctions()
     , geometries(nullptr)
     , cubeTexture(nullptr)
     , zNear(0.1)
     , zFar(1300.0)
     , carPosition(QVector3D(0.0, 0.0, 0.0))
-{ 
-    m_trackBalls[0] = TrackBall(0.05f,  QVector3D(0, 1, 0), TrackBall::Sphere);
-    m_trackBalls[1] = TrackBall(0.005f, QVector3D(0, 0, 1), TrackBall::Sphere);
-    m_trackBalls[2] = TrackBall(0.0f,   QVector3D(0, 1, 0), TrackBall::Plane);
-    distExp = 600;
-
+{
     QVector3D eyePos    = QVector3D(0.0, 30.0, -30.0);
     QVector3D centerPos = QVector3D(0.0,  0.0,   0.0);
     QVector3D upVector  = QVector3D(0.0,  1.0,   0.0);
@@ -74,10 +74,11 @@ GLWidget::GLWidget(QWidget *parent)
     camera.FieldOfView(60.0);
     camera.MouseMode(CGrCamera::PITCHYAW);
     camera.Gravity(false);
+
 }
 
 
-GLWidget::~GLWidget() {
+RoomWidget::~RoomWidget() {
     makeCurrent();
     delete cubeTexture;
     delete geometries;
@@ -86,54 +87,55 @@ GLWidget::~GLWidget() {
 
 
 QSize
-GLWidget::minimumSizeHint() const {
+RoomWidget::minimumSizeHint() const {
     return QSize(300, 300);
 }
 
 
 QSize
-GLWidget::sizeHint() const {
+RoomWidget::sizeHint() const {
     return QSize(800, 800);
 }
 
 
 void
-GLWidget::setCarPosition(double x, double y, double z) {
+RoomWidget::setCarPosition(double x, double y, double z) {
     carPosition = QVector3D(x, y, z);
 }
 
 
 void
-GLWidget::setCarPosition(QVector3D position) {
+RoomWidget::setCarPosition(QVector3D position) {
     carPosition = position;
 }
 
 
 void
-GLWidget::setCarRotation(float q0, float q1, float q2, float q3) {
+RoomWidget::setCarRotation(float q0, float q1, float q2, float q3) {
     carRotation = QQuaternion(q0, q1, q2, q3);
 }
 
 
 void
-GLWidget::setCarRotation(QQuaternion newRotation) {
+RoomWidget::setCarRotation(QQuaternion newRotation) {
     carRotation = newRotation;
 }
 
 
 void
-GLWidget::initializeGL() {
+RoomWidget::initializeGL() {
     initializeOpenGLFunctions();
     glClearColor(0.1, 0.1, 0.3, 1);
     initShaders();
     initTextures();
     glEnable(GL_DEPTH_TEST); // Enable depth buffer
+    pCar = new Car();
     geometries = new GeometryEngine;
 }
 
 
 void
-GLWidget::initShaders() {
+RoomWidget::initShaders() {
     bool bResult;
     bResult  = buggyProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/buggy.vert");
     bResult &= buggyProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/buggy.frag");
@@ -163,7 +165,7 @@ GLWidget::initShaders() {
 
 
 void
-GLWidget::initTextures() {
+RoomWidget::initTextures() {
     const QImage cubeImage = QImage(":/cube.png").mirrored();
     cubeTexture = new QOpenGLTexture(cubeImage);
     cubeTexture->setMinificationFilter(QOpenGLTexture::Nearest);
@@ -201,15 +203,17 @@ GLWidget::initTextures() {
 
 
 void
-GLWidget::resizeGL(int w, int h) {
+RoomWidget::resizeGL(int w, int h) {
     aspect = qreal(w) / qreal(h ? h : 1);
     projectionMatrix.setToIdentity();
     projectionMatrix.perspective(camera.GetFieldOfView(), aspect, zNear, zFar);
+    orthoMatrix.setToIdentity();
+    orthoMatrix.ortho(0, w, 0, h, zNear, zFar);
 }
 
 
 void
-GLWidget::paintGL() {
+RoomWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Camera matrix
@@ -218,21 +222,32 @@ GLWidget::paintGL() {
                       //camera.Center(),
                       carPosition,
                       camera.Up());
-
-    // Floor Model matrix
+    // Floor
     modelMatrix.setToIdentity();
     modelMatrix.translate(1.0, 0.0, 0.0);
     modelMatrix.scale(10.0, 1.0, 10.0);
-
     // Bind shader pipeline for use
     floorProgram.bind();
     floorProgram.setUniformValue("mvp_matrix", projectionMatrix*viewMatrix*modelMatrix);
-
     glDisable(GL_CULL_FACE); // Disable back face culling
     floorTexture->bind();
     geometries->drawFloor(&floorProgram);
+
+    // Buggy
+    modelMatrix.setToIdentity();
+    modelMatrix.translate(carPosition+QVector3D(0.0, 1.0, 0.0));
+    modelMatrix.rotate(carRotation);
+    // Bind shader pipeline for use
+    cubeProgram.bind();
+    cubeProgram.setUniformValue("mvp_matrix", projectionMatrix*viewMatrix*modelMatrix);
+    glEnable(GL_CULL_FACE); // Enable back face culling
+    cubeTexture->bind();
+    pCar->draw(&cubeProgram);
+//    geometries->drawCube(&cubeProgram);
+//    geometries->drawBuggy(&buggyProgram);
+
 /*
-    // Room model Matrix
+    // Room
     modelMatrix.setToIdentity();
     modelMatrix.scale(500.0, 500.0, 500.0);
     modelMatrix.translate(0.0, 0.0, 0.0);
@@ -244,32 +259,18 @@ GLWidget::paintGL() {
     glBindTexture(GL_TEXTURE_CUBE_MAP, roomTexture);
 //    geometries->drawRoom(&roomProgram);
 */
-    // Buggy Model matrix
-    modelMatrix.setToIdentity();
-    modelMatrix.translate(carPosition+QVector3D(0.0, 1.0, 0.0));
-    modelMatrix.rotate(carRotation);
-
-    // Bind shader pipeline for use
-    cubeProgram.bind();
-    cubeProgram.setUniformValue("mvp_matrix", projectionMatrix*viewMatrix*modelMatrix);
-
-    glEnable(GL_CULL_FACE); // Enable back face culling
-    cubeTexture->bind();
-    geometries->drawCube(&cubeProgram);
-
-//    geometries->drawBuggy(&buggyProgram);
 }
 
 
 QPointF
-GLWidget::pixelPosToViewPos(const QPointF& p) {
+RoomWidget::pixelPosToViewPos(const QPointF& p) {
     return QPointF(2.0*float(p.x())/width()-1.0,
                    1.0-2.0*float(p.y())/height());
 }
 
 
 void
-GLWidget::mousePressEvent(QMouseEvent *event) {
+RoomWidget::mousePressEvent(QMouseEvent *event) {
     if(event->buttons() & Qt::RightButton) {
         camera.MouseDown(event->x(), event->y());
         camera.MouseMode(CGrCamera::ROLLMOVE);
@@ -279,37 +280,13 @@ GLWidget::mousePressEvent(QMouseEvent *event) {
         camera.MouseDown(event->x(), event->y());
         event->accept();
     }
-/*
-    if(event->buttons() & Qt::LeftButton) {
-        m_trackBalls[0].move(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
-        event->accept();
-    }
-    else {
-        m_trackBalls[0].release(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
-    }
 
-    if(event->buttons() & Qt::RightButton) {
-        m_trackBalls[1].move(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
-        event->accept();
-    }
-    else {
-        m_trackBalls[1].release(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
-    }
-
-    if(event->buttons() & Qt::MiddleButton) {
-        m_trackBalls[2].move(pixelPosToViewPos(event->pos()), QQuaternion());
-        event->accept();
-    }
-    else {
-        m_trackBalls[2].release(pixelPosToViewPos(event->pos()), QQuaternion());
-    }
-*/
     update();
 }
 
 
 void
-GLWidget::mouseReleaseEvent(QMouseEvent *event) {
+RoomWidget::mouseReleaseEvent(QMouseEvent *event) {
     if(event->button() & Qt::RightButton) {
         camera.MouseMode(CGrCamera::PITCHYAW);
         event->accept();
@@ -318,28 +295,13 @@ GLWidget::mouseReleaseEvent(QMouseEvent *event) {
         camera.MouseMode(CGrCamera::PITCHYAW);
         event->accept();
     }
-/*
-    if(event->button() == Qt::LeftButton) {
-        m_trackBalls[0].release(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
-        event->accept();
-    }
 
-    if(event->button() == Qt::RightButton) {
-        m_trackBalls[1].release(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
-        event->accept();
-    }
-
-    if(event->button() == Qt::MiddleButton) {
-        m_trackBalls[2].release(pixelPosToViewPos(event->pos()), QQuaternion());
-        event->accept();
-    }
-*/
     update();
 }
 
 
 void
-GLWidget::mouseMoveEvent(QMouseEvent *event) {
+RoomWidget::mouseMoveEvent(QMouseEvent *event) {
     if(event->buttons() & Qt::LeftButton) {
         camera.MouseMove(event->x(), event->y());
         event->accept();
@@ -348,56 +310,22 @@ GLWidget::mouseMoveEvent(QMouseEvent *event) {
         camera.MouseMove(event->x(), event->y());
         event->accept();
     }
-/*
-    if(event->buttons() & Qt::LeftButton) {
-        m_trackBalls[0].move(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
-        event->accept();
-    }
-    else {
-        m_trackBalls[0].release(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
-    }
 
-    if(event->buttons() & Qt::RightButton) {
-        m_trackBalls[1].move(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
-        event->accept();
-    }
-    else {
-        m_trackBalls[1].release(pixelPosToViewPos(event->pos()), m_trackBalls[2].rotation().conjugated());
-    }
-
-    if(event->buttons() & Qt::MiddleButton) {
-        m_trackBalls[2].move(pixelPosToViewPos(event->pos()), QQuaternion());
-        event->accept();
-    }
-    else {
-        m_trackBalls[2].release(pixelPosToViewPos(event->pos()), QQuaternion());
-    }
-*/
     update();
 }
 
 
 void
-GLWidget::wheelEvent(QWheelEvent* event) {
+RoomWidget::wheelEvent(QWheelEvent* event) {
     QPoint numDegrees = event->angleDelta();
     if(!numDegrees.isNull()) {
         camera.MouseDown(0, 0);
         camera.MouseMode(CGrCamera::ROLLMOVE);
         camera.MouseMove(0, -numDegrees.y());
         camera.MouseMode(CGrCamera::PITCHYAW);
-//        QVector3D oldCenter = QVector3D(camera.Center()[0], camera.Center()[1], camera.Center()[2]);
-//        //oldCenter.setX(oldCenter.x()+numDegrees.ry()/10.0);
-//        oldCenter.setZ(oldCenter.z()+numDegrees.ry()/10.0);
-//        camera.SetCenter(oldCenter);
+
         event->accept();
     }
-/*
-    distExp += event->angleDelta().x();
-    if (distExp < -8 * 120)
-        distExp = -8 * 120;
-    if (distExp > 10 * 120)
-        distExp = 10 * 120;
-    event->accept();
-*/
+
     update();
 }

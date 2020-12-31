@@ -52,31 +52,33 @@
 
 #include "geometryengine.h"
 #include "GrCamera.h"
-#include "trackball.h"
+#include <model.h>
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLBuffer>
+#include <QOpenGLTexture>
+
 #include <QMatrix4x4>
 #include <QQuaternion>
 #include <QVector2D>
 #include <QBasicTimer>
-#include <QOpenGLShaderProgram>
-#include <QOpenGLTexture>
 
 
-QT_FORWARD_DECLARE_CLASS(GeometryEngine)
+QT_FORWARD_DECLARE_CLASS(Car)
 
 
 class
-GLWidget
+RoomWidget
     : public QOpenGLWidget
     , protected QOpenGLFunctions
 {
     Q_OBJECT
 
 public:
-    explicit GLWidget(QWidget *parent = nullptr);
-    ~GLWidget() override;
+    explicit RoomWidget(QWidget *parent = nullptr);
+    ~RoomWidget() override;
     void setCarRotation(float q0, float q1, float q2, float q3);
     void setCarRotation(QQuaternion newRotation);
     void setCarPosition(double x, double y, double z);
@@ -84,6 +86,7 @@ public:
 
 public:
     CGrCamera camera;
+    Car*      pCar;
 
 protected:
     void initializeGL() override;
@@ -105,7 +108,6 @@ private:
 
 private:
     GeometryEngine*      geometries;
-    TrackBall            m_trackBalls[3];
 
     QOpenGLTexture*      cubeTexture;
     GLuint               roomTexture;
@@ -118,6 +120,7 @@ private:
     QOpenGLShaderProgram modelProgram;
 
     QMatrix4x4           projectionMatrix;
+    QMatrix4x4           orthoMatrix;
     QMatrix4x4           viewMatrix;
     QMatrix4x4           modelMatrix;
 

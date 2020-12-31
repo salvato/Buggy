@@ -36,12 +36,13 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 CONFIG += c++11
 
 SOURCES += main.cpp \
-    car.cpp
+    car.cpp \
+    dashboardwidget.cpp
 SOURCES += GrCamera.cpp
 SOURCES += mesh.cpp
 SOURCES += model.cpp
 SOURCES += skyboxwidget.cpp
-SOURCES += trackball.cpp
+SOURCES +=
 SOURCES += controlsdialog.cpp
 SOURCES += axesdialog.cpp
 SOURCES += AxisFrame.cpp
@@ -49,22 +50,25 @@ SOURCES += AxisLimits.cpp
 SOURCES += DataSetProperties.cpp
 SOURCES += datastream2d.cpp
 SOURCES += geometryengine.cpp
-SOURCES += GLwidget.cpp
+SOURCES += \
+    roomwidget.cpp
 SOURCES += plot2d.cpp
 SOURCES += plotpropertiesdlg.cpp
 SOURCES += mainwindow.cpp
 
 
 HEADERS += mainwindow.h \
-    car.h
+    car.h \
+    dashboardwidget.h
 HEADERS += GrCamera.h
 HEADERS += mesh.h
 HEADERS += model.h
 HEADERS += skyboxwidget.h
-HEADERS += trackball.h
+HEADERS +=
 HEADERS += controlsdialog.h
 HEADERS += geometryengine.h
-HEADERS += GLwidget.h
+HEADERS += \
+    roomwidget.h
 HEADERS += axesdialog.h
 HEADERS += AxisFrame.h
 HEADERS += AxisLimits.h

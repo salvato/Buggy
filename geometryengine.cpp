@@ -82,6 +82,7 @@ GeometryEngine::GeometryEngine()
 //        qDebug() << "Car3.obj Correctly loaded";
 //        initBuggyGeometry();
 //    }
+
     initCubeGeometry();
     initFloorGeometry();
 }
@@ -385,15 +386,16 @@ GeometryEngine::drawFloor(QOpenGLShaderProgram *program) {
     // Tell OpenGL programmable pipeline how to locate vertex position data
     int vertexLocation = program->attributeLocation("a_position");
     program->enableAttributeArray(vertexLocation);
-    program->setAttributeBuffer("a_position", GL_FLOAT, 0, 3, sizeof(VertexData));
+    program->setAttributeBuffer("a_position", GL_FLOAT, 0, 3, sizeof(float));
     program->bind();
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, floorVertexBuf);
-    glVertexAttribPointer(0,        // attribute: Must match the layout in the shader.
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(vertexLocation,
                           3,        // size
                           GL_FLOAT, // type
                           GL_FALSE, // normalized?
-                          0,        // stride
+                          3 * sizeof(float), // stride
                           nullptr   // array buffer offset
     );
     glDrawArrays(GL_TRIANGLES, 0, 6); // Starting from vertex 0; 6 vertices -> 2 triangles

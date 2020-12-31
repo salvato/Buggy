@@ -2,8 +2,11 @@
 
 #include <mainwindow.h>
 #include <plot2d.h>
-#include <GLwidget.h>
-#include "controlsdialog.h"
+#include <roomwidget.h>
+#include <car.h>
+#include <dashboardwidget.h>
+#include <controlsdialog.h>
+
 
 #include <QSettings>
 #include <QLayout>
@@ -21,6 +24,7 @@ QVector3D testPos = QVector3D(0.0, 0.0, 0.0);
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
     , pRoomWidget(nullptr)
+    , pDashboardWidget(nullptr)
     , pLeftPlot(nullptr)
     , pRightPlot(nullptr)
     , pPIDControlsDialog(nullptr)
@@ -34,9 +38,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
     baudRate = QSerialPort::Baud9600;
 
-    eyePos    = QVector3D(0.0, 30.0,  0.0);
+    eyePos    = QVector3D(0.0, 30.0, 50.0);
     centerPos = QVector3D(0.0,  0.0,  0.0);
-    upVector  = QVector3D(0.0,  0.0,  1.0);
+    upVector  = QVector3D(0.0,  1.0,  0.0);
 
     setWindowIcon(QIcon(":/plot.png"));
     initLayout();
@@ -70,9 +74,7 @@ MainWindow::onTestTimerElapsed() {
 
     rightPath += 100;
     leftPath  += 80;
-    car.Move(rightPath, leftPath);
-    pRoomWidget->setCarRotation(car.GetRotation());
-    pRoomWidget->setCarPosition(car.GetPosition());
+    pRoomWidget->pCar->Move(rightPath, leftPath);
     pRoomWidget->update();
 }
 
@@ -222,7 +224,10 @@ MainWindow::initPlots() {
 
 void
 MainWindow::initLayout() {
-    pRoomWidget = new GLWidget(this);
+    pRoomWidget = new RoomWidget(this);
+    pDashboardWidget = new DashboardWidget(this);
+    pEditObstacleDistance = new QLineEdit();
+    pStatusBar = new QStatusBar();
 
     initPlots();
     QVBoxLayout* pPlotLayout = new QVBoxLayout();
@@ -240,14 +245,12 @@ MainWindow::initLayout() {
     firstButtonRow->addWidget(pButtonPIDControls);
     firstButtonRow->addWidget(pButtonResetCamera);
     firstButtonRow->addWidget(pButtonResetCar);
-    pEditObstacleDistance = new QLineEdit();
     firstButtonRow->addWidget(pEditObstacleDistance);
-
-    pStatusBar = new QStatusBar();
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(firstRow);
     mainLayout->addLayout(firstButtonRow);
+    mainLayout->addWidget(pDashboardWidget);
     mainLayout->addWidget(pStatusBar);
     setLayout(mainLayout);
 }
@@ -347,7 +350,7 @@ MainWindow::processData(QString sData) {
             tokens.removeFirst();
             rightPath = tokens.first().toDouble();
             tokens.removeFirst();
-            car.Move(rightPath, leftPath);
+            pRoomWidget->pCar->Move(rightPath, leftPath);
             bUpdateMotors = true;
         }
         else if(sHeader == "D") {
@@ -385,13 +388,13 @@ MainWindow::processData(QString sData) {
     if(bUpdateMotors) {
         pLeftPlot->UpdatePlot();
         pRightPlot->UpdatePlot();
-        pRoomWidget->setCarRotation(car.GetRotation()*quat1);
-        pRoomWidget->setCarPosition(car.GetPosition());
+//        pRoomWidget->setCarRotation(pCar->GetRotation()*quat1);
+//        pRoomWidget->setCarPosition(pCar->GetPosition());
         pRoomWidget->update();
     }
     else if(bUpdateWidget) {
-        pRoomWidget->setCarRotation(car.GetRotation()*quat1);
-        pRoomWidget->setCarPosition(car.GetPosition());
+//        pRoomWidget->setCarRotation(pCar->GetRotation()*quat1);
+//        pRoomWidget->setCarPosition(pCar->GetPosition());
         pRoomWidget->update();
     }
     if(bUpdateObstacleDistance) {
@@ -474,7 +477,7 @@ MainWindow::onStartStopPushed() {
     if(pButtonStartStop->text() == QString("Start")) {
         quat0 = QQuaternion(q0, q1, q2, q3).conjugated();
         t0 = dTime;
-        car.Reset(rightPath, leftPath);
+        pRoomWidget->pCar->Reset(rightPath, leftPath);
         pLeftPlot->ClearDataSet(1);
         pLeftPlot->ClearDataSet(2);
         pLeftPlot->ClearDataSet(3);
@@ -515,7 +518,7 @@ MainWindow::onResetCameraPushed() {
 
 void
 MainWindow::onResetCarPushed() {
-    car.Reset();
+    pRoomWidget->pCar->Reset();
 }
 
 

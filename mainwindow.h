@@ -1,6 +1,5 @@
 #pragma once
 
-#include <car.h>
 #include <QWidget>
 #include <QQuaternion>
 #include <QByteArray>
@@ -9,13 +8,13 @@
 #include <QTimer>
 
 
-QT_FORWARD_DECLARE_CLASS(GLWidget)
+QT_FORWARD_DECLARE_CLASS(RoomWidget)
+QT_FORWARD_DECLARE_CLASS(DashboardWidget)
 QT_FORWARD_DECLARE_CLASS(Plot2D)
 QT_FORWARD_DECLARE_CLASS(ControlsDialog)
 QT_FORWARD_DECLARE_CLASS(QPushButton)
 QT_FORWARD_DECLARE_CLASS(QSlider)
 QT_FORWARD_DECLARE_CLASS(QLineEdit)
-
 
 class MainWindow : public QWidget
 {
@@ -71,7 +70,8 @@ private slots:
     void onTestTimerElapsed();
 
 private:
-    GLWidget*        pRoomWidget;
+    RoomWidget*      pRoomWidget;
+    DashboardWidget* pDashboardWidget;
     Plot2D*          pLeftPlot;
     Plot2D*          pRightPlot;
     QPushButton*     pButtonConnect;
@@ -82,7 +82,6 @@ private:
     QLineEdit*       pEditObstacleDistance;
     ControlsDialog*  pPIDControlsDialog;
     QStatusBar*      pStatusBar;
-    Car              car;
 
     QVector3D        eyePos;
     QVector3D        centerPos;

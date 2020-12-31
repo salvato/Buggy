@@ -3,7 +3,7 @@
 ** Copyright (C) 2016 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
-** This file is part of the demonstration applications of the Qt Toolkit.
+** This file is part of the QtCore module of the Qt Toolkit.
 **
 ** $QT_BEGIN_LICENSE:BSD$
 ** Commercial License Usage
@@ -50,35 +50,59 @@
 
 #pragma once
 
-#include <QQuaternion>
-#include <QTime>
-#include <QVector3D>
+#include "geometryengine.h"
+#include "GrCamera.h"
 
-class TrackBall
+#include <QOpenGLWidget>
+#include <QOpenGLFunctions>
+#include <QMatrix4x4>
+#include <QQuaternion>
+#include <QVector2D>
+#include <QBasicTimer>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLTexture>
+
+
+QT_FORWARD_DECLARE_CLASS(GeometryEngine)
+
+
+class
+DashboardWidget
+    : public QOpenGLWidget
+    , protected QOpenGLFunctions
 {
+    Q_OBJECT
+
 public:
-    enum TrackMode {
-        Plane,
-        Sphere,
-    };
-    TrackBall(TrackMode mode = Sphere);
-    TrackBall(float angularVelocity, const QVector3D &axis, TrackMode mode = Sphere);
-    // coordinates in [-1,1]x[-1,1]
-    void push(const QPointF &p, const QQuaternion &transformation);
-    void move(const QPointF &p, const QQuaternion &transformation);
-    void release(const QPointF &p, const QQuaternion &transformation);
-    void start(); // starts clock
-    void stop(); // stops clock
-    QQuaternion rotation() const;
+    explicit DashboardWidget(QWidget *parent = nullptr);
+    ~DashboardWidget() override;
+
+public:
+
+protected:
+    void initializeGL() override;
+    void resizeGL(int w, int h) override;
+    void paintGL() override;
+    QSize minimumSizeHint() const override;
+    QSize sizeHint() const override;
+
+    void initShaders();
+    void initTextures();
 
 private:
-    QQuaternion m_rotation;
-    QVector3D m_axis = QVector3D(0, 1, 0);
-    float m_angularVelocity = 0;
+    void initFloorGeometry();
+    void drawFloor(QOpenGLShaderProgram *program);
 
-    QPointF m_lastPos;
-    QTime m_lastTime = QTime::currentTime();
-    TrackMode m_mode;
-    bool m_paused = false;
-    bool m_pressed = false;
+private:
+//    GLuint               roomTexture;
+    QOpenGLTexture*      floorTexture;
+    QOpenGLShaderProgram floorProgram;
+    GLuint               floorVertexBuf;
+
+    QMatrix4x4           orthoMatrix;
+    QMatrix4x4           modelMatrix;
+
+    qreal                aspect;
+    const qreal          zNear;
+    const qreal          zFar;
 };
