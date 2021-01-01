@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QVector3D>
 #include <QQuaternion>
-#include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 
@@ -60,8 +59,6 @@ private:
     GLuint buggyUvBuf;
     GLuint buggyNormalBuf;
     GLuint cubeTexture;
-
-
 
     struct
     VertexData {

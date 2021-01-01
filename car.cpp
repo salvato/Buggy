@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QtMath>
 #include <QMatrix4x4>
+#include <QImage>
 
 
 // 12 CPR Quadrature Encoder
