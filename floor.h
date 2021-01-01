@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QOpenGLFunctions>
+#include <QOpenGLShaderProgram>
 #include <QMatrix4x4>
 
 class Floor : public QOpenGLFunctions
@@ -16,4 +17,8 @@ protected:
     void initGeometry();
     void initTextures();
     void initShaders();
+
+private:
+    QOpenGLShaderProgram floorProgram;
+    GLuint               floorTexture;
 };
