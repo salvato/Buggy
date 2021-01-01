@@ -54,8 +54,6 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 
-#include <model.h>
-
 
 class GeometryEngine : protected QOpenGLFunctions
 {
@@ -64,32 +62,12 @@ public:
     virtual ~GeometryEngine();
 
 public:
-    void drawBuggy(QOpenGLShaderProgram *program);
-    void drawCube(QOpenGLShaderProgram *program);
     void drawRoom(QOpenGLShaderProgram *program);
-    void drawFloor(QOpenGLShaderProgram *program);
 
 private:
-    bool loadObj(QString path,
-                 QVector<QVector3D> &out_vertices,
-                 QVector<QVector2D> &out_uvs,
-                 QVector<QVector3D> &out_normals);
-    void initBuggyGeometry();
     void initCubeGeometry();
-    void initFloorGeometry();
 
 private:
-    Model*        pCar;
-    QString       sObjPath;
-
     GLuint cubeVertexBuf;
     GLuint cubeIndexBuf;
-    GLuint floorVertexBuf;
-    GLuint buggyVertexBuf;
-    GLuint buggyUvBuf;
-    GLuint buggyNormalBuf;
-
-    QVector<QVector3D> vertices;
-    QVector<QVector2D> uvs;
-    QVector<QVector3D> normals; // Not used at the present.
 };

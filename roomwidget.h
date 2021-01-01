@@ -67,6 +67,7 @@
 
 
 QT_FORWARD_DECLARE_CLASS(Car)
+QT_FORWARD_DECLARE_CLASS(Floor)
 
 
 class
@@ -79,14 +80,11 @@ RoomWidget
 public:
     explicit RoomWidget(QWidget *parent = nullptr);
     ~RoomWidget() override;
-    void setCarRotation(float q0, float q1, float q2, float q3);
-    void setCarRotation(QQuaternion newRotation);
-    void setCarPosition(double x, double y, double z);
-    void setCarPosition(QVector3D position);
 
 public:
     CGrCamera camera;
     Car*      pCar;
+    Floor*    pFloor;
 
 protected:
     void initializeGL() override;
@@ -104,17 +102,11 @@ protected:
     void initTextures();
 
 private:
-    QPointF pixelPosToViewPos(const QPointF& p);
-
-private:
     GeometryEngine*      geometries;
 
     GLuint               roomTexture;
-    QOpenGLTexture*      floorTexture;
 
     QOpenGLShaderProgram roomProgram;
-    QOpenGLShaderProgram floorProgram;
-    QOpenGLShaderProgram modelProgram;
 
     QMatrix4x4           projectionMatrix;
     QMatrix4x4           orthoMatrix;
@@ -124,8 +116,4 @@ private:
     qreal                aspect;
     const qreal          zNear;
     const qreal          zFar;
-
-//    QQuaternion          carRotation;
-//    QVector3D            carPosition;
-//    int                  distExp;
 };

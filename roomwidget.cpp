@@ -50,6 +50,7 @@
 
 #include <roomwidget.h>
 #include <car.h>
+#include <floor.h>
 #include <QMouseEvent>
 #include <math.h>
 
@@ -72,7 +73,6 @@ RoomWidget::RoomWidget(QWidget *parent)
     camera.FieldOfView(60.0);
     camera.MouseMode(CGrCamera::PITCHYAW);
     camera.Gravity(false);
-
 }
 
 
@@ -96,35 +96,6 @@ RoomWidget::sizeHint() const {
 
 
 void
-RoomWidget::setCarPosition(double x, double y, double z) {
-    Q_UNUSED(x)
-    Q_UNUSED(y)
-    Q_UNUSED(z)
-}
-
-
-void
-RoomWidget::setCarPosition(QVector3D position) {
-    Q_UNUSED(position)
-}
-
-
-void
-RoomWidget::setCarRotation(float q0, float q1, float q2, float q3) {
-    Q_UNUSED(q0)
-    Q_UNUSED(q1)
-    Q_UNUSED(q2)
-    Q_UNUSED(q3)
-}
-
-
-void
-RoomWidget::setCarRotation(QQuaternion newRotation) {
-    Q_UNUSED(newRotation)
-}
-
-
-void
 RoomWidget::initializeGL() {
     initializeOpenGLFunctions();
     glClearColor(0.1, 0.1, 0.3, 1);
@@ -132,6 +103,7 @@ RoomWidget::initializeGL() {
     initTextures();
     glEnable(GL_DEPTH_TEST); // Enable depth buffer
     pCar = new Car();
+    pFloor = new Floor();
     geometries = new GeometryEngine;
 }
 
@@ -140,18 +112,9 @@ void
 RoomWidget::initShaders() {
     bool bResult = true;
 
-    bResult &= floorProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/floor.vert");
-    bResult &= floorProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/floor.frag");
-    bResult &= floorProgram.link();
-
     bResult &= roomProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/room.vert");
     bResult &= roomProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/room.frag");
     bResult &= roomProgram.link();
-/*
-    bResult &= modelProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/model.vert");
-    bResult &= modelProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/model.frag");
-    bResult &= modelProgram.link();
-*/
     if(!bResult) {
         perror("Unble to initShaders()...exiting");
         exit(EXIT_FAILURE);
@@ -161,12 +124,6 @@ RoomWidget::initShaders() {
 
 void
 RoomWidget::initTextures() {
-    const QImage floorImage = QImage(":/Pavimento.jpg").mirrored();
-    floorTexture = new QOpenGLTexture(floorImage);
-    floorTexture->setMinificationFilter(QOpenGLTexture::Nearest);
-    floorTexture->setMagnificationFilter(QOpenGLTexture::Linear);
-    floorTexture->setWrapMode(QOpenGLTexture::Repeat);
-
     // Cubemap Textures MUST have the same size !!!
     const QImage posx = QImage(":/Pietra.jpg").convertToFormat(QImage::Format_RGBA8888);
     const QImage negx = QImage(":/Pietra.jpg").convertToFormat(QImage::Format_RGBA8888);
@@ -206,21 +163,10 @@ RoomWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Camera matrix
     viewMatrix.setToIdentity();
-    viewMatrix.lookAt(camera.Eye(),
-                      //camera.Center(),
-                      pCar->GetPosition(),
-                      camera.Up());
-    // Floor
-    modelMatrix.setToIdentity();
-    modelMatrix.translate(1.0, 0.0, 0.0);
-    modelMatrix.scale(10.0, 1.0, 10.0);
-    // Bind shader pipeline for use
-    floorProgram.bind();
-    floorProgram.setUniformValue("mvp_matrix", projectionMatrix*viewMatrix*modelMatrix);
-    glDisable(GL_CULL_FACE); // Disable back face culling
-    floorTexture->bind();
-    geometries->drawFloor(&floorProgram);
-    // Buggy
+    //viewMatrix.lookAt(camera.Eye(), camera.Center(), camera.Up());
+    viewMatrix.lookAt(camera.Eye(), pCar->GetPosition(), camera.Up());
+
+    pFloor->draw(projectionMatrix, viewMatrix);
     pCar->draw(projectionMatrix, viewMatrix);
 
 /*
@@ -236,13 +182,6 @@ RoomWidget::paintGL() {
     glBindTexture(GL_TEXTURE_CUBE_MAP, roomTexture);
 //    geometries->drawRoom(&roomProgram);
 */
-}
-
-
-QPointF
-RoomWidget::pixelPosToViewPos(const QPointF& p) {
-    return QPointF(2.0*float(p.x())/width()-1.0,
-                   1.0-2.0*float(p.y())/height());
 }
 
 

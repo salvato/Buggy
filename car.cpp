@@ -293,7 +293,7 @@ void
 Car::draw(const QMatrix4x4 projectionMatrix, const QMatrix4x4 viewMatrix) {
     QMatrix4x4 modelMatrix;
     modelMatrix.setToIdentity();
-    modelMatrix.translate(Position+QVector3D(0.0, 1.0, 0.0));
+    modelMatrix.translate(Position+QVector3D(0.0, 1.01, 0.0));
     modelMatrix.rotate(QQuaternion::fromAxisAndAngle(QVector3D(0.0, 1.0, 0.0), qRadiansToDegrees(carAngle)));
     cubeProgram.bind();
     cubeProgram.setUniformValue("projection_matrix", projectionMatrix);

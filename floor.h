@@ -21,4 +21,5 @@ protected:
 private:
     QOpenGLShaderProgram floorProgram;
     GLuint               floorTexture;
+    GLuint               floorVertexBuf;
 };
