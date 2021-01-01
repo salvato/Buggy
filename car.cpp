@@ -126,7 +126,9 @@ Car::initGeometry() {
 
 void
 Car::initTextures() {
-    const QImage cubeImage = QImage(":/cube.png").mirrored();
+    const QImage cubeImage = QImage(":/cube.png")
+                             .convertToFormat(QImage::Format_RGBA8888)
+                             .mirrored();
     glGenTextures(1, &cubeTexture);
     glBindTexture(GL_TEXTURE_2D, cubeTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

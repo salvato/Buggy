@@ -90,14 +90,13 @@ protected:
     void initTextures();
 
 private:
-    void initFloorGeometry();
-    void drawFloor(QOpenGLShaderProgram *program);
+    void initCompassGeometry();
+    void drawCompass();
 
 private:
-//    GLuint               roomTexture;
-    QOpenGLTexture*      floorTexture;
-    QOpenGLShaderProgram floorProgram;
-    GLuint               floorVertexBuf;
+    GLuint               compassTexture;
+    QOpenGLShaderProgram compassProgram;
+    GLuint               compassVertexBuf;
 
     QMatrix4x4           orthoMatrix;
     QMatrix4x4           modelMatrix;

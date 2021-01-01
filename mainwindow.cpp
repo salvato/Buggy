@@ -469,7 +469,7 @@ MainWindow::onSteadyTimeElapsed() {
 void
 MainWindow::onStartStopPushed() {
     if(pButtonStartStop->text() == QString("Start")) {
-        quat0 = QQuaternion(q0, q1, q2, q3);//.conjugated();
+        quat0 = QQuaternion(q0, q1, q2, q3).conjugated();
         t0 = dTime;
         float alfa;
         QVector3D axis;
