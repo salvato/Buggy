@@ -3,5 +3,6 @@
         <file>cube.png</file>
         <file>Pietra.jpg</file>
         <file>Pavimento.jpg</file>
+        <file>Compass.png</file>
     </qresource>
 </RCC>

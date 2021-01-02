@@ -19,14 +19,14 @@ Floor::~Floor() {
 
 void
 Floor::initGeometry() {
-    float vertices[] = {
-        -8.0f,  0.0f, -8.0f,
-         8.0f,  0.0f, -8.0f,
-         8.0f,  0.0f,  8.0f,
+    QVector3D vertices[] = {
+        QVector3D(-8.0f,  0.0f, -8.0f),
+        QVector3D( 8.0f,  0.0f, -8.0f),
+        QVector3D( 8.0f,  0.0f,  8.0f),
 
-         8.0f,  0.0f,  8.0f,
-        -8.0f,  0.0f,  8.0f,
-        -8.0f,  0.0f, -8.0f
+        QVector3D( 8.0f,  0.0f,  8.0f),
+        QVector3D(-8.0f,  0.0f,  8.0f),
+        QVector3D(-8.0f,  0.0f, -8.0f)
     };
     glGenBuffers(1, &floorVertexBuf);
     glBindBuffer(GL_ARRAY_BUFFER, floorVertexBuf);

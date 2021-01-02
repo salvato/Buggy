@@ -37,6 +37,7 @@ CONFIG += c++11
 
 SOURCES += main.cpp \
     car.cpp \
+    compass.cpp \
     dashboardwidget.cpp \
     floor.cpp
 SOURCES += GrCamera.cpp
@@ -60,6 +61,7 @@ SOURCES += mainwindow.cpp
 
 HEADERS += mainwindow.h \
     car.h \
+    compass.h \
     dashboardwidget.h \
     floor.h
 HEADERS += GrCamera.h
