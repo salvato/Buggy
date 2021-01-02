@@ -11,7 +11,7 @@
 class Car : protected QOpenGLFunctions {
 
 public:
-    Car();
+    Car(QWidget *parent=nullptr);
     ~Car();
 
 public:
@@ -34,6 +34,7 @@ protected:
     void        initShaders();
 
 private:
+    QWidget*    pParent;
     Model*      pModel;
     QString     sObjPath;
     QVector3D   Position;

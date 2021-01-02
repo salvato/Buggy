@@ -7,7 +7,7 @@
 class Compass : public QOpenGLFunctions
 {
 public:
-    Compass();
+    Compass(QWidget* parent);
     ~Compass();
 
 public:
@@ -19,6 +19,7 @@ protected:
     void initShaders();
 
 private:
+    QWidget*             pParent;
     QOpenGLShaderProgram compassProgram;
     GLuint               compassTexture;
     GLuint               compassVertexBuf;

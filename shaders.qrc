@@ -10,5 +10,7 @@
         <file>buggy.vert</file>
         <file>model.frag</file>
         <file>model.vert</file>
+        <file>compass.frag</file>
+        <file>compass.vert</file>
     </qresource>
 </RCC>

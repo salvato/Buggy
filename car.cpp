@@ -11,7 +11,8 @@
 // Quadrature encoder mode 3 (x4 mode)
 
 
-Car::Car()
+Car::Car(QWidget* parent)
+    : pParent(parent)
 {
     sObjPath = QString("../Buggy/Car/Car3.obj");
     // Initializes OpenGL function resolution for the current context

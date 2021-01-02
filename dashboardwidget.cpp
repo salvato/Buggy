@@ -48,9 +48,9 @@
 **
 ****************************************************************************/
 
-#include "dashboardwidget.h"
-#include <QMouseEvent>
-#include <math.h>
+
+#include <dashboardwidget.h>
+#include <compass.h>
 
 
 DashboardWidget::DashboardWidget(QWidget *parent)
@@ -59,6 +59,12 @@ DashboardWidget::DashboardWidget(QWidget *parent)
     , zNear(0.1)
     , zFar(1300.0)
 { 
+    QVector3D Eye, Center, Up;
+    Eye    = QVector3D(0.0, 0.0, 1.0);
+    Center = QVector3D(0.0, 0.0, 0.0);
+    Up     = QVector3D(0.0, 1.0, 0.0);
+    viewMatrix.setToIdentity();
+    viewMatrix.lookAt(Eye, Center, Up);
 }
 
 
@@ -70,79 +76,21 @@ DashboardWidget::~DashboardWidget() {
 
 QSize
 DashboardWidget::minimumSizeHint() const {
-    return QSize(60, 60);
+    return QSize(128, 128);
 }
 
 
 QSize
 DashboardWidget::sizeHint() const {
-    return QSize(800, 800);
+    return QSize(128, 128);
 }
 
 
 void
 DashboardWidget::initializeGL() {
     initializeOpenGLFunctions();
-    glClearColor(0.1, 0.1, 0.3, 1);
-    initShaders();
-    initTextures();
-    glDisable(GL_DEPTH_TEST); // Enable depth buffer
-}
-
-
-void
-DashboardWidget::initShaders() {
-    bool bResult = true;
-    bResult &= compassProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/floor.vert");
-    bResult &= compassProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/floor.frag");
-    bResult &= compassProgram.link();
-    if(!bResult) {
-        perror("Unble to initShaders()...exiting");
-        exit(EXIT_FAILURE);
-    }
-}
-
-
-void
-DashboardWidget::initTextures() {
-    const QImage compassImage = QImage(":/Pavimento.jpg")
-            .convertToFormat(QImage::Format_RGBA8888)
-            .mirrored();
-    glGenTextures(1, &compassTexture);
-    glBindTexture(GL_TEXTURE_2D, compassTexture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D,
-                 0,
-                 GL_RGBA,
-                 compassImage.width(),
-                 compassImage.height(),
-                 0,
-                 GL_RGBA,
-                 GL_UNSIGNED_BYTE,
-                 (void*)compassImage.bits()
-                );
-    glGenerateMipmap(GL_TEXTURE_2D);
-}
-
-
-void
-DashboardWidget::initCompassGeometry() {
-    QVector3D vertices[] =
-    {
-        QVector3D(-0.5f, -0.5f, 0.0f),
-        QVector3D( 0.5f,  0.5f, 0.0f),
-        QVector3D( 0.5f, -0.5f, 0.0f),
-
-        QVector3D( 0.5f,  0.5f, 0.0f),
-        QVector3D(-0.5f, -0.5f, 0.0f),
-        QVector3D(-0.5f,  0.5f, 0.0f)
-    };
-    glGenBuffers(1, &compassVertexBuf);
-    glBindBuffer(GL_ARRAY_BUFFER, compassVertexBuf);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glClearColor(0.05, 0.1, 0.2, 1.0);
+    pCompass = new Compass(this);
 }
 
 
@@ -157,34 +105,5 @@ DashboardWidget::resizeGL(int w, int h) {
 void
 DashboardWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    // Floor
-    modelMatrix.setToIdentity();
-    modelMatrix.translate(width()/2, height()/2, height()/2);
-    modelMatrix.scale(100.0, 100.0, 100.0);
-    // Bind shader pipeline for use
-    compassProgram.bind();
-    compassProgram.setUniformValue("mvp_matrix", orthoMatrix*modelMatrix);
-    glDisable(GL_CULL_FACE); // Disable back face culling
-    glBindTexture(GL_TEXTURE_2D, compassTexture);
-    drawCompass();
-}
-
-
-void
-DashboardWidget::drawCompass() {
-    // Tell OpenGL programmable pipeline how to locate vertex position data
-    int vertexLocation = compassProgram.attributeLocation("a_position");
-    compassProgram.enableAttributeArray(vertexLocation);
-    compassProgram.setAttributeBuffer("a_position", GL_FLOAT, 0, 3, sizeof(float));
-    compassProgram.bind();
-    glBindBuffer(GL_ARRAY_BUFFER, compassVertexBuf);
-    glVertexAttribPointer(0,        // attribute: Must match the layout in the shader.
-                          3,        // size
-                          GL_FLOAT, // type
-                          GL_FALSE, // normalized?
-                          3*sizeof(float),        // stride
-                          nullptr   // array buffer offset
-    );
-    glDrawArrays(GL_TRIANGLES, 0, 6); // Starting from vertex 0; 6 vertices -> 2 triangles
-    glDisableVertexAttribArray(0);
+    pCompass->draw(orthoMatrix, viewMatrix);
 }

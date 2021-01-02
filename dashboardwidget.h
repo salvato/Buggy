@@ -50,8 +50,6 @@
 
 #pragma once
 
-#include "geometryengine.h"
-#include "GrCamera.h"
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
@@ -63,7 +61,7 @@
 #include <QOpenGLTexture>
 
 
-QT_FORWARD_DECLARE_CLASS(GeometryEngine)
+QT_FORWARD_DECLARE_CLASS(Compass)
 
 
 class
@@ -86,22 +84,13 @@ protected:
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
 
-    void initShaders();
-    void initTextures();
+private:
 
 private:
-    void initCompassGeometry();
-    void drawCompass();
-
-private:
-    GLuint               compassTexture;
-    QOpenGLShaderProgram compassProgram;
-    GLuint               compassVertexBuf;
-
     QMatrix4x4           orthoMatrix;
-    QMatrix4x4           modelMatrix;
-
+    QMatrix4x4           viewMatrix;
     qreal                aspect;
     const qreal          zNear;
     const qreal          zFar;
+    Compass*             pCompass;
 };

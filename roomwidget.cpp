@@ -104,6 +104,7 @@ RoomWidget::initializeGL() {
     glEnable(GL_DEPTH_TEST); // Enable depth buffer
     pCar = new Car();
     pFloor = new Floor();
+
     geometries = new GeometryEngine;
 }
 

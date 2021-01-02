@@ -2,7 +2,9 @@
 #include <QImage>
 
 
-Floor::Floor() {
+Floor::Floor(QWidget* parent)
+    : pParent(parent)
+{
     floorTexture = -1;
     floorVertexBuf = -1;
     initializeOpenGLFunctions();
@@ -37,8 +39,7 @@ Floor::initGeometry() {
 void
 Floor::initTextures() {
     const QImage floorImage = QImage(":/Pavimento.jpg")
-                             .convertToFormat(QImage::Format_RGBA8888)
-                             .mirrored();
+                             .convertToFormat(QImage::Format_RGBA8888);
     glGenTextures(1, &floorTexture);
     glBindTexture(GL_TEXTURE_2D, floorTexture);
     glTexImage2D(GL_TEXTURE_2D,
