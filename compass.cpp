@@ -1,11 +1,13 @@
 #include "compass.h"
 #include <QWidget>
 #include <QImage>
+#include <QtMath>
 
 
 Compass::Compass(QWidget* parent)
     : pParent(parent)
 {
+    angle = QQuaternion();
     compassTexture   = -1;
     compassVertexBuf = -1;
     initializeOpenGLFunctions();
@@ -23,13 +25,13 @@ Compass::~Compass() {
 void
 Compass::initGeometry() {
     QVector3D vertices[] = {
-        QVector3D(-1.0f, -1.0f,  0.0f),
-        QVector3D( 1.0f, -1.0f,  0.0f),
-        QVector3D( 1.0f,  1.0f,  0.0f),
+        QVector3D(-0.5f, -0.5f,  0.0f),
+        QVector3D( 0.5f, -0.5f,  0.0f),
+        QVector3D( 0.5f,  0.5f,  0.0f),
 
-        QVector3D( 1.0f,  1.0f,  0.0f),
-        QVector3D(-1.0f,  1.0f,  0.0f),
-        QVector3D(-1.0f, -1.0f,  0.0f)
+        QVector3D( 0.5f,  0.5f,  0.0f),
+        QVector3D(-0.5f,  0.5f,  0.0f),
+        QVector3D(-0.5f, -0.5f,  0.0f),
     };
     glGenBuffers(1, &compassVertexBuf);
     glBindBuffer(GL_ARRAY_BUFFER, compassVertexBuf);
@@ -68,6 +70,7 @@ Compass::initShaders() {
     bResult &= compassProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,   ":/compass.vert");
     bResult &= compassProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/compass.frag");
     bResult &= compassProgram.link();
+
     if(!bResult) {
         perror("Unable to init Compass Shaders()...exiting");
         exit(EXIT_FAILURE);
@@ -79,10 +82,11 @@ void
 Compass::draw(const QMatrix4x4 projectionMatrix, const QMatrix4x4 viewMatrix) {
     QMatrix4x4 modelMatrix;
     modelMatrix.setToIdentity();
-    modelMatrix.translate(0.125*pParent->height(), 0.125*pParent->height(), 0.0);
-    modelMatrix.scale(0.75*pParent->height(), 0.75*pParent->height(), 1.0);
+    modelMatrix.translate(0.5*pParent->height(), 0.5*pParent->height(), 0.0);
+    modelMatrix.scale(0.9*pParent->height(), 0.9*pParent->height(), 1.0);
+    QVector3D euler = angle.toEulerAngles();
+    modelMatrix.rotate(euler.z(), QVector3D(0.0, 0.0, -1.0));
 
-    // Bind shader pipeline for use
     glBindTexture(GL_TEXTURE_2D, compassTexture);
     glBindBuffer(GL_ARRAY_BUFFER, compassVertexBuf);
     compassProgram.bind();
@@ -96,6 +100,4 @@ Compass::draw(const QMatrix4x4 projectionMatrix, const QMatrix4x4 viewMatrix) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDrawArrays(GL_TRIANGLES, 0, 6); // Starting from vertex 0; 6 vertices -> 2 triangles
-
-    compassProgram.disableAttributeArray(vertexLocation);
 }

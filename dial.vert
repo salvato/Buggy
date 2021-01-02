@@ -1,10 +1,11 @@
 uniform mat4   mvp_matrix;
+uniform vec4   color;
 attribute vec4 vertexPosition;
 
-varying vec2   v_texcoord;
+varying vec4   v_color;
 
 void
 main() {
     gl_Position = mvp_matrix * vertexPosition;
-    v_texcoord = vertexPosition.xy+vec2(0.5,0.5);
+    v_color = color;
 }

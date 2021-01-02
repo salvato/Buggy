@@ -4,6 +4,7 @@
 #include <plot2d.h>
 #include <roomwidget.h>
 #include <car.h>
+#include <compass.h>
 #include <dashboardwidget.h>
 #include <controlsdialog.h>
 
@@ -333,9 +334,7 @@ MainWindow::processData(QString sData) {
             tokens.removeFirst();
             q3 = tokens.first().toDouble()/1000.0;
             tokens.removeFirst();
-
-//            quat1 = QQuaternion(q0, q1, q2, q3)*quat0;
-            quat1 = QQuaternion();
+            pDashboardWidget->pCompass->angle = QQuaternion(q0, q1, q2, q3);
             bUpdateWidget = true;
         }
         else if(sHeader == "M" && nTokens > 4) {
@@ -350,6 +349,7 @@ MainWindow::processData(QString sData) {
             tokens.removeFirst();
             pRoomWidget->pCar->Move(rightPath, leftPath);
             bUpdateMotors = true;
+            bUpdateWidget = true;
         }
         else if(sHeader == "D") {
             tokens.removeFirst();
@@ -386,10 +386,10 @@ MainWindow::processData(QString sData) {
     if(bUpdateMotors) {
         pLeftPlot->UpdatePlot();
         pRightPlot->UpdatePlot();
-        pRoomWidget->update();
     }
-    else if(bUpdateWidget) {
+    if(bUpdateWidget) {
         pRoomWidget->update();
+        pDashboardWidget->update();
     }
     if(bUpdateObstacleDistance) {
         pEditObstacleDistance->setText(QString("%1").arg(obstacleDistance));
@@ -469,11 +469,8 @@ MainWindow::onSteadyTimeElapsed() {
 void
 MainWindow::onStartStopPushed() {
     if(pButtonStartStop->text() == QString("Start")) {
-        quat0 = QQuaternion(q0, q1, q2, q3).conjugated();
         t0 = dTime;
-        float alfa;
-        QVector3D axis;
-        quat0.getAxisAndAngle(&axis, &alfa);
+        float alfa = QQuaternion(q0, q1, q2, q3).toEulerAngles().z();
         pRoomWidget->pCar->Reset(rightPath, leftPath);
         pRoomWidget->pCar->SetAngle(alfa);
         pLeftPlot->ClearDataSet(1);

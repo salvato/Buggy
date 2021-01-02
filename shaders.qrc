@@ -12,5 +12,7 @@
         <file>model.vert</file>
         <file>compass.frag</file>
         <file>compass.vert</file>
+        <file>dial.frag</file>
+        <file>dial.vert</file>
     </qresource>
 </RCC>

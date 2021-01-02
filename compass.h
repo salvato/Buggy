@@ -3,6 +3,8 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 #include <QMatrix4x4>
+#include <QQuaternion>
+
 
 class Compass : public QOpenGLFunctions
 {
@@ -17,6 +19,9 @@ protected:
     void initGeometry();
     void initTextures();
     void initShaders();
+
+public:
+    QQuaternion angle;
 
 private:
     QWidget*             pParent;

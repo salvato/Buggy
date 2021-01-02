@@ -84,7 +84,8 @@ protected:
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
 
-private:
+public:
+    Compass*             pCompass;
 
 private:
     QMatrix4x4           orthoMatrix;
@@ -92,5 +93,4 @@ private:
     qreal                aspect;
     const qreal          zNear;
     const qreal          zFar;
-    Compass*             pCompass;
 };
